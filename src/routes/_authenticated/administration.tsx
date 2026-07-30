@@ -84,7 +84,7 @@ function AdminPage() {
   const addRule = useMutation({
     mutationFn: async () => {
       const { error } = await supabase.from("deduction_rules").insert({
-        shop_id: shopId,
+        shop_id: shopId!,
         name: draft.name.trim(),
         category: draft.category,
         deduction: draft.blocking ? 0 : Number(draft.deduction || 0),
@@ -102,7 +102,7 @@ function AdminPage() {
   });
 
   const updateRule = useMutation({
-    mutationFn: async ({ id, patch }: { id: string; patch: Record<string, unknown> }) => {
+    mutationFn: async ({ id, patch }: { id: string; patch: { name?: string; deduction?: number; active?: boolean } }) => {
       const { error } = await supabase.from("deduction_rules").update(patch).eq("id", id);
       if (error) throw error;
     },
@@ -124,7 +124,7 @@ function AdminPage() {
   const savePrice = useMutation({
     mutationFn: async ({ modelId, storage, value }: { modelId: string; storage: number; value: number }) => {
       const { error } = await supabase.from("shop_prices").upsert(
-        { shop_id: shopId, model_id: modelId, color: "*", storage_gb: storage, base_price: value },
+        { shop_id: shopId!, model_id: modelId, color: "*", storage_gb: storage, base_price: value },
         { onConflict: "shop_id,model_id,color,storage_gb" },
       );
       if (error) throw error;
