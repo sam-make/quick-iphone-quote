@@ -26,7 +26,7 @@ export const Route = createFileRoute("/")({
       { property: "og:title", content: "ReprisePro — Logiciel d'estimation de reprise iPhone" },
       {
         property: "og:description",
-        content: "Le SaaS de reprise iPhone pensé par un réparateur, pour des réparateurs.",
+        content: "Estimez la reprise d'un iPhone en moins de 2 minutes. Règles de déduction 100 % personnalisables, historique complet, espace sécurisé par boutique.",
       },
     ],
   }),
