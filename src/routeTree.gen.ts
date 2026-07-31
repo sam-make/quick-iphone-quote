@@ -22,6 +22,7 @@ import { Route as AuthenticatedTableauDeBordRouteImport } from './routes/_authen
 import { Route as AuthenticatedClientsIndexRouteImport } from './routes/_authenticated/clients.index'
 import { Route as AuthenticatedClientsIdRouteImport } from './routes/_authenticated/clients.$id'
 import { Route as AuthenticatedReparationsIndexRouteImport } from './routes/_authenticated/reparations.index'
+import { Route as AuthenticatedReparationsNouvelleRouteImport } from './routes/_authenticated/reparations.nouvelle'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -91,6 +92,12 @@ const AuthenticatedReparationsIndexRoute =
     path: '/reparations/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedReparationsNouvelleRoute =
+  AuthenticatedReparationsNouvelleRouteImport.update({
+    id: '/reparations/nouvelle',
+    path: '/reparations/nouvelle',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -103,6 +110,7 @@ export interface FileRoutesByFullPath {
   '/historique': typeof AuthenticatedHistoriqueRoute
   '/tableau-de-bord': typeof AuthenticatedTableauDeBordRoute
   '/clients/$id': typeof AuthenticatedClientsIdRoute
+  '/reparations/nouvelle': typeof AuthenticatedReparationsNouvelleRoute
   '/clients/': typeof AuthenticatedClientsIndexRoute
   '/reparations/': typeof AuthenticatedReparationsIndexRoute
 }
@@ -117,6 +125,7 @@ export interface FileRoutesByTo {
   '/historique': typeof AuthenticatedHistoriqueRoute
   '/tableau-de-bord': typeof AuthenticatedTableauDeBordRoute
   '/clients/$id': typeof AuthenticatedClientsIdRoute
+  '/reparations/nouvelle': typeof AuthenticatedReparationsNouvelleRoute
   '/clients': typeof AuthenticatedClientsIndexRoute
   '/reparations': typeof AuthenticatedReparationsIndexRoute
 }
@@ -133,6 +142,7 @@ export interface FileRoutesById {
   '/_authenticated/historique': typeof AuthenticatedHistoriqueRoute
   '/_authenticated/tableau-de-bord': typeof AuthenticatedTableauDeBordRoute
   '/_authenticated/clients/$id': typeof AuthenticatedClientsIdRoute
+  '/_authenticated/reparations/nouvelle': typeof AuthenticatedReparationsNouvelleRoute
   '/_authenticated/clients/': typeof AuthenticatedClientsIndexRoute
   '/_authenticated/reparations/': typeof AuthenticatedReparationsIndexRoute
 }
@@ -149,6 +159,7 @@ export interface FileRouteTypes {
     | '/historique'
     | '/tableau-de-bord'
     | '/clients/$id'
+    | '/reparations/nouvelle'
     | '/clients/'
     | '/reparations/'
   fileRoutesByTo: FileRoutesByTo
@@ -163,6 +174,7 @@ export interface FileRouteTypes {
     | '/historique'
     | '/tableau-de-bord'
     | '/clients/$id'
+    | '/reparations/nouvelle'
     | '/clients'
     | '/reparations'
   id:
@@ -178,6 +190,7 @@ export interface FileRouteTypes {
     | '/_authenticated/historique'
     | '/_authenticated/tableau-de-bord'
     | '/_authenticated/clients/$id'
+    | '/_authenticated/reparations/nouvelle'
     | '/_authenticated/clients/'
     | '/_authenticated/reparations/'
   fileRoutesById: FileRoutesById
@@ -284,6 +297,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedReparationsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/reparations/nouvelle': {
+      id: '/_authenticated/reparations/nouvelle'
+      path: '/reparations/nouvelle'
+      fullPath: '/reparations/nouvelle'
+      preLoaderRoute: typeof AuthenticatedReparationsNouvelleRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -293,6 +313,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedHistoriqueRoute: typeof AuthenticatedHistoriqueRoute
   AuthenticatedTableauDeBordRoute: typeof AuthenticatedTableauDeBordRoute
   AuthenticatedClientsIdRoute: typeof AuthenticatedClientsIdRoute
+  AuthenticatedReparationsNouvelleRoute: typeof AuthenticatedReparationsNouvelleRoute
   AuthenticatedClientsIndexRoute: typeof AuthenticatedClientsIndexRoute
   AuthenticatedReparationsIndexRoute: typeof AuthenticatedReparationsIndexRoute
 }
@@ -303,6 +324,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedHistoriqueRoute: AuthenticatedHistoriqueRoute,
   AuthenticatedTableauDeBordRoute: AuthenticatedTableauDeBordRoute,
   AuthenticatedClientsIdRoute: AuthenticatedClientsIdRoute,
+  AuthenticatedReparationsNouvelleRoute: AuthenticatedReparationsNouvelleRoute,
   AuthenticatedClientsIndexRoute: AuthenticatedClientsIndexRoute,
   AuthenticatedReparationsIndexRoute: AuthenticatedReparationsIndexRoute,
 }
