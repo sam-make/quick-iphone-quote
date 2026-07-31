@@ -14,6 +14,110 @@ export type Database = {
   }
   public: {
     Tables: {
+      customer_devices: {
+        Row: {
+          brand: string
+          color: string | null
+          created_at: string
+          customer_id: string
+          id: string
+          imei: string | null
+          model: string
+          shop_id: string
+          storage: string | null
+          unlock_code: string | null
+          updated_at: string
+        }
+        Insert: {
+          brand?: string
+          color?: string | null
+          created_at?: string
+          customer_id: string
+          id?: string
+          imei?: string | null
+          model: string
+          shop_id: string
+          storage?: string | null
+          unlock_code?: string | null
+          updated_at?: string
+        }
+        Update: {
+          brand?: string
+          color?: string | null
+          created_at?: string
+          customer_id?: string
+          id?: string
+          imei?: string | null
+          model?: string
+          shop_id?: string
+          storage?: string | null
+          unlock_code?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customer_devices_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "customer_devices_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      customers: {
+        Row: {
+          address: string | null
+          created_at: string
+          email: string | null
+          first_name: string
+          id: string
+          last_name: string
+          notes: string | null
+          phone: string
+          shop_id: string
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          email?: string | null
+          first_name?: string
+          id?: string
+          last_name?: string
+          notes?: string | null
+          phone: string
+          shop_id: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          email?: string | null
+          first_name?: string
+          id?: string
+          last_name?: string
+          notes?: string | null
+          phone?: string
+          shop_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "customers_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       deduction_rules: {
         Row: {
           active: boolean
@@ -214,6 +318,73 @@ export type Database = {
           },
         ]
       }
+      invoices: {
+        Row: {
+          created_at: string
+          customer_id: string
+          customer_snapshot: Json
+          device_snapshot: Json
+          id: string
+          issued_at: string
+          lines: Json
+          number: string
+          repair_id: string
+          shop_id: string
+          shop_snapshot: Json
+          total: number
+        }
+        Insert: {
+          created_at?: string
+          customer_id: string
+          customer_snapshot?: Json
+          device_snapshot?: Json
+          id?: string
+          issued_at?: string
+          lines?: Json
+          number: string
+          repair_id: string
+          shop_id: string
+          shop_snapshot?: Json
+          total?: number
+        }
+        Update: {
+          created_at?: string
+          customer_id?: string
+          customer_snapshot?: Json
+          device_snapshot?: Json
+          id?: string
+          issued_at?: string
+          lines?: Json
+          number?: string
+          repair_id?: string
+          shop_id?: string
+          shop_snapshot?: Json
+          total?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "invoices_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_repair_id_fkey"
+            columns: ["repair_id"]
+            isOneToOne: true
+            referencedRelation: "repairs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "invoices_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -239,6 +410,265 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "profiles_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      repair_items: {
+        Row: {
+          created_at: string
+          duration_minutes: number
+          id: string
+          name: string
+          quantity: number
+          repair_id: string
+          service_id: string | null
+          unit_price: number
+        }
+        Insert: {
+          created_at?: string
+          duration_minutes?: number
+          id?: string
+          name: string
+          quantity?: number
+          repair_id: string
+          service_id?: string | null
+          unit_price?: number
+        }
+        Update: {
+          created_at?: string
+          duration_minutes?: number
+          id?: string
+          name?: string
+          quantity?: number
+          repair_id?: string
+          service_id?: string | null
+          unit_price?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "repair_items_repair_id_fkey"
+            columns: ["repair_id"]
+            isOneToOne: false
+            referencedRelation: "repairs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "repair_items_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "repair_services"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      repair_photos: {
+        Row: {
+          created_at: string
+          id: string
+          phase: Database["public"]["Enums"]["photo_phase"]
+          repair_id: string
+          storage_path: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          phase?: Database["public"]["Enums"]["photo_phase"]
+          repair_id: string
+          storage_path: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          phase?: Database["public"]["Enums"]["photo_phase"]
+          repair_id?: string
+          storage_path?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "repair_photos_repair_id_fkey"
+            columns: ["repair_id"]
+            isOneToOne: false
+            referencedRelation: "repairs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      repair_services: {
+        Row: {
+          active: boolean
+          category: string
+          created_at: string
+          description: string | null
+          duration_minutes: number
+          id: string
+          name: string
+          price: number
+          shop_id: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          category?: string
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number
+          id?: string
+          name: string
+          price?: number
+          shop_id: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          category?: string
+          created_at?: string
+          description?: string | null
+          duration_minutes?: number
+          id?: string
+          name?: string
+          price?: number
+          shop_id?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "repair_services_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      repair_status_history: {
+        Row: {
+          comment: string | null
+          created_at: string
+          employee_name: string
+          id: string
+          repair_id: string
+          status: Database["public"]["Enums"]["repair_status"]
+          user_id: string | null
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          employee_name?: string
+          id?: string
+          repair_id: string
+          status: Database["public"]["Enums"]["repair_status"]
+          user_id?: string | null
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          employee_name?: string
+          id?: string
+          repair_id?: string
+          status?: Database["public"]["Enums"]["repair_status"]
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "repair_status_history_repair_id_fkey"
+            columns: ["repair_id"]
+            isOneToOne: false
+            referencedRelation: "repairs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      repairs: {
+        Row: {
+          brand: string
+          color: string | null
+          condition: string | null
+          created_at: string
+          customer_id: string
+          device_id: string | null
+          employee_name: string
+          id: string
+          imei: string | null
+          issue: string
+          model: string
+          reference: string
+          shop_id: string
+          status: Database["public"]["Enums"]["repair_status"]
+          storage: string | null
+          total_minutes: number
+          total_price: number
+          unlock_code: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          brand?: string
+          color?: string | null
+          condition?: string | null
+          created_at?: string
+          customer_id: string
+          device_id?: string | null
+          employee_name?: string
+          id?: string
+          imei?: string | null
+          issue?: string
+          model: string
+          reference: string
+          shop_id: string
+          status?: Database["public"]["Enums"]["repair_status"]
+          storage?: string | null
+          total_minutes?: number
+          total_price?: number
+          unlock_code?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          brand?: string
+          color?: string | null
+          condition?: string | null
+          created_at?: string
+          customer_id?: string
+          device_id?: string | null
+          employee_name?: string
+          id?: string
+          imei?: string | null
+          issue?: string
+          model?: string
+          reference?: string
+          shop_id?: string
+          status?: Database["public"]["Enums"]["repair_status"]
+          storage?: string | null
+          total_minutes?: number
+          total_price?: number
+          unlock_code?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "repairs_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "repairs_device_id_fkey"
+            columns: ["device_id"]
+            isOneToOne: false
+            referencedRelation: "customer_devices"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "repairs_shop_id_fkey"
             columns: ["shop_id"]
             isOneToOne: false
             referencedRelation: "shops"
@@ -367,10 +797,22 @@ export type Database = {
         Returns: boolean
       }
       seed_default_rules: { Args: { _shop_id: string }; Returns: undefined }
+      seed_default_services: { Args: { _shop_id: string }; Returns: undefined }
       storage_step: { Args: { _gb: number }; Returns: number }
     }
     Enums: {
       app_role: "admin" | "employee"
+      photo_phase: "avant" | "pendant" | "apres"
+      repair_status:
+        | "recu"
+        | "diagnostic"
+        | "attente_validation"
+        | "attente_piece"
+        | "en_reparation"
+        | "tests"
+        | "termine"
+        | "restitue"
+        | "annule"
       rule_category: "esthetique" | "technique" | "blocage" | "autre"
     }
     CompositeTypes: {
@@ -500,6 +942,18 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "employee"],
+      photo_phase: ["avant", "pendant", "apres"],
+      repair_status: [
+        "recu",
+        "diagnostic",
+        "attente_validation",
+        "attente_piece",
+        "en_reparation",
+        "tests",
+        "termine",
+        "restitue",
+        "annule",
+      ],
       rule_category: ["esthetique", "technique", "blocage", "autre"],
     },
   },
