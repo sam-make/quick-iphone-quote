@@ -2,12 +2,14 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowRight,
   Building2,
+  Check,
   Gauge,
   History,
   Lock,
   ShieldCheck,
   Smartphone,
   SlidersHorizontal,
+  Star,
 } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 import { Button } from "@/components/ui/button";
