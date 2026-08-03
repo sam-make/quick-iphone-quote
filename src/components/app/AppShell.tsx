@@ -1,7 +1,7 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState, type ReactNode } from "react";
-import { Gauge, History, LogOut, Menu, Settings, Sparkles, X } from "lucide-react";
+import { Gauge, History, LogOut, Menu, Settings, Sparkles, Users, Wrench, X } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,6 +10,8 @@ import { cn } from "@/lib/utils";
 
 const NAV = [
   { to: "/tableau-de-bord", label: "Tableau de bord", icon: Gauge },
+  { to: "/clients", label: "Clients", icon: Users },
+  { to: "/reparations", label: "Réparations", icon: Wrench },
   { to: "/estimation", label: "Nouvelle estimation", icon: Sparkles },
   { to: "/historique", label: "Historique", icon: History },
   { to: "/administration", label: "Administration", icon: Settings, adminOnly: true },
@@ -34,7 +36,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const nav = (
     <nav className="flex flex-col gap-1">
       {items.map((item) => {
-        const active = pathname === item.to;
+        const active = pathname === item.to || pathname.startsWith(`${item.to}/`);
         return (
           <Link
             key={item.to}
