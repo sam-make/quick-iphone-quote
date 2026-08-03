@@ -194,6 +194,93 @@ function Landing() {
           </div>
         </section>
 
+        <section className="border-t border-border/70 bg-surface-2/60 py-20">
+          <div className="mx-auto max-w-6xl px-5">
+            <div className="text-center">
+              <h2 className="text-3xl font-semibold text-ink md:text-4xl">Des formes adaptées à chaque boutique</h2>
+              <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
+                Choisissez le niveau de fonctionnalités qui correspond à votre activité. Plus vous montez en offre, plus vous débloquez d'outils avancés.
+              </p>
+            </div>
+            <div className="mt-12 grid gap-5 lg:grid-cols-3">
+              <article className="surface-card flex flex-col p-6">
+                <h3 className="text-lg font-semibold text-ink">Eco</h3>
+                <p className="mt-1 text-sm text-muted-foreground">Fonctionnalités de base</p>
+                <div className="mt-4 flex items-baseline gap-1">
+                  <span className="text-4xl font-semibold text-ink">3.99</span>
+                  <span className="text-sm text-muted-foreground">€/mois</span>
+                </div>
+                <ul className="mt-6 flex-1 space-y-3">
+                  {["Estimations illimitées", "Historique des 30 jours", "1 utilisateur"].map((item) => (
+                    <li key={item} className="flex items-start gap-2.5 text-sm text-foreground">
+                      <Check className="mt-0.5 size-4 shrink-0 text-primary" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+                <Button variant="outline" className="mt-6 w-full" asChild>
+                  <Link to="/inscription">Choisir Eco</Link>
+                </Button>
+              </article>
+
+              <article className="surface-card relative flex flex-col p-6 ring-1 ring-primary/20">
+                <h3 className="text-lg font-semibold text-ink">Basic</h3>
+                <p className="mt-1 text-sm text-muted-foreground">Fonctionnalités améliorées</p>
+                <div className="mt-4 flex items-baseline gap-1">
+                  <span className="text-4xl font-semibold text-ink">5.99</span>
+                  <span className="text-sm text-muted-foreground">€/mois</span>
+                </div>
+                <ul className="mt-6 flex-1 space-y-3">
+                  {[
+                    "Tout ce qu'inclut Eco",
+                    "Historique illimité",
+                    "Jusqu'à 3 utilisateurs",
+                    "Personnalisation des règles de déduction",
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-2.5 text-sm text-foreground">
+                      <Check className="mt-0.5 size-4 shrink-0 text-primary" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+                <Button className="mt-6 w-full" asChild>
+                  <Link to="/inscription">Choisir Basic</Link>
+                </Button>
+              </article>
+
+              <article className="surface-card relative flex flex-col overflow-hidden p-6 ring-1 ring-primary">
+                <div className="absolute right-0 top-0 rounded-bl-2xl bg-primary px-3 py-1 text-xs font-medium text-primary-foreground">
+                  <Star className="mr-1 inline size-3" />
+                  Le plus complet
+                </div>
+                <h3 className="text-lg font-semibold text-ink">Pro</h3>
+                <p className="mt-1 text-sm text-muted-foreground">Toutes les fonctionnalités avancées</p>
+                <div className="mt-4 flex items-baseline gap-1">
+                  <span className="text-4xl font-semibold text-ink">9.99</span>
+                  <span className="text-sm text-muted-foreground">€/mois</span>
+                </div>
+                <ul className="mt-6 flex-1 space-y-3">
+                  {[
+                    "Tout ce qu'inclut Basic",
+                    "Gestion clients & dossiers de réparation",
+                    "Facturation intégrée",
+                    "Utilisateurs illimités",
+                    "Support prioritaire",
+                  ].map((item) => (
+                    <li key={item} className="flex items-start gap-2.5 text-sm text-foreground">
+                      <Check className="mt-0.5 size-4 shrink-0 text-primary" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+                <Button className="mt-6 w-full" asChild>
+                  <Link to="/inscription">Choisir Pro</Link>
+                </Button>
+              </article>
+            </div>
+          </div>
+        </section>
+
         <section className="px-5 pb-24">
           <div className="mx-auto max-w-5xl rounded-3xl bg-[image:var(--gradient-primary)] px-8 py-14 text-center text-primary-foreground shadow-[var(--shadow-float)]">
             <h2 className="text-3xl font-semibold md:text-4xl">Prêt à fiabiliser vos reprises&nbsp;?</h2>
