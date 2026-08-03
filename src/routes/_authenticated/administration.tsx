@@ -19,6 +19,7 @@ import {
   type DeductionRule,
   type RuleCategory,
 } from "@/lib/pricing";
+import type { RepairService } from "@/lib/repairs";
 
 export const Route = createFileRoute("/_authenticated/administration")({
   head: () => ({
@@ -42,6 +43,13 @@ function AdminPage() {
   };
 
   const [draft, setDraft] = useState({ name: "", deduction: "", category: "technique" as RuleCategory, blocking: false });
+  const [serviceDraft, setServiceDraft] = useState({
+    name: "",
+    price: "",
+    duration: "",
+    category: "autre",
+    description: "",
+  });
 
   const { data: rules = [] } = useQuery({
     queryKey: ["admin-rules", shopId],
@@ -74,6 +82,72 @@ function AdminPage() {
       const { data } = await supabase.from("shop_prices").select("id, model_id, storage_gb, base_price").eq("color", "*");
       return (data ?? []) as { id: string; model_id: string; storage_gb: number; base_price: number }[];
     },
+  });
+
+  const { data: services = [] } = useQuery({
+    queryKey: ["admin-services", shopId],
+    enabled: Boolean(shopId),
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("repair_services")
+        .select("id, name, price, duration_minutes, category, description, active, sort_order")
+        .order("sort_order");
+      if (error) throw error;
+      return data as RepairService[];
+    },
+  });
+
+  const refreshServices = () => {
+    queryClient.invalidateQueries({ queryKey: ["admin-services"] });
+    queryClient.invalidateQueries({ queryKey: ["repair-services"] });
+  };
+
+  const addService = useMutation({
+    mutationFn: async () => {
+      const { error } = await supabase.from("repair_services").insert({
+        shop_id: shopId!,
+        name: serviceDraft.name.trim(),
+        price: Number(serviceDraft.price || 0),
+        duration_minutes: Number(serviceDraft.duration || 0),
+        category: serviceDraft.category.trim() || "autre",
+        description: serviceDraft.description.trim() || null,
+        sort_order: 500,
+      });
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      setServiceDraft({ name: "", price: "", duration: "", category: "autre", description: "" });
+      toast.success("Prestation ajoutée.");
+      refreshServices();
+    },
+    onError: () => toast.error("Ajout impossible."),
+  });
+
+  const updateService = useMutation({
+    mutationFn: async ({
+      id,
+      patch,
+    }: {
+      id: string;
+      patch: Partial<Pick<RepairService, "name" | "price" | "duration_minutes" | "category" | "description" | "active">>;
+    }) => {
+      const { error } = await supabase.from("repair_services").update(patch).eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: refreshServices,
+    onError: () => toast.error("Modification impossible."),
+  });
+
+  const deleteService = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase.from("repair_services").delete().eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      toast.success("Prestation supprimée.");
+      refreshServices();
+    },
+    onError: () => toast.error("Suppression impossible."),
   });
 
   const refreshRules = () => {
@@ -154,6 +228,7 @@ function AdminPage() {
         <TabsList>
           <TabsTrigger value="rules">Règles de déduction</TabsTrigger>
           <TabsTrigger value="prices">Prix de base</TabsTrigger>
+          <TabsTrigger value="services">Prestations</TabsTrigger>
         </TabsList>
 
         <TabsContent value="rules" className="space-y-6">
@@ -304,6 +379,145 @@ function AdminPage() {
               </div>
             </section>
           ))}
+        </TabsContent>
+
+        <TabsContent value="services" className="space-y-6">
+          <section className="surface-card p-6">
+            <h2 className="text-base font-semibold text-ink">Nouvelle prestation</h2>
+            <div className="mt-4 grid gap-4 sm:grid-cols-[1fr_120px_120px_140px_auto] sm:items-end">
+              <div className="space-y-2">
+                <Label htmlFor="service-name">Titre</Label>
+                <Input
+                  id="service-name"
+                  value={serviceDraft.name}
+                  maxLength={80}
+                  placeholder="Remplacement écran"
+                  onChange={(event) => setServiceDraft((prev) => ({ ...prev, name: event.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="service-price">Prix (€)</Label>
+                <Input
+                  id="service-price"
+                  type="number"
+                  min={0}
+                  value={serviceDraft.price}
+                  onChange={(event) => setServiceDraft((prev) => ({ ...prev, price: event.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="service-duration">Durée (min)</Label>
+                <Input
+                  id="service-duration"
+                  type="number"
+                  min={0}
+                  value={serviceDraft.duration}
+                  onChange={(event) => setServiceDraft((prev) => ({ ...prev, duration: event.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="service-category">Catégorie</Label>
+                <Input
+                  id="service-category"
+                  value={serviceDraft.category}
+                  maxLength={40}
+                  placeholder="ecran"
+                  onChange={(event) => setServiceDraft((prev) => ({ ...prev, category: event.target.value }))}
+                />
+              </div>
+              <Button onClick={() => addService.mutate()} disabled={!serviceDraft.name.trim() || addService.isPending}>
+                <Plus className="size-4" />
+                Ajouter
+              </Button>
+            </div>
+            <div className="mt-4 space-y-2">
+              <Label htmlFor="service-description">Description (optionnelle)</Label>
+              <Input
+                id="service-description"
+                value={serviceDraft.description}
+                maxLength={200}
+                onChange={(event) => setServiceDraft((prev) => ({ ...prev, description: event.target.value }))}
+              />
+            </div>
+          </section>
+
+          <section className="surface-card overflow-hidden">
+            <h3 className="border-b border-border px-6 py-4 text-sm font-semibold text-ink">
+              Catalogue de prestations ({services.length})
+            </h3>
+            <ul className="divide-y divide-border">
+              {services.map((service) => (
+                <li key={service.id} className="grid gap-3 px-6 py-4 md:grid-cols-[1fr_110px_110px_130px_auto] md:items-center">
+                  <Input
+                    className="h-9"
+                    defaultValue={service.name}
+                    onBlur={(event) => {
+                      const value = event.target.value.trim();
+                      if (value && value !== service.name) updateService.mutate({ id: service.id, patch: { name: value } });
+                    }}
+                  />
+                  <div className="flex items-center gap-1">
+                    <Input
+                      className="h-9 w-full"
+                      type="number"
+                      min={0}
+                      defaultValue={Number(service.price)}
+                      onBlur={(event) => {
+                        const value = Number(event.target.value);
+                        if (!Number.isNaN(value) && value !== Number(service.price)) {
+                          updateService.mutate({ id: service.id, patch: { price: value } });
+                        }
+                      }}
+                    />
+                    <span className="text-sm text-muted-foreground">€</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Input
+                      className="h-9 w-full"
+                      type="number"
+                      min={0}
+                      defaultValue={service.duration_minutes}
+                      onBlur={(event) => {
+                        const value = Number(event.target.value);
+                        if (!Number.isNaN(value) && value !== service.duration_minutes) {
+                          updateService.mutate({ id: service.id, patch: { duration_minutes: value } });
+                        }
+                      }}
+                    />
+                    <span className="text-xs text-muted-foreground">min</span>
+                  </div>
+                  <Input
+                    className="h-9"
+                    defaultValue={service.category}
+                    onBlur={(event) => {
+                      const value = event.target.value.trim();
+                      if (value && value !== service.category) {
+                        updateService.mutate({ id: service.id, patch: { category: value } });
+                      }
+                    }}
+                  />
+                  <div className="flex items-center gap-3 md:justify-end">
+                    <span className="text-xs text-muted-foreground">{service.active ? "Active" : "Inactive"}</span>
+                    <Switch
+                      checked={service.active}
+                      onCheckedChange={(value) => updateService.mutate({ id: service.id, patch: { active: value } })}
+                    />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label="Supprimer la prestation"
+                      onClick={() => deleteService.mutate(service.id)}
+                    >
+                      <Trash2 className="size-4 text-destructive" />
+                    </Button>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            {services.length === 0 && (
+              <p className="px-6 py-6 text-sm text-muted-foreground">Aucune prestation pour le moment.</p>
+            )}
+          </section>
         </TabsContent>
       </Tabs>
     </div>
