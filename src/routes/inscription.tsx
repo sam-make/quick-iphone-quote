@@ -80,6 +80,17 @@ function SignupPage() {
       return;
     }
 
+    // Supabase renvoie un utilisateur sans identité quand l'adresse est déjà
+    // enregistrée (anti-énumération) : aucun compte n'est créé, aucun mot de
+    // passe n'est modifié. On oriente vers connexion / réinitialisation.
+    if (data.user && (data.user.identities?.length ?? 0) === 0) {
+      toast.error(
+        "Cette adresse a déjà un espace boutique. Connectez-vous ou réinitialisez votre mot de passe.",
+      );
+      navigate({ to: "/connexion", replace: true });
+      return;
+    }
+
     if (data.session) {
       toast.success("Espace boutique créé.");
       navigate({ to: "/tableau-de-bord", replace: true });

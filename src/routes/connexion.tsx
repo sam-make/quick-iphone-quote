@@ -48,7 +48,18 @@ function LoginPage() {
     const { error } = await supabase.auth.signInWithPassword(parsed.data);
     setSubmitting(false);
     if (error) {
-      toast.error("Connexion impossible : identifiants incorrects.");
+      const message = error.message.toLowerCase();
+      if (message.includes("not confirmed")) {
+        toast.error("Adresse e-mail non confirmée : ouvrez le lien reçu par e-mail.");
+      } else if (message.includes("invalid login credentials")) {
+        toast.error(
+          "E-mail ou mot de passe incorrect. Utilisez « Mot de passe oublié ? » si besoin.",
+        );
+      } else if (error.status === 429) {
+        toast.error("Trop de tentatives. Patientez quelques minutes.");
+      } else {
+        toast.error(error.message);
+      }
       return;
     }
     navigate({ to: "/tableau-de-bord", replace: true });
