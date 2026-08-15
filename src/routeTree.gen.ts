@@ -21,7 +21,9 @@ import { Route as AuthenticatedHistoriqueRouteImport } from './routes/_authentic
 import { Route as AuthenticatedTableauDeBordRouteImport } from './routes/_authenticated/tableau-de-bord'
 import { Route as AuthenticatedClientsIndexRouteImport } from './routes/_authenticated/clients.index'
 import { Route as AuthenticatedClientsIdRouteImport } from './routes/_authenticated/clients.$id'
+import { Route as AuthenticatedFacturesIdRouteImport } from './routes/_authenticated/factures.$id'
 import { Route as AuthenticatedReparationsIndexRouteImport } from './routes/_authenticated/reparations.index'
+import { Route as AuthenticatedReparationsIdRouteImport } from './routes/_authenticated/reparations.$id'
 import { Route as AuthenticatedReparationsNouvelleRouteImport } from './routes/_authenticated/reparations.nouvelle'
 
 const IndexRoute = IndexRouteImport.update({
@@ -86,10 +88,21 @@ const AuthenticatedClientsIdRoute = AuthenticatedClientsIdRouteImport.update({
   path: '/clients/$id',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedFacturesIdRoute = AuthenticatedFacturesIdRouteImport.update({
+  id: '/factures/$id',
+  path: '/factures/$id',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedReparationsIndexRoute =
   AuthenticatedReparationsIndexRouteImport.update({
     id: '/reparations/',
     path: '/reparations/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedReparationsIdRoute =
+  AuthenticatedReparationsIdRouteImport.update({
+    id: '/reparations/$id',
+    path: '/reparations/$id',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedReparationsNouvelleRoute =
@@ -110,6 +123,8 @@ export interface FileRoutesByFullPath {
   '/historique': typeof AuthenticatedHistoriqueRoute
   '/tableau-de-bord': typeof AuthenticatedTableauDeBordRoute
   '/clients/$id': typeof AuthenticatedClientsIdRoute
+  '/factures/$id': typeof AuthenticatedFacturesIdRoute
+  '/reparations/$id': typeof AuthenticatedReparationsIdRoute
   '/reparations/nouvelle': typeof AuthenticatedReparationsNouvelleRoute
   '/clients/': typeof AuthenticatedClientsIndexRoute
   '/reparations/': typeof AuthenticatedReparationsIndexRoute
@@ -125,6 +140,8 @@ export interface FileRoutesByTo {
   '/historique': typeof AuthenticatedHistoriqueRoute
   '/tableau-de-bord': typeof AuthenticatedTableauDeBordRoute
   '/clients/$id': typeof AuthenticatedClientsIdRoute
+  '/factures/$id': typeof AuthenticatedFacturesIdRoute
+  '/reparations/$id': typeof AuthenticatedReparationsIdRoute
   '/reparations/nouvelle': typeof AuthenticatedReparationsNouvelleRoute
   '/clients': typeof AuthenticatedClientsIndexRoute
   '/reparations': typeof AuthenticatedReparationsIndexRoute
@@ -142,6 +159,8 @@ export interface FileRoutesById {
   '/_authenticated/historique': typeof AuthenticatedHistoriqueRoute
   '/_authenticated/tableau-de-bord': typeof AuthenticatedTableauDeBordRoute
   '/_authenticated/clients/$id': typeof AuthenticatedClientsIdRoute
+  '/_authenticated/factures/$id': typeof AuthenticatedFacturesIdRoute
+  '/_authenticated/reparations/$id': typeof AuthenticatedReparationsIdRoute
   '/_authenticated/reparations/nouvelle': typeof AuthenticatedReparationsNouvelleRoute
   '/_authenticated/clients/': typeof AuthenticatedClientsIndexRoute
   '/_authenticated/reparations/': typeof AuthenticatedReparationsIndexRoute
@@ -159,6 +178,8 @@ export interface FileRouteTypes {
     | '/historique'
     | '/tableau-de-bord'
     | '/clients/$id'
+    | '/factures/$id'
+    | '/reparations/$id'
     | '/reparations/nouvelle'
     | '/clients/'
     | '/reparations/'
@@ -174,6 +195,8 @@ export interface FileRouteTypes {
     | '/historique'
     | '/tableau-de-bord'
     | '/clients/$id'
+    | '/factures/$id'
+    | '/reparations/$id'
     | '/reparations/nouvelle'
     | '/clients'
     | '/reparations'
@@ -190,6 +213,8 @@ export interface FileRouteTypes {
     | '/_authenticated/historique'
     | '/_authenticated/tableau-de-bord'
     | '/_authenticated/clients/$id'
+    | '/_authenticated/factures/$id'
+    | '/_authenticated/reparations/$id'
     | '/_authenticated/reparations/nouvelle'
     | '/_authenticated/clients/'
     | '/_authenticated/reparations/'
@@ -290,11 +315,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedClientsIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/factures/$id': {
+      id: '/_authenticated/factures/$id'
+      path: '/factures/$id'
+      fullPath: '/factures/$id'
+      preLoaderRoute: typeof AuthenticatedFacturesIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/reparations/': {
       id: '/_authenticated/reparations/'
       path: '/reparations'
       fullPath: '/reparations/'
       preLoaderRoute: typeof AuthenticatedReparationsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/reparations/$id': {
+      id: '/_authenticated/reparations/$id'
+      path: '/reparations/$id'
+      fullPath: '/reparations/$id'
+      preLoaderRoute: typeof AuthenticatedReparationsIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/reparations/nouvelle': {
@@ -313,6 +352,8 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedHistoriqueRoute: typeof AuthenticatedHistoriqueRoute
   AuthenticatedTableauDeBordRoute: typeof AuthenticatedTableauDeBordRoute
   AuthenticatedClientsIdRoute: typeof AuthenticatedClientsIdRoute
+  AuthenticatedFacturesIdRoute: typeof AuthenticatedFacturesIdRoute
+  AuthenticatedReparationsIdRoute: typeof AuthenticatedReparationsIdRoute
   AuthenticatedReparationsNouvelleRoute: typeof AuthenticatedReparationsNouvelleRoute
   AuthenticatedClientsIndexRoute: typeof AuthenticatedClientsIndexRoute
   AuthenticatedReparationsIndexRoute: typeof AuthenticatedReparationsIndexRoute
@@ -324,6 +365,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedHistoriqueRoute: AuthenticatedHistoriqueRoute,
   AuthenticatedTableauDeBordRoute: AuthenticatedTableauDeBordRoute,
   AuthenticatedClientsIdRoute: AuthenticatedClientsIdRoute,
+  AuthenticatedFacturesIdRoute: AuthenticatedFacturesIdRoute,
+  AuthenticatedReparationsIdRoute: AuthenticatedReparationsIdRoute,
   AuthenticatedReparationsNouvelleRoute: AuthenticatedReparationsNouvelleRoute,
   AuthenticatedClientsIndexRoute: AuthenticatedClientsIndexRoute,
   AuthenticatedReparationsIndexRoute: AuthenticatedReparationsIndexRoute,

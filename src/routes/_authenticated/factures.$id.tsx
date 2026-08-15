@@ -48,7 +48,7 @@ function InvoicePage() {
   const shop = (invoice.shop_snapshot ?? {}) as Record<string, string | null>;
   const customer = (invoice.customer_snapshot ?? {}) as Record<string, string | null>;
   const device = (invoice.device_snapshot ?? {}) as Record<string, string | null>;
-  const lines = (invoice.lines ?? []) as InvoiceLine[];
+  const lines = (invoice.lines ?? []) as unknown as InvoiceLine[];
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
