@@ -32,6 +32,8 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [unconfirmed, setUnconfirmed] = useState(false);
+  const [resending, setResending] = useState(false);
 
   useEffect(() => {
     if (!loading && session) navigate({ to: "/tableau-de-bord", replace: true });
@@ -50,8 +52,10 @@ function LoginPage() {
     if (error) {
       const message = error.message.toLowerCase();
       if (message.includes("not confirmed")) {
+        setUnconfirmed(true);
         toast.error("Adresse e-mail non confirmée : ouvrez le lien reçu par e-mail.");
       } else if (message.includes("invalid login credentials")) {
+        setUnconfirmed(false);
         toast.error(
           "E-mail ou mot de passe incorrect. Utilisez « Mot de passe oublié ? » si besoin.",
         );
@@ -63,6 +67,19 @@ function LoginPage() {
       return;
     }
     navigate({ to: "/tableau-de-bord", replace: true });
+  }
+
+  async function handleResend() {
+    setResending(true);
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email: email.trim(),
+      options: { emailRedirectTo: `${window.location.origin}/tableau-de-bord` },
+    });
+    setResending(false);
+    toast[error ? "error" : "success"](
+      error ? error.message : "E-mail de confirmation renvoyé.",
+    );
   }
 
   return (
@@ -110,6 +127,11 @@ function LoginPage() {
         <Button type="submit" className="w-full" size="lg" disabled={submitting}>
           {submitting ? "Connexion…" : "Se connecter"}
         </Button>
+        {unconfirmed ? (
+          <Button type="button" variant="outline" className="w-full" onClick={handleResend} disabled={resending}>
+            {resending ? "Envoi…" : "Renvoyer l'e-mail de confirmation"}
+          </Button>
+        ) : null}
       </form>
     </AuthLayout>
   );
