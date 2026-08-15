@@ -72,11 +72,20 @@ function SignupPage() {
     setSubmitting(false);
 
     if (error) {
-      toast.error(
-        error.message.includes("already registered")
-          ? "Un compte existe déjà avec cette adresse."
-          : "Création impossible. Réessayez dans un instant.",
-      );
+      const message = error.message.toLowerCase();
+      if (message.includes("already registered")) {
+        toast.error("Un compte existe déjà avec cette adresse. Connectez-vous.");
+      } else if (message.includes("weak") || message.includes("pwned")) {
+        toast.error(
+          "Ce mot de passe figure dans des fuites de données connues. Choisissez-en un autre, plus unique.",
+        );
+      } else if (message.includes("invalid") && message.includes("email")) {
+        toast.error("Adresse e-mail refusée par le service d'authentification.");
+      } else if (error.status === 429) {
+        toast.error("Trop de tentatives. Patientez quelques minutes.");
+      } else {
+        toast.error(error.message);
+      }
       return;
     }
 

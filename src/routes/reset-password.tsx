@@ -74,7 +74,12 @@ function ResetPasswordPage() {
     const { error } = await supabase.auth.updateUser({ password });
     setSubmitting(false);
     if (error) {
-      toast.error(error.message);
+      const message = error.message.toLowerCase();
+      if (message.includes("weak") || message.includes("pwned")) {
+        toast.error("Ce mot de passe figure dans des fuites connues. Choisissez-en un autre.");
+      } else {
+        toast.error(error.message);
+      }
       return;
     }
     toast.success("Mot de passe mis à jour.");
