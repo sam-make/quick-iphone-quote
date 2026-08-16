@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useWorkspace } from "@/hooks/useWorkspace";
@@ -20,6 +20,15 @@ import {
   type RuleCategory,
 } from "@/lib/pricing";
 import type { RepairService } from "@/lib/repairs";
+import {
+  changeEmployeeRole,
+  deleteEmployee,
+  fetchMembers,
+  inviteEmployee,
+  updateShopSettings,
+} from "@/lib/team.functions";
+import { useServerFn } from "@tanstack/react-start";
+import { useEffect } from "react";
 
 export const Route = createFileRoute("/_authenticated/administration")({
   head: () => ({
