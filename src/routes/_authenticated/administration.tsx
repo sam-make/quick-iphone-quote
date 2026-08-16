@@ -52,6 +52,85 @@ function AdminPage() {
   };
 
   const [draft, setDraft] = useState({ name: "", deduction: "", category: "technique" as RuleCategory, blocking: false });
+  const [shopForm, setShopForm] = useState({ name: "", address: "", phone: "", email: "" });
+  const [inviteForm, setInviteForm] = useState({ email: "", fullName: "", role: "employee" as "admin" | "employee" });
+
+  useEffect(() => {
+    if (!workspace) return;
+    setShopForm({
+      name: workspace.shop.name ?? "",
+      address: workspace.shop.address ?? "",
+      phone: workspace.shop.phone ?? "",
+      email: workspace.shop.email ?? "",
+    });
+  }, [workspace?.shop.id, workspace?.shop.name, workspace?.shop.address, workspace?.shop.phone, workspace?.shop.email]);
+
+  const saveShopFn = useServerFn(updateShopSettings);
+  const membersFn = useServerFn(fetchMembers);
+  const inviteFn = useServerFn(inviteEmployee);
+  const roleFn = useServerFn(changeEmployeeRole);
+  const removeFn = useServerFn(deleteEmployee);
+
+  const saveShop = useMutation({
+    mutationFn: () =>
+      saveShopFn({
+        data: {
+          name: shopForm.name.trim(),
+          address: shopForm.address.trim() || null,
+          phone: shopForm.phone.trim() || null,
+          email: shopForm.email.trim() || "",
+        },
+      }),
+    onSuccess: () => {
+      toast.success("Boutique mise à jour.");
+      queryClient.invalidateQueries({ queryKey: ["workspace"] });
+    },
+    onError: (error: Error) => toast.error(error.message || "Enregistrement impossible."),
+  });
+
+  const { data: members = [] } = useQuery({
+    queryKey: ["members", shopId],
+    enabled: Boolean(shopId) && workspace?.role === "admin",
+    queryFn: () => membersFn({ data: undefined }),
+  });
+
+  const refreshMembers = () => queryClient.invalidateQueries({ queryKey: ["members"] });
+
+  const invite = useMutation({
+    mutationFn: () =>
+      inviteFn({
+        data: {
+          email: inviteForm.email.trim(),
+          fullName: inviteForm.fullName.trim(),
+          role: inviteForm.role,
+          redirectTo: `${window.location.origin}/reset-password`,
+        },
+      }),
+    onSuccess: () => {
+      setInviteForm({ email: "", fullName: "", role: "employee" });
+      toast.success("Invitation envoyée par e-mail.");
+      refreshMembers();
+    },
+    onError: (error: Error) => toast.error(error.message || "Invitation impossible."),
+  });
+
+  const setRole = useMutation({
+    mutationFn: (data: { memberId: string; role: "admin" | "employee" }) => roleFn({ data }),
+    onSuccess: () => {
+      toast.success("Rôle mis à jour.");
+      refreshMembers();
+    },
+    onError: (error: Error) => toast.error(error.message || "Modification impossible."),
+  });
+
+  const removeMember = useMutation({
+    mutationFn: (memberId: string) => removeFn({ data: { memberId } }),
+    onSuccess: () => {
+      toast.success("Employé supprimé.");
+      refreshMembers();
+    },
+    onError: (error: Error) => toast.error(error.message || "Suppression impossible."),
+  });
   const [serviceDraft, setServiceDraft] = useState({
     name: "",
     price: "",
@@ -238,6 +317,8 @@ function AdminPage() {
           <TabsTrigger value="rules">Règles de déduction</TabsTrigger>
           <TabsTrigger value="prices">Prix de base</TabsTrigger>
           <TabsTrigger value="services">Prestations</TabsTrigger>
+          <TabsTrigger value="shop">Boutique</TabsTrigger>
+          <TabsTrigger value="team">Employés</TabsTrigger>
         </TabsList>
 
         <TabsContent value="rules" className="space-y-6">
