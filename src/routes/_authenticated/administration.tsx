@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, UserPlus } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useWorkspace } from "@/hooks/useWorkspace";
@@ -20,6 +20,15 @@ import {
   type RuleCategory,
 } from "@/lib/pricing";
 import type { RepairService } from "@/lib/repairs";
+import {
+  changeEmployeeRole,
+  deleteEmployee,
+  fetchMembers,
+  inviteEmployee,
+  updateShopSettings,
+} from "@/lib/team.functions";
+import { useServerFn } from "@tanstack/react-start";
+import { useEffect } from "react";
 
 export const Route = createFileRoute("/_authenticated/administration")({
   head: () => ({
@@ -43,6 +52,85 @@ function AdminPage() {
   };
 
   const [draft, setDraft] = useState({ name: "", deduction: "", category: "technique" as RuleCategory, blocking: false });
+  const [shopForm, setShopForm] = useState({ name: "", address: "", phone: "", email: "" });
+  const [inviteForm, setInviteForm] = useState({ email: "", fullName: "", role: "employee" as "admin" | "employee" });
+
+  useEffect(() => {
+    if (!workspace) return;
+    setShopForm({
+      name: workspace.shop.name ?? "",
+      address: workspace.shop.address ?? "",
+      phone: workspace.shop.phone ?? "",
+      email: workspace.shop.email ?? "",
+    });
+  }, [workspace?.shop.id, workspace?.shop.name, workspace?.shop.address, workspace?.shop.phone, workspace?.shop.email]);
+
+  const saveShopFn = useServerFn(updateShopSettings);
+  const membersFn = useServerFn(fetchMembers);
+  const inviteFn = useServerFn(inviteEmployee);
+  const roleFn = useServerFn(changeEmployeeRole);
+  const removeFn = useServerFn(deleteEmployee);
+
+  const saveShop = useMutation({
+    mutationFn: () =>
+      saveShopFn({
+        data: {
+          name: shopForm.name.trim(),
+          address: shopForm.address.trim() || null,
+          phone: shopForm.phone.trim() || null,
+          email: shopForm.email.trim() || "",
+        },
+      }),
+    onSuccess: () => {
+      toast.success("Boutique mise à jour.");
+      queryClient.invalidateQueries({ queryKey: ["workspace"] });
+    },
+    onError: (error: Error) => toast.error(error.message || "Enregistrement impossible."),
+  });
+
+  const { data: members = [] } = useQuery({
+    queryKey: ["members", shopId],
+    enabled: Boolean(shopId) && workspace?.role === "admin",
+    queryFn: () => membersFn({ data: undefined }),
+  });
+
+  const refreshMembers = () => queryClient.invalidateQueries({ queryKey: ["members"] });
+
+  const invite = useMutation({
+    mutationFn: () =>
+      inviteFn({
+        data: {
+          email: inviteForm.email.trim(),
+          fullName: inviteForm.fullName.trim(),
+          role: inviteForm.role,
+          redirectTo: `${window.location.origin}/reset-password`,
+        },
+      }),
+    onSuccess: () => {
+      setInviteForm({ email: "", fullName: "", role: "employee" });
+      toast.success("Invitation envoyée par e-mail.");
+      refreshMembers();
+    },
+    onError: (error: Error) => toast.error(error.message || "Invitation impossible."),
+  });
+
+  const setRole = useMutation({
+    mutationFn: (data: { memberId: string; role: "admin" | "employee" }) => roleFn({ data }),
+    onSuccess: () => {
+      toast.success("Rôle mis à jour.");
+      refreshMembers();
+    },
+    onError: (error: Error) => toast.error(error.message || "Modification impossible."),
+  });
+
+  const removeMember = useMutation({
+    mutationFn: (memberId: string) => removeFn({ data: { memberId } }),
+    onSuccess: () => {
+      toast.success("Employé supprimé.");
+      refreshMembers();
+    },
+    onError: (error: Error) => toast.error(error.message || "Suppression impossible."),
+  });
   const [serviceDraft, setServiceDraft] = useState({
     name: "",
     price: "",
@@ -229,6 +317,8 @@ function AdminPage() {
           <TabsTrigger value="rules">Règles de déduction</TabsTrigger>
           <TabsTrigger value="prices">Prix de base</TabsTrigger>
           <TabsTrigger value="services">Prestations</TabsTrigger>
+          <TabsTrigger value="shop">Boutique</TabsTrigger>
+          <TabsTrigger value="team">Employés</TabsTrigger>
         </TabsList>
 
         <TabsContent value="rules" className="space-y-6">
@@ -516,6 +606,159 @@ function AdminPage() {
             </ul>
             {services.length === 0 && (
               <p className="px-6 py-6 text-sm text-muted-foreground">Aucune prestation pour le moment.</p>
+            )}
+          </section>
+        </TabsContent>
+
+        <TabsContent value="shop" className="space-y-6">
+          <section className="surface-card p-6">
+            <h2 className="text-base font-semibold text-ink">Paramètres de la boutique</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Ces informations apparaissent sur vos factures et documents client.
+            </p>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="shop-name">Nom</Label>
+                <Input
+                  id="shop-name"
+                  value={shopForm.name}
+                  maxLength={120}
+                  onChange={(event) => setShopForm((prev) => ({ ...prev, name: event.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="shop-phone">Téléphone</Label>
+                <Input
+                  id="shop-phone"
+                  value={shopForm.phone}
+                  maxLength={40}
+                  onChange={(event) => setShopForm((prev) => ({ ...prev, phone: event.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="shop-email">E-mail</Label>
+                <Input
+                  id="shop-email"
+                  type="email"
+                  value={shopForm.email}
+                  maxLength={160}
+                  onChange={(event) => setShopForm((prev) => ({ ...prev, email: event.target.value }))}
+                />
+              </div>
+              <div className="space-y-2 sm:col-span-2">
+                <Label htmlFor="shop-address">Adresse</Label>
+                <Input
+                  id="shop-address"
+                  value={shopForm.address}
+                  maxLength={300}
+                  onChange={(event) => setShopForm((prev) => ({ ...prev, address: event.target.value }))}
+                />
+              </div>
+            </div>
+            <Button
+              className="mt-5"
+              onClick={() => saveShop.mutate()}
+              disabled={shopForm.name.trim().length < 2 || saveShop.isPending}
+            >
+              Enregistrer
+            </Button>
+          </section>
+        </TabsContent>
+
+        <TabsContent value="team" className="space-y-6">
+          <section className="surface-card p-6">
+            <h2 className="text-base font-semibold text-ink">Inviter un employé</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              L'employé reçoit un e-mail d'invitation pour définir son mot de passe et rejoint automatiquement votre
+              boutique.
+            </p>
+            <div className="mt-4 grid gap-4 sm:grid-cols-[1fr_1fr_160px_auto] sm:items-end">
+              <div className="space-y-2">
+                <Label htmlFor="invite-name">Nom complet</Label>
+                <Input
+                  id="invite-name"
+                  value={inviteForm.fullName}
+                  maxLength={120}
+                  onChange={(event) => setInviteForm((prev) => ({ ...prev, fullName: event.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="invite-email">E-mail</Label>
+                <Input
+                  id="invite-email"
+                  type="email"
+                  value={inviteForm.email}
+                  maxLength={160}
+                  onChange={(event) => setInviteForm((prev) => ({ ...prev, email: event.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="invite-role">Rôle</Label>
+                <select
+                  id="invite-role"
+                  className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm"
+                  value={inviteForm.role}
+                  onChange={(event) =>
+                    setInviteForm((prev) => ({ ...prev, role: event.target.value as "admin" | "employee" }))
+                  }
+                >
+                  <option value="employee">Employé</option>
+                  <option value="admin">Administrateur</option>
+                </select>
+              </div>
+              <Button
+                onClick={() => invite.mutate()}
+                disabled={!inviteForm.email.trim() || inviteForm.fullName.trim().length < 2 || invite.isPending}
+              >
+                <UserPlus className="size-4" />
+                Inviter
+              </Button>
+            </div>
+          </section>
+
+          <section className="surface-card overflow-hidden">
+            <h3 className="border-b border-border px-6 py-4 text-sm font-semibold text-ink">
+              Équipe ({members.length})
+            </h3>
+            <ul className="divide-y divide-border">
+              {members.map((member) => {
+                const isSelf = member.id === workspace?.profile.id;
+                return (
+                  <li key={member.id} className="flex flex-wrap items-center gap-3 px-6 py-4">
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-ink">
+                        {member.full_name}
+                        {isSelf && <span className="ml-2 text-xs text-muted-foreground">(vous)</span>}
+                      </p>
+                      <p className="truncate text-xs text-muted-foreground">{member.email ?? "—"}</p>
+                    </div>
+                    <select
+                      aria-label="Rôle"
+                      className="h-9 rounded-md border border-input bg-transparent px-3 text-sm"
+                      value={member.role}
+                      disabled={isSelf || setRole.isPending}
+                      onChange={(event) =>
+                        setRole.mutate({ memberId: member.id, role: event.target.value as "admin" | "employee" })
+                      }
+                    >
+                      <option value="employee">Employé</option>
+                      <option value="admin">Administrateur</option>
+                    </select>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      aria-label="Supprimer l'employé"
+                      disabled={isSelf || removeMember.isPending}
+                      onClick={() => removeMember.mutate(member.id)}
+                    >
+                      <Trash2 className="size-4 text-destructive" />
+                    </Button>
+                  </li>
+                );
+              })}
+            </ul>
+            {members.length === 0 && (
+              <p className="px-6 py-6 text-sm text-muted-foreground">Aucun employé pour le moment.</p>
             )}
           </section>
         </TabsContent>

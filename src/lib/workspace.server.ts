@@ -41,6 +41,25 @@ export async function ensureWorkspaceFor(
 
   let shopId = existing?.shop_id as string | undefined;
 
+  // Utilisateur invité par un administrateur : on le rattache à la boutique
+  // existante en tant qu'employé, sans créer de nouvelle boutique.
+  if (!shopId && typeof metadata.invited_shop_id === "string") {
+    const invitedShopId = metadata.invited_shop_id as string;
+    const { data: target } = await admin.from("shops").select("id").eq("id", invitedShopId).maybeSingle();
+    if (target) {
+      shopId = target.id as string;
+      await admin.from("profiles").insert({
+        id: userId,
+        shop_id: shopId,
+        full_name: (metadata.full_name as string) || userEmail || "Employé",
+        email: userEmail,
+      });
+      await admin
+        .from("user_roles")
+        .insert({ user_id: userId, shop_id: shopId, role: (metadata.invited_role as string) === "admin" ? "admin" : "employee" });
+    }
+  }
+
   if (!shopId) {
     const shopName = (metadata.shop_name as string) || "Ma boutique";
     const { data: shop, error: shopError } = await admin
