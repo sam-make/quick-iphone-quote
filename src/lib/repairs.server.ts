@@ -102,7 +102,12 @@ async function nextSequence(supabase: AnyClient, prefix: "REP" | "FA") {
 }
 
 /** Creates the repair folder: customer, device, priced lines and initial status. */
-export async function createRepairFor(supabase: AnyClient, userId: string, input: RepairInput) {
+export async function createRepairFor(
+  supabase: AnyClient,
+  admin: AnyClient,
+  userId: string,
+  input: RepairInput,
+) {
   const profile = await currentProfile(supabase, userId);
   const { customer } = await upsertCustomerFor(supabase, userId, input.customer);
 
@@ -119,7 +124,15 @@ export async function createRepairFor(supabase: AnyClient, userId: string, input
   };
 
   if (deviceId) {
-    await supabase.from("customer_devices").update(devicePayload).eq("id", deviceId);
+    // The device must belong to this customer (and therefore this shop).
+    const { data: owned, error: deviceError } = await supabase
+      .from("customer_devices")
+      .update(devicePayload)
+      .eq("id", deviceId)
+      .eq("customer_id", customer.id)
+      .select("id")
+      .maybeSingle();
+    if (deviceError || !owned) throw new Error("Appareil introuvable pour ce client.");
   } else {
     const { data: device, error } = await supabase
       .from("customer_devices")
@@ -167,7 +180,9 @@ export async function createRepairFor(supabase: AnyClient, userId: string, input
   const totals = totalsOf(lines);
   const reference = await nextSequence(supabase, "REP");
 
-  const { data: repair, error: repairError } = await supabase
+  // Totals are computed above from the shop catalogue; direct writes are closed
+  // to members, so the privileged client persists them.
+  const { data: repair, error: repairError } = await admin
     .from("repairs")
     .insert({
       shop_id: profile.shop_id,
@@ -192,7 +207,7 @@ export async function createRepairFor(supabase: AnyClient, userId: string, input
     .single();
   if (repairError) throw new Error(repairError.message);
 
-  const { error: itemsError } = await supabase.from("repair_items").insert(
+  const { error: itemsError } = await admin.from("repair_items").insert(
     lines.map((line) => ({
       repair_id: repair.id,
       service_id: line.serviceId,
@@ -202,9 +217,12 @@ export async function createRepairFor(supabase: AnyClient, userId: string, input
       duration_minutes: line.durationMinutes,
     })),
   );
-  if (itemsError) throw new Error(itemsError.message);
+  if (itemsError) {
+    await admin.from("repairs").delete().eq("id", repair.id);
+    throw new Error(itemsError.message);
+  }
 
-  await supabase.from("repair_status_history").insert({
+  await admin.from("repair_status_history").insert({
     repair_id: repair.id,
     status: "recu",
     user_id: userId,
@@ -218,16 +236,30 @@ export async function createRepairFor(supabase: AnyClient, userId: string, input
 /** Records a status change together with its author and timestamp. */
 export async function changeStatusFor(
   supabase: AnyClient,
+  admin: AnyClient,
   userId: string,
   repairId: string,
   status: RepairStatus,
   comment?: string | null,
 ) {
   const profile = await currentProfile(supabase, userId);
-  const { error } = await supabase.from("repairs").update({ status }).eq("id", repairId);
+  // Read through RLS: only a repair of the caller's shop is found.
+  const { data: owned } = await supabase
+    .from("repairs")
+    .select("id")
+    .eq("id", repairId)
+    .eq("shop_id", profile.shop_id)
+    .maybeSingle();
+  if (!owned) throw new Error("Dossier introuvable.");
+
+  const { error } = await admin
+    .from("repairs")
+    .update({ status })
+    .eq("id", repairId)
+    .eq("shop_id", profile.shop_id);
   if (error) throw new Error(error.message);
 
-  await supabase.from("repair_status_history").insert({
+  await admin.from("repair_status_history").insert({
     repair_id: repairId,
     status,
     user_id: userId,
@@ -260,6 +292,7 @@ export async function generateInvoiceFor(
       "id, reference, customer_id, brand, model, color, storage, imei, issue, total_price, repair_items(name, unit_price, quantity)",
     )
     .eq("id", repairId)
+    .eq("shop_id", profile.shop_id)
     .single();
   if (error || !repair) throw new Error("Dossier introuvable.");
 
