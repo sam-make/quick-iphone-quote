@@ -73,6 +73,7 @@ export const generateInvoice = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => z.object({ repairId: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { generateInvoiceFor } = await import("./repairs.server");
-    return generateInvoiceFor(context.supabase, context.userId, data.repairId);
+    return generateInvoiceFor(context.supabase, supabaseAdmin, context.userId, data.repairId);
   });

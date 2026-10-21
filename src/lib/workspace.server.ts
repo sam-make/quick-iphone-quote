@@ -4,7 +4,7 @@
  * `workspace.functions.ts` handlers.
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { computePrice, storageStep, type DeductionRule } from "./pricing";
+import { computePrice, resolveBasePrice, type DeductionRule } from "./pricing";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type AnyClient = SupabaseClient<any, any, any>;
@@ -175,7 +175,7 @@ export async function saveEstimation(
 
   const breakdown = computePrice(basePrice, rules);
 
-  const { data: estimation, error: insertError } = await supabase
+  const { data: estimation, error: insertError } = await admin
     .from("estimations")
     .insert({
       shop_id: profile.shop_id,
@@ -197,7 +197,7 @@ export async function saveEstimation(
   if (insertError) throw new Error(insertError.message);
 
   if (rules.length > 0) {
-    await supabase.from("estimation_defects").insert(
+    const { error: defectsError } = await admin.from("estimation_defects").insert(
       rules.map((rule) => ({
         estimation_id: estimation.id,
         rule_id: rule.id,
@@ -207,6 +207,10 @@ export async function saveEstimation(
         is_blocking: rule.is_blocking,
       })),
     );
+    if (defectsError) {
+      await admin.from("estimations").delete().eq("id", estimation.id);
+      throw new Error(defectsError.message);
+    }
   }
 
   return { id: estimation.id as string, ...breakdown };
