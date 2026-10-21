@@ -57,16 +57,18 @@ export const createRepair = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => repairSchema.parse(data))
   .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { createRepairFor } = await import("./repairs.server");
-    return createRepairFor(context.supabase, context.userId, data);
+    return createRepairFor(context.supabase, supabaseAdmin, context.userId, data);
   });
 
 export const changeRepairStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => statusSchema.parse(data))
   .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { changeStatusFor } = await import("./repairs.server");
-    return changeStatusFor(context.supabase, context.userId, data.repairId, data.status, data.comment);
+    return changeStatusFor(context.supabase, supabaseAdmin, context.userId, data.repairId, data.status, data.comment);
   });
 
 export const generateInvoice = createServerFn({ method: "POST" })
