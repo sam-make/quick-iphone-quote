@@ -126,7 +126,14 @@ export interface EstimationInput {
  * Recomputes the price server-side (never trusting the browser) and persists
  * the estimation plus its defect lines.
  */
-export async function saveEstimation(supabase: AnyClient, userId: string, input: EstimationInput) {
+export async function saveEstimation(
+  supabase: AnyClient,
+  admin: AnyClient,
+  userId: string,
+  input: EstimationInput,
+) {
+  // Reads go through the user's client (tenant isolation enforced by RLS);
+  // the write uses the privileged client because direct inserts are closed.
   const { data: profile, error: profileError } = await supabase
     .from("profiles")
     .select("shop_id, full_name")
@@ -153,11 +160,7 @@ export async function saveEstimation(supabase: AnyClient, userId: string, input:
     .eq("storage_gb", input.storageGb)
     .in("color", [input.color, "*"]);
 
-  const exact = overrides?.find((row: { color: string }) => row.color === input.color);
-  const wildcard = overrides?.find((row: { color: string }) => row.color === "*");
-  const basePrice = Number(
-    exact?.base_price ?? wildcard?.base_price ?? Number(model.base_price) + storageStep(input.storageGb),
-  );
+  const basePrice = resolveBasePrice(model.base_price, input.storageGb, input.color, overrides ?? []);
 
   let rules: DeductionRule[] = [];
   if (input.ruleIds.length > 0) {
