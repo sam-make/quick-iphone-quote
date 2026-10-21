@@ -33,6 +33,7 @@ export const createEstimation = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: EstimationInput) => estimationSchema.parse(data))
   .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { saveEstimation } = await import("./workspace.server");
-    return saveEstimation(context.supabase, context.userId, data);
+    return saveEstimation(context.supabase, supabaseAdmin, context.userId, data);
   });

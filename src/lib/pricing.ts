@@ -48,6 +48,27 @@ export function storageStep(gb: number): number {
   return 0;
 }
 
+export interface ShopPriceRow {
+  color: string;
+  base_price: number | string;
+}
+
+/**
+ * Base price priority: exact shop price (model + color + storage), then the
+ * shop's "all colors" price ("*"), then catalogue price + storage step.
+ * `overrides` must already be filtered on the model and storage.
+ */
+export function resolveBasePrice(
+  catalogBasePrice: number | string,
+  storageGb: number,
+  color: string,
+  overrides: ShopPriceRow[],
+): number {
+  const exact = overrides.find((row) => row.color === color);
+  const wildcard = overrides.find((row) => row.color === "*");
+  return Number(exact?.base_price ?? wildcard?.base_price ?? Number(catalogBasePrice) + storageStep(storageGb));
+}
+
 export function computePrice(basePrice: number, rules: DeductionRule[]): PriceBreakdown {
   const applied = rules.filter((rule) => rule.active);
   const blocking = applied.filter((rule) => rule.is_blocking);

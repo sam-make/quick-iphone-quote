@@ -1,7 +1,7 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState, type ReactNode } from "react";
-import { Gauge, History, LogOut, Menu, Settings, Sparkles, Users, Wrench, X } from "lucide-react";
+import { AlertTriangle, Gauge, Loader2, History, LogOut, Menu, Settings, Sparkles, Users, Wrench, X } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,7 +20,7 @@ const NAV = [
 export function AppShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { data: workspace } = useWorkspace();
+  const { data: workspace, isLoading: workspaceLoading, isError: workspaceError, refetch } = useWorkspace();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const [open, setOpen] = useState(false);
 
@@ -31,7 +31,10 @@ export function AppShell({ children }: { children: ReactNode }) {
     navigate({ to: "/connexion", replace: true });
   }
 
-  const items = NAV.filter((item) => !("adminOnly" in item && item.adminOnly) || workspace?.role === "admin");
+  // Admin link stays visible (as a loading placeholder) until the role is known,
+  // so a slow or failed workspace load never silently hides it.
+  const roleKnown = Boolean(workspace);
+  const items = NAV.filter((item) => !("adminOnly" in item && item.adminOnly) || !roleKnown || workspace?.role === "admin");
 
   const nav = (
     <nav className="flex flex-col gap-1">
@@ -51,6 +54,9 @@ export function AppShell({ children }: { children: ReactNode }) {
           >
             <item.icon className={cn("size-4", active && "text-primary")} />
             {item.label}
+            {"adminOnly" in item && item.adminOnly && workspaceLoading && (
+              <Loader2 className="ml-auto size-3.5 animate-spin text-muted-foreground" aria-label="Chargement du rôle" />
+            )}
           </Link>
         );
       })}
@@ -104,6 +110,16 @@ export function AppShell({ children }: { children: ReactNode }) {
             <Button variant="ghost" size="sm" className="mt-2 w-full justify-start" onClick={handleSignOut}>
               <LogOut className="size-4" />
               Déconnexion
+            </Button>
+          </div>
+        )}
+
+        {workspaceError && (
+          <div role="alert" className="flex flex-wrap items-center gap-3 border-b border-destructive/30 bg-destructive/10 px-5 py-3 text-sm text-destructive lg:px-8">
+            <AlertTriangle className="size-4" />
+            <span className="flex-1">Impossible de charger votre boutique. Certaines rubriques peuvent être indisponibles.</span>
+            <Button size="sm" variant="outline" onClick={() => refetch()}>
+              Réessayer
             </Button>
           </div>
         )}

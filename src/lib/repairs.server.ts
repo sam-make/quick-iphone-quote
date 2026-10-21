@@ -94,19 +94,11 @@ export interface RepairInput {
   services: { serviceId?: string | null; name?: string | null; unitPrice?: number | null; quantity: number }[];
 }
 
-async function nextSequence(supabase: AnyClient, table: "repairs" | "invoices", shopId: string, prefix: string) {
-  const column = table === "repairs" ? "reference" : "number";
-  const year = new Date().getFullYear();
-  const { data } = await supabase
-    .from(table)
-    .select(column)
-    .eq("shop_id", shopId)
-    .like(column, `${prefix}-${year}-%`)
-    .order(column, { ascending: false })
-    .limit(1);
-  const last = (data?.[0] as Record<string, string> | undefined)?.[column];
-  const next = last ? Number(last.split("-").pop()) + 1 : 1;
-  return `${prefix}-${year}-${String(next).padStart(4, "0")}`;
+/** Atomic per-shop yearly reference (REP-2026-0001 / FA-2026-0001), allocated by the database. */
+async function nextSequence(supabase: AnyClient, prefix: "REP" | "FA") {
+  const { data, error } = await supabase.rpc("next_shop_reference", { _kind: prefix });
+  if (error || typeof data !== "string") throw new Error(error?.message ?? "Numérotation impossible.");
+  return data;
 }
 
 /** Creates the repair folder: customer, device, priced lines and initial status. */
@@ -173,7 +165,7 @@ export async function createRepairFor(supabase: AnyClient, userId: string, input
   if (lines.length === 0) throw new Error("Sélectionnez au moins une prestation.");
 
   const totals = totalsOf(lines);
-  const reference = await nextSequence(supabase, "repairs", profile.shop_id, "REP");
+  const reference = await nextSequence(supabase, "REP");
 
   const { data: repair, error: repairError } = await supabase
     .from("repairs")
@@ -247,7 +239,12 @@ export async function changeStatusFor(
 }
 
 /** Builds the invoice from the persisted repair lines (never from the browser). */
-export async function generateInvoiceFor(supabase: AnyClient, userId: string, repairId: string) {
+export async function generateInvoiceFor(
+  supabase: AnyClient,
+  admin: AnyClient,
+  userId: string,
+  repairId: string,
+) {
   const profile = await currentProfile(supabase, userId);
 
   const { data: existing } = await supabase
@@ -280,9 +277,10 @@ export async function generateInvoiceFor(supabase: AnyClient, userId: string, re
 
   const items = (repair.repair_items ?? []) as { name: string; unit_price: number; quantity: number }[];
   const total = items.reduce((sum, item) => sum + Number(item.unit_price) * Number(item.quantity), 0);
-  const number = await nextSequence(supabase, "invoices", profile.shop_id, "FA");
+  const number = await nextSequence(supabase, "FA");
 
-  const { data: invoice, error: invoiceError } = await supabase
+  // Repair was read through RLS above, so it belongs to the caller's shop.
+  const { data: invoice, error: invoiceError } = await admin
     .from("invoices")
     .insert({
       shop_id: profile.shop_id,

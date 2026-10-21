@@ -43,7 +43,8 @@ export const Route = createFileRoute("/_authenticated/administration")({
 });
 
 function AdminPage() {
-  const { data: workspace } = useWorkspace();
+  const workspaceQuery = useWorkspace();
+  const workspace = workspaceQuery.data;
   const shopId = workspace?.shop.id;
   const queryClient = useQueryClient();
   const invalidate = () => {
@@ -299,7 +300,20 @@ function AdminPage() {
     onError: () => toast.error("Enregistrement impossible."),
   });
 
-  if (workspace && workspace.role !== "admin") {
+  if (workspaceQuery.isLoading) {
+    return <p className="text-sm text-muted-foreground">Chargement de la boutique…</p>;
+  }
+  if (workspaceQuery.isError || !workspace) {
+    return (
+      <div role="alert" className="space-y-3 text-sm">
+        <p className="text-destructive">Impossible de vérifier vos droits d'accès pour le moment.</p>
+        <Button size="sm" variant="outline" onClick={() => workspaceQuery.refetch()}>
+          Réessayer
+        </Button>
+      </div>
+    );
+  }
+  if (workspace.role !== "admin") {
     return <p className="text-sm text-muted-foreground">Accès réservé à l'administrateur de la boutique.</p>;
   }
 

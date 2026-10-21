@@ -11,6 +11,7 @@ import {
   CATEGORY_LABELS,
   CATEGORY_ORDER,
   computePrice,
+  resolveBasePrice,
   formatEuro,
   formatStorage,
   storageStep,
@@ -96,13 +97,8 @@ function EstimationPage() {
 
   const basePrice = useMemo(() => {
     if (!model || storage === null) return 0;
-    const exact = prices.find(
-      (row) => row.model_id === model.id && row.storage_gb === storage && row.color === color,
-    );
-    const wildcard = prices.find(
-      (row) => row.model_id === model.id && row.storage_gb === storage && row.color === "*",
-    );
-    return Number(exact?.base_price ?? wildcard?.base_price ?? Number(model.base_price) + storageStep(storage));
+    const overrides = prices.filter((row) => row.model_id === model.id && row.storage_gb === storage);
+    return resolveBasePrice(model.base_price, storage, color, overrides);
   }, [model, storage, color, prices]);
 
   const selectedRules = rules.filter((rule) => selected[rule.id]);
