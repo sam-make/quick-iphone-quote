@@ -13,5 +13,6 @@ export function useWorkspace() {
     queryFn: () => fetchWorkspace({ data: undefined }),
     enabled: Boolean(user?.id),
     staleTime: 60_000,
+    retry: 2,
   });
 }
