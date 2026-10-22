@@ -1,62 +1,80 @@
-# Audit Trade-In Pro — état actuel et plan d'amélioration
+# Plan d'audit priorisé — Trade-In Pro (lecture seule)
 
-Audit uniquement : aucun fichier n'a été modifié. Les constats ci-dessous viennent de la lecture du code et de requêtes sur la base.
+Ce plan décrit l'audit à mener. Il ne modifie aucun fichier, ne déploie rien et n'ajoute aucun service payant. Aucun blocage lié aux crédits n'est constaté pour cette demande. Les points ci-dessous sont des vérifications à faire : leur résultat n'est pas encore confirmé.
 
-## 1) Ce qui existe réellement
+## Priorité 1 — Fiabilité du calcul des estimations
 
-- **Pages publiques** : accueil, connexion, inscription (avec création de la boutique), mot de passe oublié, réinitialisation.
-- **Espace connecté** (protégé, redirige vers /connexion) : tableau de bord, nouvelle estimation, historique, clients (liste + fiche), réparations (liste, création, détail avec statuts et photos), factures, administration.
-- **Administration** (réservée aux admins) : onglets Règles de déduction (ajout, modification, suppression, activation), Prestations, Prix, Boutique, Employés (invitation, changement de rôle, suppression).
-- **Catalogue** : 30 modèles d'iPhone en base, avec couleurs, capacités et prix de base. Seulement 8 prix personnalisés boutique au total.
-- **Moteur de calcul** : prix de base, puis prix boutique exact (modèle + couleur + capacité), sinon prix « toutes couleurs », sinon prix catalogue + supplément selon la capacité ; on retire les défauts cochés ; un blocage met le prix à 0. Le calcul tourne dans le navigateur et est **recalculé côté serveur** à l'enregistrement.
-- **Isolation entre boutiques** : la protection est activée sur les 16 tables, toujours filtrée par la boutique de l'utilisateur. Les suppressions sensibles sont réservées à l'admin. Historiques et factures ne peuvent pas être modifiés.
-- 8 boutiques et 5 estimations en base (2 boutiques ont des estimations).
+**À examiner**
+- `src/lib/pricing.ts` : `resolveBasePrice`, `computePrice`, `storageStep`
+- `src/lib/pricing.test.ts` : couverture actuelle
+- `src/routes/_authenticated/estimation.tsx` : calcul dans le navigateur
+- Fonction serveur d'enregistrement d'une estimation (`saveEstimation`, dans `src/lib/workspace.server.ts` ou un fichier voisin) : le calcul refait côté serveur
+- Fonction SQL `storage_step` : doit donner le même résultat que `storageStep`
 
-## 2) Lacunes vérifiées
+**Risques concrets**
+- Le navigateur et le serveur ne calculent pas pareil, par exemple si les règles ne sont pas filtrées de la même façon (actives, de la même boutique).
+- Le serveur accepte des identifiants de règles d'une autre boutique, ou des règles désactivées.
+- Le supplément de capacité est différent entre le code et la base.
+- Des valeurs limites mal gérées : déduction négative, prix boutique à 0, capacité inconnue, modèle désactivé.
 
-- **Aucun test automatisé** dans le projet (aucun fichier de test), alors que le calcul du prix est le cœur du produit.
-- **Le serveur n'est pas le seul à pouvoir écrire certaines données** : les règles de la base permettent à un membre connecté d'insérer directement une estimation ou une facture avec un montant libre. Les écritures normales passent bien par le serveur, mais ce raccourci reste ouvert.
-- **Numéros de dossiers et de factures** : on lit le dernier numéro puis on ajoute 1, sans verrou. Deux créations en même temps peuvent donner le même numéro ou un échec.
-- **Lien Administration** : il disparaît pendant le chargement ou si la boutique n'arrive pas à se charger, sans aucun message d'erreur (déjà diagnostiqué, pas corrigé).
-- **Prix boutique quasi vides** (8 lignes) : la plupart des estimations utilisent donc le prix catalogue par défaut + le supplément de capacité, qui est codé en dur à deux endroits (dans le code et en base).
-- **Pas de suivi des actions admin** (qui a modifié une règle ou un prix, et quand).
-- **Pas d'abonnement ni de limites** par boutique, alors que l'objectif est un SaaS vendu sur abonnement.
-- **Multi-marques** : prévu dans la structure (champ marque), mais pas d'interface pour gérer d'autres marques ou modèles (catalogue en lecture seule).
-- **Responsive / pages d'erreur** : non vérifiés visuellement dans cet audit. Il reste à les tester sur mobile.
+**Vérifications**
+1. Lire la fonction serveur et vérifier qu'elle relit le prix et les règles depuis la base, filtrés par boutique, et qu'elle ignore tout montant envoyé par le navigateur.
+2. Comparer `storage_step` et `storageStep` pour 64, 128, 256, 512 et 1024 Go (requête de lecture seule).
+3. Lister les cas manquants dans les tests : règle d'une autre boutique, règle inactive, déduction négative, prix « toutes couleurs » face au prix exact, blocage.
+4. Lancer `bun run test` et noter le résultat.
 
-## 3) Risques prioritaires
+## Priorité 2 — Sécurité de la base et isolation entre boutiques
 
-1. Montants falsifiables (estimations / factures) en passant à côté du serveur : risque juridique et financier.
-2. Numéros de factures en double ou manquants : problème de conformité comptable.
-3. Aucun test sur le calcul du prix : un bug passerait inaperçu.
-4. L'admin perd l'accès à l'administration dès que le chargement de la boutique échoue : impression de produit cassé.
+**À examiner**
+- `drizzle/migrations/*.sql` (dont `0001_phase1b_lock_repair_writes.sql`)
+- Les règles d'accès et les droits sur les 17 tables (requêtes sur `pg_policies` et sur `information_schema.role_table_grants`)
+- Les fonctions `current_shop_id`, `has_role`, `next_shop_reference`, `seed_default_*` : appelant autorisé, `search_path`, droit d'exécution
+- `scripts/check-direct-writes.py`
+- `src/lib/team.server.ts` : invitation, changement de rôle, suppression
+- `src/lib/workspace.server.ts` : rattachement d'un invité à une boutique
 
-## 4) Plan d'amélioration
+**Risques concrets**
+- Le rattachement par invitation se fie à `invited_shop_id` dans les métadonnées : vérifier qu'un utilisateur ne peut pas modifier ses propres métadonnées pour rejoindre une autre boutique (risque élevé à confirmer).
+- Un admin peut changer son propre rôle ou supprimer le dernier admin de la boutique.
+- Une fonction en security definer est exécutable par `anon`, ou n'est pas limitée à la boutique de l'appelant.
+- `profiles` : un utilisateur peut modifier son propre `shop_id`.
+- Le stockage des photos n'est pas cloisonné par boutique.
+- `device_models` est en lecture pour tous : à confirmer que c'est voulu.
 
-**P0 — sécurité et fiabilité**
-- Fermer l'écriture directe des estimations, défauts d'estimation et factures depuis le navigateur ; seules les actions serveur vérifiées peuvent les créer.
-- Numéros de dossiers et factures fiables : un compteur par boutique et par année, géré dans la base de façon atomique, avec une contrainte d'unicité.
-- Tests du moteur de calcul : déductions, blocage → 0 €, prix jamais négatif, ordre de priorité des prix (exact > toutes couleurs > catalogue), suppléments de capacité.
-- Lien Administration : afficher un état de chargement et un message clair en cas d'erreur, et réessayer automatiquement.
+**Vérifications**
+1. Pour chaque table, faire un tableau : opérations autorisées, rôles concernés, filtre de boutique.
+2. Vérifier que `profiles` interdit la modification de `shop_id`, et que `user_roles` n'accepte aucune écriture depuis le navigateur.
+3. Lire les règles d'accès de `storage.objects` pour le dossier des photos.
+4. Lancer le linter de sécurité et `scripts/check-direct-writes.py`.
+5. Avec deux comptes test de boutiques différentes, faire des lectures croisées en lecture seule, sur une copie de travail isolée seulement, pour ne pas toucher aux données réelles.
 
-**P1 — qualité produit**
-- Grille de prix complète : remplissage en masse par modèle, import/export CSV, alerte « prix par défaut utilisé » dans l'estimation.
-- Journal des actions admin (règles, prix, prestations, employés).
-- Historique : filtres (date, employé, modèle), export CSV, fiche détaillée imprimable/PDF pour le client.
-- Vérification mobile et tablette de toutes les pages, avec des pages d'erreur et des messages vides homogènes.
+## Priorité 3 — Réparations et factures
 
-**P2 — croissance SaaS**
-- Abonnements et limites par boutique (paiement en ligne).
-- Gestion du catalogue multi-marques (Samsung, Pixel…) par un super-admin.
-- Statistiques : marge, prix moyen, défauts les plus fréquents.
+**À examiner**
+- `src/lib/repairs.server.ts`, `src/lib/repairs.functions.ts`, `src/lib/repairs.ts` (`totalsOf`)
+- `src/routes/_authenticated/reparations.nouvelle.tsx`, `reparations.$id.tsx`, `factures.$id.tsx`
+- `src/components/repairs/ServicesStep.tsx`, `src/lib/repair-photos.ts`
 
-## 5) Première amélioration recommandée
+**Risques concrets**
+- `changeStatusFor` accepte n'importe quel passage d'un statut à un autre, y compris après « restitué » ou « annulé ».
+- `generateInvoiceFor` : deux clics en même temps peuvent créer deux factures, faute de contrainte d'unicité sur `repair_id` (à vérifier).
+- Facture créée pour une réparation annulée ou pas encore terminée.
+- Le total de la facture est recalculé à partir des lignes au lieu de reprendre `total_price` : il peut y avoir un écart.
+- Une création partielle (réparation sans lignes, ou historique manquant) si l'une des étapes échoue.
+- Un appareil existant réattribué à un autre client.
+- Un numéro consommé puis perdu si l'insertion échoue : un trou dans la numérotation des factures, à évaluer pour la conformité.
 
-Le **P0 sécurité des montants** : bloquer l'écriture directe des estimations et factures, et ajouter la numérotation atomique, avec des tests du calcul. C'est petit, sans impact visible pour les vendeurs, et c'est ce qui protège la valeur légale des prix et des factures.
+**Vérifications**
+1. Vérifier les contraintes d'unicité sur `invoices(repair_id)`, `invoices(shop_id, number)` et `repairs(shop_id, reference)`.
+2. Faire la liste des passages de statut autorisés, et dire lesquels devraient être interdits.
+3. Vérifier, par une requête de lecture, que chaque facture a le même total que sa réparation et que les numéros se suivent.
+4. Relire les messages d'erreur et les cas de nouvelle tentative dans les pages.
+
+## Livrable de l'audit
+
+Pour chaque point : constaté ou écarté, avec le fichier et la ligne en preuve, une gravité (critique, élevée, moyenne, faible) et la correction proposée. Aucune correction ne sera appliquée sans votre accord.
 
 ## Détails techniques
 
-- Retirer les policies INSERT `authenticated` sur `estimations`, `estimation_defects` et `invoices`. Les insertions passent par `supabaseAdmin` dans les server functions, une fois l'appelant et sa boutique vérifiés (`saveEstimation` et `generateInvoiceFor` lisent déjà le profil).
-- Créer une table `shop_counters(shop_id, kind, year, value)` et une fonction SQL `next_reference(kind)` en security definer (`UPDATE ... RETURNING`), plus `UNIQUE(shop_id, reference)` et `UNIQUE(shop_id, number)`. Remplacer `nextSequence` par cette fonction.
-- Tests Vitest dans `src/lib/pricing.test.ts`, et sortir le choix du prix de base de `estimation.tsx` vers une fonction pure `resolveBasePrice`, partagée avec le serveur.
-- Dans `AppShell` : gérer `isLoading` / `isError` de `useWorkspace`.
+- Requêtes en lecture seule uniquement : `pg_policies`, `pg_proc` (`prosecdef`, `proconfig`, `proacl`), `information_schema.role_table_grants`, `pg_constraint`.
+- Les tests à ajouter plus tard iraient dans `src/lib/pricing.test.ts` et dans un nouveau fichier `src/lib/repairs.test.ts` (pour `totalsOf` et les passages de statut).
