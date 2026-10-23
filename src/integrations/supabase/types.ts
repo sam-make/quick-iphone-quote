@@ -249,6 +249,84 @@ export type Database = {
           },
         ]
       }
+      estimation_market_analyses: {
+        Row: {
+          created_at: string
+          estimation_id: string
+          id: string
+          notes: string | null
+          other_costs: number | null
+          private_checked_at: string | null
+          private_confidence: string | null
+          private_price: number | null
+          private_source: string | null
+          pro_checked_at: string | null
+          pro_confidence: string | null
+          pro_price: number | null
+          pro_source: string | null
+          repair_costs: number | null
+          shop_id: string
+          target_margin_pct: number | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          estimation_id: string
+          id?: string
+          notes?: string | null
+          other_costs?: number | null
+          private_checked_at?: string | null
+          private_confidence?: string | null
+          private_price?: number | null
+          private_source?: string | null
+          pro_checked_at?: string | null
+          pro_confidence?: string | null
+          pro_price?: number | null
+          pro_source?: string | null
+          repair_costs?: number | null
+          shop_id: string
+          target_margin_pct?: number | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          estimation_id?: string
+          id?: string
+          notes?: string | null
+          other_costs?: number | null
+          private_checked_at?: string | null
+          private_confidence?: string | null
+          private_price?: number | null
+          private_source?: string | null
+          pro_checked_at?: string | null
+          pro_confidence?: string | null
+          pro_price?: number | null
+          pro_source?: string | null
+          repair_costs?: number | null
+          shop_id?: string
+          target_margin_pct?: number | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "estimation_market_analyses_estimation_id_fkey"
+            columns: ["estimation_id"]
+            isOneToOne: true
+            referencedRelation: "estimations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "estimation_market_analyses_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       estimations: {
         Row: {
           base_price: number
