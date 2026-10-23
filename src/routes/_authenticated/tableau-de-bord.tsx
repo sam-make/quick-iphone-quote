@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode, type PointerEvent as ReactPointerEvent } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -89,13 +89,13 @@ function DashboardPage() {
 
   // Mouse drag on desktop (touch swipe is handled natively by scroll-snap).
   const drag = useRef<{ x: number; left: number; moved: boolean } | null>(null);
-  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+  const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
     if (e.pointerType !== "mouse" || e.button !== 0) return;
     const track = trackRef.current;
     if (!track) return;
     drag.current = { x: e.clientX, left: track.scrollLeft, moved: false };
   };
-  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+  const onPointerMove = (e: ReactPointerEvent<HTMLDivElement>) => {
     const d = drag.current;
     const track = trackRef.current;
     if (!d || !track) return;
@@ -109,7 +109,7 @@ function DashboardPage() {
     }
     track.scrollLeft = d.left - dx;
   };
-  const endDrag = (e: React.PointerEvent<HTMLDivElement>) => {
+  const endDrag = (e: ReactPointerEvent<HTMLDivElement>) => {
     const d = drag.current;
     const track = trackRef.current;
     drag.current = null;
