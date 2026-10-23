@@ -87,6 +87,52 @@ function DashboardPage() {
     };
   }, []);
 
+  // Mouse drag on desktop (touch swipe is handled natively by scroll-snap).
+  const drag = useRef<{ x: number; left: number; moved: boolean } | null>(null);
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.pointerType !== "mouse" || e.button !== 0) return;
+    const track = trackRef.current;
+    if (!track) return;
+    drag.current = { x: e.clientX, left: track.scrollLeft, moved: false };
+  };
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const d = drag.current;
+    const track = trackRef.current;
+    if (!d || !track) return;
+    const dx = e.clientX - d.x;
+    if (!d.moved && Math.abs(dx) < 6) return;
+    if (!d.moved) {
+      d.moved = true;
+      track.setPointerCapture(e.pointerId);
+      track.style.scrollSnapType = "none";
+      track.style.scrollBehavior = "auto";
+    }
+    track.scrollLeft = d.left - dx;
+  };
+  const endDrag = (e: React.PointerEvent<HTMLDivElement>) => {
+    const d = drag.current;
+    const track = trackRef.current;
+    drag.current = null;
+    if (!d?.moved || !track) return;
+    if (track.hasPointerCapture(e.pointerId)) track.releasePointerCapture(e.pointerId);
+    const dx = e.clientX - d.x;
+    const current = Math.round(d.left / Math.max(1, track.clientWidth));
+    const threshold = track.clientWidth * 0.15;
+    let index = current;
+    if (dx < -threshold) index = Math.min(VIEWS.length - 1, current + 1);
+    if (dx > threshold) index = Math.max(0, current - 1);
+    track.style.scrollSnapType = "";
+    track.style.scrollBehavior = "";
+    goTo(VIEWS[index].id);
+    // Swallow the click that follows a drag so links don't open.
+    const block = (ev: MouseEvent) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+    };
+    window.addEventListener("click", block, { capture: true, once: true });
+    setTimeout(() => window.removeEventListener("click", block, { capture: true }), 0);
+  };
+
   const onTabKey = (event: KeyboardEvent<HTMLDivElement>) => {
     const index = VIEWS.findIndex((v) => v.id === view);
     let target = -1;
@@ -145,7 +191,12 @@ function DashboardPage() {
 
       <div
         ref={trackRef}
-        className="-mx-4 flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain scroll-smooth [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={endDrag}
+        onPointerCancel={endDrag}
+        onDragStart={(e) => e.preventDefault()}
+        className="-mx-4 flex touch-pan-x touch-pan-y snap-x snap-mandatory overflow-x-auto overscroll-x-contain scroll-smooth select-none md:select-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         <section
           id="panel-repairs"
