@@ -57,8 +57,14 @@ export function toAmount(value: number | string | null | undefined): number | nu
   return round2(value);
 }
 
-function scenario(marketPrice: number | null, invested: number, costs: number, targetPct: number | null): Scenario {
-  if (marketPrice === null) return { marketPrice: null, grossMargin: null, marginPct: null, maxPurchasePrice: null };
+function scenario(
+  marketPrice: number | null,
+  invested: number,
+  costs: number,
+  targetPct: number | null,
+): Scenario {
+  if (marketPrice === null)
+    return { marketPrice: null, grossMargin: null, marginPct: null, maxPurchasePrice: null };
   const grossMargin = round2(marketPrice - invested);
   const marginPct = marketPrice > 0 ? round2((grossMargin / marketPrice) * 100) : null;
   const maxPurchasePrice =
