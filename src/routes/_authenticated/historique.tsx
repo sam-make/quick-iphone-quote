@@ -14,6 +14,8 @@ export const Route = createFileRoute("/_authenticated/historique")({
       { name: "description", content: "Retrouvez toutes les estimations de reprise réalisées par votre boutique." },
       { property: "og:title", content: "Historique des estimations — ReprisePro" },
       { property: "og:description", content: "Date, employé, appareil, défauts et prix proposé." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: HistoryPage,
@@ -107,17 +109,17 @@ function HistoryPage() {
                   ))}
                 </div>
               )}
-              <details className="mt-4 border-t border-border pt-3">
+              {workspace && !row.is_blocked && <details className="mt-4 border-t border-border pt-3">
                 <summary className="cursor-pointer text-sm font-medium text-primary">Analyse du marché et rentabilité</summary>
                 <div className="mt-4">
                   <MarketAnalysisPanel
                     estimationId={row.id}
-                    shopId={workspace!.shop.id}
-                    purchasePrice={row.is_blocked ? 0 : Number(row.final_price)}
+                    shopId={workspace.shop.id}
+                    purchasePrice={Number(row.final_price)}
                     description={`${row.model_name} ${formatStorage(row.storage_gb)} ${row.color}`}
                   />
                 </div>
-              </details>
+              </details>}
             </article>
           ))}
         </div>

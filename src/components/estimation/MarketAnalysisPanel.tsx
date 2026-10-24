@@ -31,7 +31,7 @@ const fmt2 = (v: number) => new Intl.NumberFormat("fr-FR", { style: "currency", 
 export function MarketAnalysisPanel({ estimationId, shopId, purchasePrice, description }: Props) {
   const qc = useQueryClient();
   const [form, setForm] = useState<Form>(EMPTY);
-  const { data, isLoading } = useQuery({
+  const { data, isLoading, isError, refetch } = useQuery({
     queryKey: ["market-analysis", estimationId],
     queryFn: async () => {
       const { data, error } = await supabase.from("estimation_market_analyses").select("*").eq("estimation_id", estimationId).maybeSingle();
@@ -64,6 +64,12 @@ export function MarketAnalysisPanel({ estimationId, shopId, purchasePrice, descr
 
   const save = useMutation({
     mutationFn: async () => {
+      const amounts: (keyof Form)[] = ["repair_costs", "other_costs", "target_margin_pct", "pro_price", "private_price"];
+      if (amounts.some((key) => form[key].trim() !== "" && toAmount(form[key]) === null)) {
+        throw new Error("Saisissez des montants valides, supérieurs ou égaux à zéro.");
+      }
+      const target = toAmount(form.target_margin_pct);
+      if (target !== null && target >= 100) throw new Error("La marge cible doit être inférieure à 100 %.");
       const txt = (v: string) => v.trim() || null;
       const { error } = await supabase.from("estimation_market_analyses").upsert(
         {
@@ -81,13 +87,19 @@ export function MarketAnalysisPanel({ estimationId, shopId, purchasePrice, descr
       if (error) throw error;
     },
     onSuccess: () => { toast.success("Analyse enregistrée."); qc.invalidateQueries({ queryKey: ["market-analysis", estimationId] }); },
-    onError: () => toast.error("Enregistrement impossible."),
+    onError: (error) => toast.error(error instanceof Error ? error.message : "Enregistrement impossible."),
   });
 
   if (isLoading) return <p className="text-sm text-muted-foreground">Chargement…</p>;
+  if (isError) return (
+    <div role="alert" className="space-y-2">
+      <p className="text-sm text-destructive">Impossible de charger l’analyse enregistrée.</p>
+      <Button variant="outline" onClick={() => refetch()}>Réessayer</Button>
+    </div>
+  );
 
   const quoteFields = (p: "pro" | "private", title: string) => (
-    <fieldset className="space-y-3 rounded-xl border border-border p-4">
+    <fieldset className="space-y-3 border-t border-border pt-4">
       <legend className="px-1 text-sm font-semibold text-ink">{title}</legend>
       <div className="grid gap-3 sm:grid-cols-2">
         <div className="space-y-1"><Label>Prix de marché (€)</Label><Input inputMode="decimal" value={form[`${p}_price`]} onChange={set(`${p}_price`)} placeholder="À renseigner" /></div>
@@ -122,13 +134,15 @@ export function MarketAnalysisPanel({ estimationId, shopId, purchasePrice, descr
       </div>
       <div className="space-y-1"><Label>Notes</Label><Input value={form.notes} onChange={set("notes")} /></div>
 
-      <dl className="grid gap-x-6 gap-y-2 rounded-xl bg-muted/50 p-4 text-sm sm:grid-cols-2">
+       <dl className="grid gap-x-6 gap-y-2 border-y border-border py-4 text-sm sm:grid-cols-2 [&>div]:gap-3 [&>div>dd]:shrink-0">
         <div className="flex justify-between"><dt className="text-muted-foreground">Prix d'achat</dt><dd className="font-medium text-ink">{fmt2(r.purchasePrice)}</dd></div>
         <div className="flex justify-between"><dt className="text-muted-foreground">Réparations et frais</dt><dd className="font-medium text-ink">{fmt2(r.totalCosts)}</dd></div>
         <div className="flex justify-between"><dt className="text-muted-foreground">Prix marché pro</dt><dd>{money(r.pro.marketPrice)}</dd></div>
         <div className="flex justify-between"><dt className="text-muted-foreground">Marge brute pro</dt><dd>{margin(r.pro.grossMargin)}</dd></div>
         <div className="flex justify-between"><dt className="text-muted-foreground">Prix marché particulier</dt><dd>{money(r.private.marketPrice)}</dd></div>
         <div className="flex justify-between"><dt className="text-muted-foreground">Marge brute particulier</dt><dd>{margin(r.private.grossMargin)}</dd></div>
+         <div className="flex justify-between"><dt className="text-muted-foreground">Marge pro (%)</dt><dd>{r.pro.marginPct === null ? "À renseigner" : `${r.pro.marginPct.toLocaleString("fr-FR")} %`}</dd></div>
+         <div className="flex justify-between"><dt className="text-muted-foreground">Marge particulier (%)</dt><dd>{r.private.marginPct === null ? "À renseigner" : `${r.private.marginPct.toLocaleString("fr-FR")} %`}</dd></div>
         <div className="flex justify-between"><dt className="text-muted-foreground">Rachat max conseillé (pro)</dt><dd>{money(r.pro.maxPurchasePrice)}</dd></div>
         <div className="flex justify-between"><dt className="text-muted-foreground">Rachat max conseillé (particulier)</dt><dd>{money(r.private.maxPurchasePrice)}</dd></div>
       </dl>

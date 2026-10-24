@@ -26,6 +26,8 @@ export const Route = createFileRoute("/")({
           "Estimez la reprise d'un iPhone en moins de 2 minutes. Règles de déduction 100 % personnalisables, historique complet, espace sécurisé par boutique.",
       },
       { property: "og:title", content: "ReprisePro — Logiciel d'estimation de reprise iPhone" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
       {
         property: "og:description",
         content: "Estimez la reprise d'un iPhone en moins de 2 minutes. Règles de déduction 100 % personnalisables, historique complet, espace sécurisé par boutique.",

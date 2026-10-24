@@ -14,6 +14,8 @@ export const Route = createFileRoute("/reset-password")({
       { name: "description", content: "Définissez un nouveau mot de passe pour votre compte ReprisePro." },
       { property: "og:title", content: "Nouveau mot de passe — ReprisePro" },
       { property: "og:description", content: "Choisissez un nouveau mot de passe sécurisé." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: ResetPasswordPage,

@@ -32,6 +32,8 @@ export const Route = createFileRoute("/_authenticated/estimation")({
       { name: "description", content: "Estimez la reprise d'un iPhone en moins de deux minutes." },
       { property: "og:title", content: "Nouvelle estimation — ReprisePro" },
       { property: "og:description", content: "Diagnostic guidé et prix de reprise calculé instantanément." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: EstimationPage,

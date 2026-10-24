@@ -18,6 +18,8 @@ export const Route = createFileRoute("/inscription")({
       },
       { property: "og:title", content: "Créer un espace boutique — ReprisePro" },
       { property: "og:description", content: "Ouvrez l'espace de votre boutique en moins d'une minute." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: SignupPage,
