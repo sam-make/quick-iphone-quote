@@ -11,9 +11,14 @@ export const Route = createFileRoute("/_authenticated/historique")({
   head: () => ({
     meta: [
       { title: "Historique des estimations — ReprisePro" },
-      { name: "description", content: "Retrouvez toutes les estimations de reprise réalisées par votre boutique." },
+      {
+        name: "description",
+        content: "Retrouvez toutes les estimations de reprise réalisées par votre boutique.",
+      },
       { property: "og:title", content: "Historique des estimations — ReprisePro" },
       { property: "og:description", content: "Date, employé, appareil, défauts et prix proposé." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: HistoryPage,
@@ -57,7 +62,9 @@ function HistoryPage() {
     <div className="mx-auto max-w-6xl space-y-6">
       <div>
         <h1 className="text-2xl font-semibold text-ink md:text-3xl">Historique</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Toutes les estimations enregistrées par votre boutique.</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Toutes les estimations enregistrées par votre boutique.
+        </p>
       </div>
 
       {isLoading ? (
@@ -91,14 +98,18 @@ function HistoryPage() {
                     </p>
                   )}
                   <p className="text-xs text-muted-foreground">
-                    Base {formatEuro(Number(row.base_price))} · −{formatEuro(Number(row.total_deduction))}
+                    Base {formatEuro(Number(row.base_price))} · −
+                    {formatEuro(Number(row.total_deduction))}
                   </p>
                 </div>
               </div>
               {row.estimation_defects.length > 0 && (
                 <div className="mt-4 flex flex-wrap gap-1.5 border-t border-border pt-3">
                   {row.estimation_defects.map((defect) => (
-                    <Badge key={defect.id} variant={defect.is_blocking ? "destructive" : "secondary"}>
+                    <Badge
+                      key={defect.id}
+                      variant={defect.is_blocking ? "destructive" : "secondary"}
+                    >
                       {defect.rule_name}
                       {!defect.is_blocking && Number(defect.deduction) > 0
                         ? ` −${formatEuro(Number(defect.deduction))}`
@@ -107,17 +118,21 @@ function HistoryPage() {
                   ))}
                 </div>
               )}
-              <details className="mt-4 border-t border-border pt-3">
-                <summary className="cursor-pointer text-sm font-medium text-primary">Analyse du marché et rentabilité</summary>
-                <div className="mt-4">
-                  <MarketAnalysisPanel
-                    estimationId={row.id}
-                    shopId={workspace!.shop.id}
-                    purchasePrice={row.is_blocked ? 0 : Number(row.final_price)}
-                    description={`${row.model_name} ${formatStorage(row.storage_gb)} ${row.color}`}
-                  />
-                </div>
-              </details>
+              {workspace && !row.is_blocked && (
+                <details className="mt-4 border-t border-border pt-3">
+                  <summary className="cursor-pointer text-sm font-medium text-primary">
+                    Analyse du marché et rentabilité
+                  </summary>
+                  <div className="mt-4">
+                    <MarketAnalysisPanel
+                      estimationId={row.id}
+                      shopId={workspace.shop.id}
+                      purchasePrice={Number(row.final_price)}
+                      description={`${row.model_name} ${formatStorage(row.storage_gb)} ${row.color}`}
+                    />
+                  </div>
+                </details>
+              )}
             </article>
           ))}
         </div>

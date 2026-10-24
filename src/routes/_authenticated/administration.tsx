@@ -37,6 +37,8 @@ export const Route = createFileRoute("/_authenticated/administration")({
       { name: "description", content: "Gérez vos règles de déduction, vos prix de base et les infos de la boutique." },
       { property: "og:title", content: "Administration — ReprisePro" },
       { property: "og:description", content: "Règles de déduction 100 % personnalisables par boutique." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: AdminPage,

@@ -15,6 +15,8 @@ export const Route = createFileRoute("/mot-de-passe-oublie")({
       { name: "description", content: "Recevez un lien sécurisé pour réinitialiser votre mot de passe ReprisePro." },
       { property: "og:title", content: "Mot de passe oublié — ReprisePro" },
       { property: "og:description", content: "Réinitialisez l'accès à votre espace boutique." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: ForgotPasswordPage,

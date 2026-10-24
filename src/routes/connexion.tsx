@@ -16,6 +16,8 @@ export const Route = createFileRoute("/connexion")({
       { name: "description", content: "Connectez-vous à l'espace sécurisé de votre boutique ReprisePro." },
       { property: "og:title", content: "Connexion — ReprisePro" },
       { property: "og:description", content: "Accédez à l'espace de votre boutique de reprise iPhone." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: LoginPage,
