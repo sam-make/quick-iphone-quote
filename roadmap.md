@@ -4,3 +4,9 @@
 - [x] Tests moteur de prix
 - [x] État chargement/erreur workspace (lien Administration)
 - [x] Vérifications (tests, typecheck)
+
+## Analyse du marché et rentabilité
+- [ ] Vérifier le stockage existant et les deux scénarios sans modifier Auth/RLS
+- [ ] Finaliser les états de saisie, chargement et erreur nécessaires
+- [ ] Exécuter les tests et vérifier l’enregistrement connecté, puis le rechargement
+- [ ] Contrôler les diagnostics automatiques et rapporter les limites sans publier
