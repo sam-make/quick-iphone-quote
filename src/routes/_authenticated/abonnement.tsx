@@ -159,14 +159,13 @@ function SubscriptionPage() {
         </p>
       )}
       {secret && (
-        <EmbeddedCheckoutProvider stripe={getTestStripe()} options={{ clientSecret: secret }}>
+        <EmbeddedCheckoutProvider stripe={getStripe()} options={{ clientSecret: secret }}>
           <EmbeddedCheckout />
         </EmbeddedCheckoutProvider>
       )}
       <p className="text-sm text-muted-foreground">
         Le retour du paiement ne confirme pas l’abonnement : le statut affiché provient des
-        notifications vérifiées. Les accès actuels restent inchangés pendant la préparation au
-        lancement.
+        notifications vérifiées de Stripe.
       </p>
     </div>
   );
