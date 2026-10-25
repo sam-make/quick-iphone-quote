@@ -33,7 +33,9 @@ export async function getShopAccess(
     .from("shop_subscriptions")
     .select("status,current_period_end,cancel_at_period_end")
     .eq("shop_id", profile.shop_id)
-    .eq("environment", "sandbox")
+    // Un abonnement valide en test (aperçu) ou en réel (production) donne accès :
+    // la même base sert les deux environnements. Règle identique à shop_has_access.
+    .in("environment", ["sandbox", "live"])
     .order("updated_at", { ascending: false })
     .limit(1);
   if (subError) throw new Error(subError.message);
