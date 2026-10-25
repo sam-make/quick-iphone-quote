@@ -1,7 +1,7 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useState, type ReactNode } from "react";
-import { AlertTriangle, Gauge, Loader2, History, LogOut, Menu, Settings, Sparkles, Users, Wrench, X } from "lucide-react";
+import { AlertTriangle, CreditCard, Gauge, Loader2, History, LogOut, Menu, Settings, Sparkles, Users, Wrench, X } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,6 +15,7 @@ const NAV = [
   { to: "/estimation", label: "Nouvelle estimation", icon: Sparkles },
   { to: "/historique", label: "Historique", icon: History },
   { to: "/administration", label: "Administration", icon: Settings, adminOnly: true },
+  { to: "/abonnement", label: "Abonnement test", icon: CreditCard },
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {

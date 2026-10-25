@@ -15,6 +15,7 @@ import { Route as ConnexionRouteImport } from './routes/connexion'
 import { Route as InscriptionRouteImport } from './routes/inscription'
 import { Route as MotDePasseOublieRouteImport } from './routes/mot-de-passe-oublie'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as AuthenticatedAbonnementRouteImport } from './routes/_authenticated/abonnement'
 import { Route as AuthenticatedAdministrationRouteImport } from './routes/_authenticated/administration'
 import { Route as AuthenticatedEstimationRouteImport } from './routes/_authenticated/estimation'
 import { Route as AuthenticatedHistoriqueRouteImport } from './routes/_authenticated/historique'
@@ -25,6 +26,7 @@ import { Route as AuthenticatedFacturesIdRouteImport } from './routes/_authentic
 import { Route as AuthenticatedReparationsIndexRouteImport } from './routes/_authenticated/reparations.index'
 import { Route as AuthenticatedReparationsIdRouteImport } from './routes/_authenticated/reparations.$id'
 import { Route as AuthenticatedReparationsNouvelleRouteImport } from './routes/_authenticated/reparations.nouvelle'
+import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -54,6 +56,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAbonnementRoute = AuthenticatedAbonnementRouteImport.update({
+  id: '/abonnement',
+  path: '/abonnement',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedAdministrationRoute =
   AuthenticatedAdministrationRouteImport.update({
@@ -111,6 +118,12 @@ const AuthenticatedReparationsNouvelleRoute =
     path: '/reparations/nouvelle',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const ApiPublicPaymentsWebhookRoute =
+  ApiPublicPaymentsWebhookRouteImport.update({
+    id: '/api/public/payments/webhook',
+    path: '/api/public/payments/webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -118,6 +131,7 @@ export interface FileRoutesByFullPath {
   '/inscription': typeof InscriptionRoute
   '/mot-de-passe-oublie': typeof MotDePasseOublieRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/abonnement': typeof AuthenticatedAbonnementRoute
   '/administration': typeof AuthenticatedAdministrationRoute
   '/estimation': typeof AuthenticatedEstimationRoute
   '/historique': typeof AuthenticatedHistoriqueRoute
@@ -128,6 +142,7 @@ export interface FileRoutesByFullPath {
   '/reparations/nouvelle': typeof AuthenticatedReparationsNouvelleRoute
   '/clients/': typeof AuthenticatedClientsIndexRoute
   '/reparations/': typeof AuthenticatedReparationsIndexRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -135,6 +150,7 @@ export interface FileRoutesByTo {
   '/inscription': typeof InscriptionRoute
   '/mot-de-passe-oublie': typeof MotDePasseOublieRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/abonnement': typeof AuthenticatedAbonnementRoute
   '/administration': typeof AuthenticatedAdministrationRoute
   '/estimation': typeof AuthenticatedEstimationRoute
   '/historique': typeof AuthenticatedHistoriqueRoute
@@ -145,6 +161,7 @@ export interface FileRoutesByTo {
   '/reparations/nouvelle': typeof AuthenticatedReparationsNouvelleRoute
   '/clients': typeof AuthenticatedClientsIndexRoute
   '/reparations': typeof AuthenticatedReparationsIndexRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -154,6 +171,7 @@ export interface FileRoutesById {
   '/inscription': typeof InscriptionRoute
   '/mot-de-passe-oublie': typeof MotDePasseOublieRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/abonnement': typeof AuthenticatedAbonnementRoute
   '/_authenticated/administration': typeof AuthenticatedAdministrationRoute
   '/_authenticated/estimation': typeof AuthenticatedEstimationRoute
   '/_authenticated/historique': typeof AuthenticatedHistoriqueRoute
@@ -164,6 +182,7 @@ export interface FileRoutesById {
   '/_authenticated/reparations/nouvelle': typeof AuthenticatedReparationsNouvelleRoute
   '/_authenticated/clients/': typeof AuthenticatedClientsIndexRoute
   '/_authenticated/reparations/': typeof AuthenticatedReparationsIndexRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -173,6 +192,7 @@ export interface FileRouteTypes {
     | '/inscription'
     | '/mot-de-passe-oublie'
     | '/reset-password'
+    | '/abonnement'
     | '/administration'
     | '/estimation'
     | '/historique'
@@ -183,6 +203,7 @@ export interface FileRouteTypes {
     | '/reparations/nouvelle'
     | '/clients/'
     | '/reparations/'
+    | '/api/public/payments/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -190,6 +211,7 @@ export interface FileRouteTypes {
     | '/inscription'
     | '/mot-de-passe-oublie'
     | '/reset-password'
+    | '/abonnement'
     | '/administration'
     | '/estimation'
     | '/historique'
@@ -200,6 +222,7 @@ export interface FileRouteTypes {
     | '/reparations/nouvelle'
     | '/clients'
     | '/reparations'
+    | '/api/public/payments/webhook'
   id:
     | '__root__'
     | '/'
@@ -208,6 +231,7 @@ export interface FileRouteTypes {
     | '/inscription'
     | '/mot-de-passe-oublie'
     | '/reset-password'
+    | '/_authenticated/abonnement'
     | '/_authenticated/administration'
     | '/_authenticated/estimation'
     | '/_authenticated/historique'
@@ -218,6 +242,7 @@ export interface FileRouteTypes {
     | '/_authenticated/reparations/nouvelle'
     | '/_authenticated/clients/'
     | '/_authenticated/reparations/'
+    | '/api/public/payments/webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -227,6 +252,7 @@ export interface RootRouteChildren {
   InscriptionRoute: typeof InscriptionRoute
   MotDePasseOublieRoute: typeof MotDePasseOublieRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -272,6 +298,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/abonnement': {
+      id: '/_authenticated/abonnement'
+      path: '/abonnement'
+      fullPath: '/abonnement'
+      preLoaderRoute: typeof AuthenticatedAbonnementRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/administration': {
       id: '/_authenticated/administration'
@@ -343,10 +376,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedReparationsNouvelleRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/public/payments/webhook': {
+      id: '/api/public/payments/webhook'
+      path: '/api/public/payments/webhook'
+      fullPath: '/api/public/payments/webhook'
+      preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAbonnementRoute: typeof AuthenticatedAbonnementRoute
   AuthenticatedAdministrationRoute: typeof AuthenticatedAdministrationRoute
   AuthenticatedEstimationRoute: typeof AuthenticatedEstimationRoute
   AuthenticatedHistoriqueRoute: typeof AuthenticatedHistoriqueRoute
@@ -360,6 +401,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAbonnementRoute: AuthenticatedAbonnementRoute,
   AuthenticatedAdministrationRoute: AuthenticatedAdministrationRoute,
   AuthenticatedEstimationRoute: AuthenticatedEstimationRoute,
   AuthenticatedHistoriqueRoute: AuthenticatedHistoriqueRoute,
@@ -382,6 +424,7 @@ const rootRouteChildren: RootRouteChildren = {
   InscriptionRoute: InscriptionRoute,
   MotDePasseOublieRoute: MotDePasseOublieRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
