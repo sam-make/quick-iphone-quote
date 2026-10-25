@@ -44,7 +44,9 @@ function CgvPage() {
           supplémentaire. Aucun autre forfait n’est proposé.
         </p>
         <p>
-          Le prix s’entend toutes taxes comprises (TVA applicable incluse). Toute évolution
+          Le prix s’entend toutes taxes comprises (TVA applicable incluse). Les boutiques créées
+          avant le 26 octobre 2026 bénéficient d’une période de transition gratuite jusqu’au
+          25 novembre 2026, après laquelle un abonnement est nécessaire. Toute évolution
           tarifaire future serait annoncée avant application et ne concernerait que les périodes
           suivantes.
         </p>
@@ -54,7 +56,10 @@ function CgvPage() {
         <p>
           La souscription s’effectue en ligne depuis l’espace de la boutique, par un administrateur
           de celle-ci. Le paiement est traité par Stripe ; les données bancaires ne transitent
-          jamais par nos serveurs.
+          jamais par nos serveurs. Le paiement est encaissé par Stripe en qualité de revendeur
+          (gestion des taxes, de la fraude et des litiges) et apparaît sur le relevé bancaire sous
+          un libellé « LINK.COM ».{" "}
+          <Missing>rôle de Stripe comme revendeur et émetteur des reçus à faire valider par un conseil juridique</Missing>
         </p>
         <p>
           L’abonnement est facturé mensuellement, à date anniversaire de la souscription, par
@@ -80,9 +85,11 @@ function CgvPage() {
 
       <LegalSection title="5. Échec de paiement">
         <p>
-          En cas d’échec de prélèvement, le paiement est automatiquement retenté pendant quelques
-          jours. L’accès au service est maintenu pendant cette période de régularisation. À
-          l’issue des tentatives, l’abonnement est suspendu puis résilié, sans perte des données.
+          En cas d’échec de prélèvement, le paiement est automatiquement retenté par Stripe.
+          L’accès au service est maintenu jusqu’à la fin de la période mensuelle déjà payée. Si le
+          paiement n’est pas régularisé à cette date, les fonctionnalités sont suspendues jusqu’à
+          la régularisation ou à une nouvelle souscription ; les données de la boutique sont
+          conservées.
         </p>
       </LegalSection>
 
@@ -104,6 +111,12 @@ function CgvPage() {
         <p>
           L’éditeur ne saurait être tenu responsable des dommages indirects (perte d’exploitation,
           manque à gagner) ni des conséquences d’une mauvaise utilisation du service.
+        </p>
+        <p>
+          La boutique est responsable des comptes de ses employés, de l’exactitude des données
+          qu’elle saisit et du respect de ses propres obligations envers ses clients (information,
+          facturation, protection des données).{" "}
+          <Missing>clause de limitation de responsabilité à faire valider par un conseil juridique</Missing>
         </p>
       </LegalSection>
 

@@ -44,7 +44,9 @@ function ConfidentialitePage() {
         </p>
         <p>
           <strong>Données d’exploitation saisies par la boutique :</strong> fiches clients (nom,
-          téléphone, e-mail, adresse), réparations, estimations, factures, règles de prix.
+          téléphone, e-mail, adresse), appareils (modèle, couleur, capacité, numéro IMEI et, le cas
+          échéant, code de déverrouillage), réparations, photos des appareils, estimations,
+          factures, règles de prix, comptes des employés invités (nom, e-mail, rôle).
         </p>
         <p>
           <strong>Données de paiement :</strong> traitées intégralement par Stripe ; nous ne
@@ -59,7 +61,8 @@ function ConfidentialitePage() {
 
       <LegalSection title="3. Finalités et bases légales">
         <p>
-          Fourniture du service et gestion du compte (exécution du contrat), facturation de
+          Fourniture du service et gestion du compte (exécution du contrat), gestion des accès des
+          employés (exécution du contrat), facturation de
           l’abonnement (exécution du contrat), sécurité et prévention de la fraude (intérêt
           légitime), obligations comptables et fiscales (obligation légale).
         </p>
@@ -67,12 +70,13 @@ function ConfidentialitePage() {
 
       <LegalSection title="4. Sous-traitants et destinataires">
         <p>
-          Hébergement de l’application et de la base de données : infrastructure cloud de Lovable.
-          Paiement : Stripe. Aucune donnée n’est vendue ni partagée à des tiers à des fins
+          Hébergement de l’application, de la base de données, des photos et envoi des e-mails de
+          connexion : Lovable (Lovable Cloud, qui s’appuie sur Supabase). Paiement et abonnement :
+          Stripe. Aucun outil d’intelligence artificielle ni de mesure d’audience n’est utilisé. Aucune donnée n’est vendue ni partagée à des tiers à des fins
           commerciales.
         </p>
         <p>
-          <Missing>liste définitive des sous-traitants et localisation des données à confirmer</Missing>
+          <Missing>pays d’hébergement des données et garanties en cas de transfert hors Union européenne, à confirmer auprès de Lovable et Stripe</Missing>
         </p>
       </LegalSection>
 
@@ -107,7 +111,8 @@ function ConfidentialitePage() {
         <p>
           Les données de chaque boutique sont isolées et inaccessibles aux autres boutiques. Les
           échanges sont chiffrés (HTTPS) et les mots de passe sont stockés sous forme dérivée
-          (hachage). Les accès aux données sont journalisés.
+          (hachage). L’accès aux fonctions d’administration est réservé aux administrateurs de la
+          boutique.
         </p>
       </LegalSection>
     </LegalLayout>
