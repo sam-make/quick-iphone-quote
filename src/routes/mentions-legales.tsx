@@ -32,8 +32,9 @@ function MentionsLegalesPage() {
           <Missing>raison sociale et forme juridique (ex. SAS, EURL, entrepreneur individuel)</Missing>
         </p>
         <p>
-          <Missing>capital social</Missing> — <Missing>numéro SIRET</Missing> —{" "}
-          <Missing>RCS (ville et numéro)</Missing>
+          <Missing>capital social, si applicable</Missing> — <Missing>numéro SIRET</Missing> —{" "}
+          <Missing>RCS (ville et numéro), si applicable</Missing> —{" "}
+          <Missing>numéro de TVA intracommunautaire, si applicable</Missing>
         </p>
         <p>
           Siège social : <Missing>adresse complète du siège social</Missing>
@@ -68,6 +69,10 @@ function MentionsLegalesPage() {
       <LegalSection title="Contact">
         <p>
           Pour toute question relative au service : <Missing>adresse e-mail de support</Missing>
+        </p>
+        <p>
+          Pour toute demande relative aux données personnelles :{" "}
+          <Missing>contact RGPD (e-mail ou adresse postale)</Missing>
         </p>
       </LegalSection>
     </LegalLayout>
