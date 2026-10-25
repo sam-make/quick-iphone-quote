@@ -6,7 +6,8 @@ import { Logo } from "@/components/brand/Logo";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useWorkspace } from "@/hooks/useWorkspace";
-import { getTestSubscription } from "@/lib/payments.functions";
+import { getShopSubscription } from "@/lib/payments.functions";
+import { getStripeEnvironment } from "@/lib/stripe";
 import { hasSubscriptionAccess } from "@/lib/subscription";
 import { LEGACY_TRANSITION_END, resolveShopAccess } from "@/lib/access";
 import { cn } from "@/lib/utils";
@@ -22,8 +23,8 @@ const NAV = [
 ] as const;
 
 const subscriptionOptions = queryOptions({
-  queryKey: ["test-subscription"],
-  queryFn: () => getTestSubscription({ data: { environment: "sandbox" } }),
+  queryKey: ["shop-subscription"],
+  queryFn: () => getShopSubscription({ data: { environment: getStripeEnvironment() } }),
   staleTime: 30_000,
 });
 

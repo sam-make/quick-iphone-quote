@@ -7,30 +7,30 @@ import { CreditCard, ExternalLink, RefreshCw, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import {
-  createTestCheckout,
-  createTestPortal,
-  getTestSubscription,
+  createCheckout,
+  createPortal,
+  getShopSubscription,
 } from "@/lib/payments.functions";
-import { getTestStripe } from "@/lib/stripe";
+import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { hasSubscriptionAccess } from "@/lib/subscription";
 import { useWorkspace } from "@/hooks/useWorkspace";
 const options = queryOptions({
-  queryKey: ["test-subscription"],
-  queryFn: () => getTestSubscription({ data: { environment: "sandbox" } }),
+  queryKey: ["shop-subscription"],
+  queryFn: () => getShopSubscription({ data: { environment: getStripeEnvironment() } }),
   refetchInterval: 5000,
 });
 export const Route = createFileRoute("/_authenticated/abonnement")({
   head: () => ({
     meta: [
-      { title: "Abonnement test — Trade-In Pro" },
+      { title: "Abonnement — Trade-In Pro" },
       {
         name: "description",
-        content: "Abonnement unique Trade-In Pro à 10,99 EUR/mois en environnement test.",
+        content: "Abonnement unique Trade-In Pro à 10,99 EUR/mois, toutes fonctionnalités incluses.",
       },
-      { property: "og:title", content: "Abonnement test — Trade-In Pro" },
+      { property: "og:title", content: "Abonnement — Trade-In Pro" },
       {
         property: "og:description",
-        content: "Gestion de l’abonnement et du statut de test de votre boutique.",
+        content: "Gestion de l’abonnement et du statut de votre boutique.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -45,13 +45,13 @@ function SubscriptionPage() {
   const sub = rows.find((s) => hasSubscriptionAccess(s)) ?? rows[0] ?? null;
   const [secret, setSecret] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const checkout = useServerFn(createTestCheckout);
-  const portal = useServerFn(createTestPortal);
+  const checkout = useServerFn(createCheckout);
+  const portal = useServerFn(createPortal);
   const qc = useQueryClient();
   const purchase = useMutation({
     mutationFn: async () => {
-      getTestStripe();
-      const r = await checkout({ data: { environment: "sandbox" } });
+      getStripe();
+      const r = await checkout({ data: { environment: getStripeEnvironment() } });
       if ("error" in r) throw new Error(r.error);
       return r.clientSecret;
     },
@@ -63,7 +63,7 @@ function SubscriptionPage() {
   });
   const manage = useMutation({
     mutationFn: async () => {
-      const r = await portal({ data: { environment: "sandbox" } });
+      const r = await portal({ data: { environment: getStripeEnvironment() } });
       if ("error" in r) throw new Error(r.error);
       return r.url;
     },
@@ -102,7 +102,7 @@ function SubscriptionPage() {
               </span>
             </p>
             <p className="mt-3 text-sm">
-              Statut test :{" "}
+              Statut :{" "}
               <strong>{sub ? (labels[sub.status] ?? sub.status) : "Aucun abonnement"}</strong>
             </p>
             {sub?.current_period_end && (
@@ -115,13 +115,13 @@ function SubscriptionPage() {
             )}
             <p className="mt-2 text-sm text-muted-foreground">
               {hasSubscriptionAccess(sub)
-                ? "Période de test valide."
-                : "Aucune période payée de test valide."}
+                ? "Période payée valide."
+                : "Aucune période payée valide."}
             </p>
           </div>
           <Button
             variant="outline"
-            onClick={() => qc.invalidateQueries({ queryKey: ["test-subscription"] })}
+            onClick={() => qc.invalidateQueries({ queryKey: ["shop-subscription"] })}
           >
             <RefreshCw className="size-4" />
             Actualiser le statut
@@ -139,12 +139,12 @@ function SubscriptionPage() {
                 ) : (
                   <CreditCard className="size-4" />
                 )}
-                Souscrire en test
+                Souscrire
               </Button>
             )}
             <Button variant="outline" disabled={manage.isPending} onClick={() => manage.mutate()}>
               <ExternalLink className="size-4" />
-              Portail client test
+              Portail client
             </Button>
           </div>
         ) : (
@@ -159,14 +159,13 @@ function SubscriptionPage() {
         </p>
       )}
       {secret && (
-        <EmbeddedCheckoutProvider stripe={getTestStripe()} options={{ clientSecret: secret }}>
+        <EmbeddedCheckoutProvider stripe={getStripe()} options={{ clientSecret: secret }}>
           <EmbeddedCheckout />
         </EmbeddedCheckoutProvider>
       )}
       <p className="text-sm text-muted-foreground">
         Le retour du paiement ne confirme pas l’abonnement : le statut affiché provient des
-        notifications vérifiées. Les accès actuels restent inchangés pendant la préparation au
-        lancement.
+        notifications vérifiées de Stripe.
       </p>
     </div>
   );

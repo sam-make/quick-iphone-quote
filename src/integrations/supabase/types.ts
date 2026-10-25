@@ -976,10 +976,11 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      apply_test_subscription_event: {
+      apply_subscription_event: {
         Args: {
           p_cancel: boolean
           p_customer_id: string
+          p_environment: string
           p_event_created: number
           p_event_id: string
           p_event_type: string

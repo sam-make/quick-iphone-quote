@@ -2,27 +2,27 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { testEnvironmentSchema } from "./subscription";
-const inputSchema = z.object({ environment: testEnvironmentSchema }).strict();
-export const getTestSubscription = createServerFn({ method: "POST" })
+import { environmentSchema } from "./subscription";
+const inputSchema = z.object({ environment: environmentSchema }).strict();
+export const getShopSubscription = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: z.infer<typeof inputSchema>) => inputSchema.parse(d))
-  .handler(async ({ context }) => {
-    const { data, error } = await context.supabase
+  .handler(async ({ data, context }) => {
+    const { data: rows, error } = await context.supabase
       .from("shop_subscriptions")
       .select("status,current_period_end,cancel_at_period_end,price_id,updated_at")
-      .eq("environment", "sandbox")
+      .eq("environment", data.environment)
       .order("updated_at", { ascending: false });
     if (error) throw new Error(error.message);
-    return data;
+    return rows;
   });
-export const createTestCheckout = createServerFn({ method: "POST" })
+export const createCheckout = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: z.infer<typeof inputSchema>) => inputSchema.parse(d))
-  .handler(async ({ context }) => {
+  .handler(async ({ data, context }) => {
     const { createStripeClient, getStripeErrorMessage } = await import("./stripe.server");
     try {
-      const { assertTestPrice } = await import("./subscription");
+      const { assertPlanPrice } = await import("./subscription");
       const { data: profile, error: pError } = await context.supabase
         .from("profiles")
         .select("shop_id")
@@ -39,15 +39,15 @@ export const createTestCheckout = createServerFn({ method: "POST" })
         error: uError,
       } = await context.supabase.auth.getUser();
       if (uError || !user?.email) throw new Error("Compte e-mail introuvable.");
-      const stripe = createStripeClient("sandbox");
+      const stripe = createStripeClient(data.environment);
       const prices = await stripe.prices.list({
         lookup_keys: ["trade_in_pro_monthly"],
         active: true,
         limit: 1,
       });
       const price = prices.data[0];
-      if (!price) throw new Error("Prix test introuvable.");
-      assertTestPrice(price);
+      if (!price) throw new Error("Prix introuvable.");
+      assertPlanPrice(price, data.environment);
       const customerId = await resolveOrCreateCustomer(stripe, {
         userId: context.userId,
         email: user.email,
@@ -75,10 +75,10 @@ export const createTestCheckout = createServerFn({ method: "POST" })
       return { error: getStripeErrorMessage(e) };
     }
   });
-export const createTestPortal = createServerFn({ method: "POST" })
+export const createPortal = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: z.infer<typeof inputSchema>) => inputSchema.parse(d))
-  .handler(async ({ context }) => {
+  .handler(async ({ data, context }) => {
     const { createStripeClient, getStripeErrorMessage } = await import("./stripe.server");
     try {
       const { data: isAdmin, error } = await context.supabase.rpc("has_role", {
@@ -86,13 +86,13 @@ export const createTestPortal = createServerFn({ method: "POST" })
         _role: "admin",
       });
       if (error || !isAdmin) throw new Error("Seul un administrateur peut gérer l’abonnement.");
-      const stripe = createStripeClient("sandbox");
+      const stripe = createStripeClient(data.environment);
       const customers = await stripe.customers.search({
         query: `metadata['userId']:'${context.userId}'`,
         limit: 1,
       });
       const customer = customers.data[0];
-      if (!customer) throw new Error("Aucun compte de facturation de test.");
+      if (!customer) throw new Error("Aucun compte de facturation.");
       const portal = await stripe.billingPortal.sessions.create({
         customer: customer.id,
         return_url: `${new URL(getRequest().url).origin}/abonnement`,
