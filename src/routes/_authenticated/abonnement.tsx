@@ -7,16 +7,16 @@ import { CreditCard, ExternalLink, RefreshCw, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import {
-  createTestCheckout,
-  createTestPortal,
-  getTestSubscription,
+  createCheckout,
+  createPortal,
+  getShopSubscription,
 } from "@/lib/payments.functions";
-import { getTestStripe } from "@/lib/stripe";
+import { getStripe, getStripeEnvironment } from "@/lib/stripe";
 import { hasSubscriptionAccess } from "@/lib/subscription";
 import { useWorkspace } from "@/hooks/useWorkspace";
 const options = queryOptions({
-  queryKey: ["test-subscription"],
-  queryFn: () => getTestSubscription({ data: { environment: "sandbox" } }),
+  queryKey: ["shop-subscription"],
+  queryFn: () => getShopSubscription({ data: { environment: getStripeEnvironment() } }),
   refetchInterval: 5000,
 });
 export const Route = createFileRoute("/_authenticated/abonnement")({

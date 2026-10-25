@@ -23,8 +23,8 @@ const NAV = [
 ] as const;
 
 const subscriptionOptions = queryOptions({
-  queryKey: ["test-subscription"],
-  queryFn: () => getTestSubscription({ data: { environment: "sandbox" } }),
+  queryKey: ["shop-subscription"],
+  queryFn: () => getShopSubscription({ data: { environment: getStripeEnvironment() } }),
   staleTime: 30_000,
 });
 
