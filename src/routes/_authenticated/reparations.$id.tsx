@@ -15,6 +15,8 @@ import {
   PHASE_LABELS,
   PHOTO_PHASES,
   REPAIR_STATUSES,
+  canChangeStatus,
+  INVOICEABLE_STATUSES,
   STATUS_LABELS,
   type PhotoPhase,
   type RepairStatus,
@@ -157,11 +159,14 @@ function RepairDetailPage() {
         {repair.issue ? <p className="text-sm text-ink">{repair.issue}</p> : null}
 
         <div className="flex flex-wrap gap-2 pt-2">
-          {REPAIR_STATUSES.map((value) => (
+          {REPAIR_STATUSES.map((value) => {
+            const rule = canChangeStatus(repair.status, value, { invoiced: !!data.invoice });
+            return (
             <button
               key={value}
               type="button"
-              disabled={statusMutation.isPending || value === repair.status}
+              title={rule.ok ? undefined : rule.reason}
+              disabled={statusMutation.isPending || !rule.ok}
               onClick={() => statusMutation.mutate(value)}
               className={cn(
                 "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
@@ -172,7 +177,8 @@ function RepairDetailPage() {
             >
               {STATUS_LABELS[value]}
             </button>
-          ))}
+            );
+          })}
         </div>
 
         <div className="pt-2">
@@ -186,7 +192,12 @@ function RepairDetailPage() {
           ) : (
             <Button
               variant="outline"
-              disabled={invoiceMutation.isPending || repair.status === "annule"}
+              disabled={invoiceMutation.isPending || !INVOICEABLE_STATUSES.includes(repair.status)}
+              title={
+                INVOICEABLE_STATUSES.includes(repair.status)
+                  ? undefined
+                  : "Facturation possible une fois la réparation terminée"
+              }
               onClick={() => invoiceMutation.mutate()}
             >
               <FileText className="size-4" />
