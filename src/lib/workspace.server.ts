@@ -18,7 +18,13 @@ export interface WorkspaceSignupInput {
 }
 
 export interface WorkspaceSnapshot {
-  shop: { id: string; name: string; address: string | null; phone: string | null; email: string | null };
+  shop: {
+    id: string;
+    name: string;
+    address: string | null;
+    phone: string | null;
+    email: string | null;
+  };
   profile: { id: string; full_name: string; email: string | null };
   role: "admin" | "employee";
 }
@@ -71,7 +77,9 @@ export async function ensureWorkspaceFor(
     });
     if (profileError) throw new Error(profileError.message);
 
-    const { error: roleError } = await admin.from("user_roles").insert({ user_id: userId, shop_id: shopId, role: "admin" });
+    const { error: roleError } = await admin
+      .from("user_roles")
+      .insert({ user_id: userId, shop_id: shopId, role: "admin" });
     if (roleError) throw new Error(roleError.message);
     const { error: seedError } = await admin.rpc("seed_default_rules", { _shop_id: shopId });
     if (seedError) throw new Error(seedError.message);
@@ -97,12 +105,17 @@ export async function ensureWorkspaceFor(
     .eq("user_id", userId)
     .eq("shop_id", shopId)
     .maybeSingle();
-  if (roleError || !roleRow) throw new Error("Rôle boutique introuvable. Contactez l’administrateur.");
+  if (roleError || !roleRow)
+    throw new Error("Rôle boutique introuvable. Contactez l’administrateur.");
 
   return {
     shop: shop as WorkspaceSnapshot["shop"],
-    profile: (profile ?? { id: userId, full_name: "", email: userEmail }) as WorkspaceSnapshot["profile"],
-    role: ((roleRow?.role as "admin" | "employee") ?? "employee"),
+    profile: (profile ?? {
+      id: userId,
+      full_name: "",
+      email: userEmail,
+    }) as WorkspaceSnapshot["profile"],
+    role: (roleRow?.role as "admin" | "employee") ?? "employee",
   };
 }
 
@@ -153,7 +166,12 @@ export async function saveEstimation(
     .eq("storage_gb", input.storageGb)
     .in("color", [input.color, "*"]);
 
-  const basePrice = resolveBasePrice(model.base_price, input.storageGb, input.color, overrides ?? []);
+  const basePrice = resolveBasePrice(
+    model.base_price,
+    input.storageGb,
+    input.color,
+    overrides ?? [],
+  );
 
   let rules: DeductionRule[] = [];
   if (input.ruleIds.length > 0) {

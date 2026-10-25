@@ -50,7 +50,9 @@ const SHOP = { id: "shop-new", name: "Ma boutique", address: null, phone: null, 
 describe("ensureWorkspaceFor — métadonnées utilisateur jamais dignes de confiance", () => {
   it("ne crée aucune boutique si la lecture du profil échoue", async () => {
     const { client, calls } = mockClient({ profiles: { maybeSingle: ko("lecture refusée") } });
-    await expect(ensureWorkspaceFor(client, "user-1", null, { invited_role: "admin" })).rejects.toThrow("lecture refusée");
+    await expect(
+      ensureWorkspaceFor(client, "user-1", null, { invited_role: "admin" }),
+    ).rejects.toThrow("lecture refusée");
     expect(calls).toEqual([]);
   });
 
@@ -59,7 +61,9 @@ describe("ensureWorkspaceFor — métadonnées utilisateur jamais dignes de conf
       profiles: { maybeSingle: ok({ shop_id: "shop-A" }), single: ok({ id: "user-2" }) },
       shops: { single: ok(SHOP) },
     });
-    await expect(ensureWorkspaceFor(client, "user-2", null, { invited_role: "admin" })).rejects.toThrow("Rôle boutique introuvable");
+    await expect(
+      ensureWorkspaceFor(client, "user-2", null, { invited_role: "admin" }),
+    ).rejects.toThrow("Rôle boutique introuvable");
   });
   it("ignore invited_shop_id / invited_role falsifiés et crée une boutique propre", async () => {
     const { client, calls } = mockClient({
@@ -114,8 +118,20 @@ describe("inviteMember — erreurs d'écriture non silencieuses", () => {
     const { client: supabase } = mockClient({ profiles: { single: ok({ shop_id: "shop-A" }) } });
     supabase.rpc = async () => ok(true);
     const { client: admin, calls } = mockClient({ profiles: { maybeSingle: ok({ id: "inv-1" }) } });
-    admin.auth = { admin: { inviteUserByEmail: async () => ok({ user: { id: "inv-1", email: "new@x.fr", invited_at: "2026-10-25T00:00:00Z" } }) } };
-    await expect(inviteMember(supabase, admin, "admin-1", { email: "new@x.fr", fullName: "Invité", role: "admin", redirectTo: "http://localhost:8080/connexion" })).rejects.toThrow("déjà rattaché");
+    admin.auth = {
+      admin: {
+        inviteUserByEmail: async () =>
+          ok({ user: { id: "inv-1", email: "new@x.fr", invited_at: "2026-10-25T00:00:00Z" } }),
+      },
+    };
+    await expect(
+      inviteMember(supabase, admin, "admin-1", {
+        email: "new@x.fr",
+        fullName: "Invité",
+        role: "admin",
+        redirectTo: "http://localhost:8080/connexion",
+      }),
+    ).rejects.toThrow("déjà rattaché");
     expect(calls).toEqual([]);
   });
   it("échoue et retire le profil si l'écriture du rôle échoue", async () => {
@@ -135,7 +151,8 @@ describe("inviteMember — erreurs d'écriture non silencieuses", () => {
     });
     admin.auth = {
       admin: {
-        inviteUserByEmail: async () => ok({ user: { id: "inv-1", email: "new@x.fr", invited_at: "2026-10-25T00:00:00Z" } }),
+        inviteUserByEmail: async () =>
+          ok({ user: { id: "inv-1", email: "new@x.fr", invited_at: "2026-10-25T00:00:00Z" } }),
       },
     };
 

@@ -26,7 +26,10 @@ export const Route = createFileRoute("/_authenticated/reparations/$id")({
   head: () => ({
     meta: [
       { title: "Dossier de réparation — ReprisePro" },
-      { name: "description", content: "Détail du dossier : appareil, prestations, photos et suivi de statut." },
+      {
+        name: "description",
+        content: "Détail du dossier : appareil, prestations, photos et suivi de statut.",
+      },
       { property: "og:title", content: "Dossier de réparation — ReprisePro" },
       { property: "og:description", content: "Suivi complet d'une réparation de votre boutique." },
       { property: "og:type", content: "website" },
@@ -85,7 +88,9 @@ function RepairDetailPage() {
     let cancelled = false;
     async function resolve() {
       const entries = await Promise.all(
-        (data?.photos ?? []).map(async (photo) => [photo.id, (await signedPhotoUrl(photo.storage_path)) ?? ""] as const),
+        (data?.photos ?? []).map(
+          async (photo) => [photo.id, (await signedPhotoUrl(photo.storage_path)) ?? ""] as const,
+        ),
       );
       if (!cancelled) setPhotoUrls(Object.fromEntries(entries));
     }
@@ -135,10 +140,13 @@ function RepairDetailPage() {
         <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-2xl font-semibold text-ink">{repair.reference}</h1>
           <StatusBadge status={repair.status as RepairStatus} />
-          <span className="ml-auto text-lg font-semibold text-ink">{formatEuro(Number(repair.total_price))}</span>
+          <span className="ml-auto text-lg font-semibold text-ink">
+            {formatEuro(Number(repair.total_price))}
+          </span>
         </div>
         <p className="text-sm text-muted-foreground">
-          {customerName(repair.customers)} · {repair.customers?.phone} · {repair.brand} {repair.model}
+          {customerName(repair.customers)} · {repair.customers?.phone} · {repair.brand}{" "}
+          {repair.model}
           {repair.storage ? ` · ${repair.storage}` : ""}
           {repair.color ? ` · ${repair.color}` : ""}
         </p>
@@ -176,7 +184,11 @@ function RepairDetailPage() {
               </Link>
             </Button>
           ) : (
-            <Button variant="outline" disabled={invoiceMutation.isPending || repair.status === "annule"} onClick={() => invoiceMutation.mutate()}>
+            <Button
+              variant="outline"
+              disabled={invoiceMutation.isPending || repair.status === "annule"}
+              onClick={() => invoiceMutation.mutate()}
+            >
               <FileText className="size-4" />
               {invoiceMutation.isPending ? "Génération…" : "Générer la facture"}
             </Button>
@@ -192,7 +204,9 @@ function RepairDetailPage() {
               <span className="text-ink">
                 {item.name} × {item.quantity}
               </span>
-              <span className="text-muted-foreground">{formatEuro(Number(item.unit_price) * item.quantity)}</span>
+              <span className="text-muted-foreground">
+                {formatEuro(Number(item.unit_price) * item.quantity)}
+              </span>
             </li>
           ))}
         </ul>
@@ -221,7 +235,9 @@ function RepairDetailPage() {
               </div>
             );
           })}
-          {data.photos.length === 0 ? <p className="text-sm text-muted-foreground">Aucune photo.</p> : null}
+          {data.photos.length === 0 ? (
+            <p className="text-sm text-muted-foreground">Aucune photo.</p>
+          ) : null}
         </div>
       </section>
 
@@ -237,7 +253,9 @@ function RepairDetailPage() {
               </span>
             </li>
           ))}
-          {data.history.length === 0 ? <li className="text-muted-foreground">Aucun changement enregistré.</li> : null}
+          {data.history.length === 0 ? (
+            <li className="text-muted-foreground">Aucun changement enregistré.</li>
+          ) : null}
         </ol>
       </section>
     </div>
