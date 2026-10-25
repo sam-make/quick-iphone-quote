@@ -9,9 +9,9 @@ import { formatEuro } from "@/lib/pricing";
 export const Route = createFileRoute("/_authenticated/factures/$id")({
   head: () => ({
     meta: [
-      { title: "Facture — ReprisePro" },
+      { title: "Facture — Trade-In Pro" },
       { name: "description", content: "Facture imprimable d'une réparation, avec détail des prestations." },
-      { property: "og:title", content: "Facture — ReprisePro" },
+      { property: "og:title", content: "Facture — Trade-In Pro" },
       { property: "og:description", content: "Document de facturation généré par votre boutique." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

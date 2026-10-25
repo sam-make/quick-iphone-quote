@@ -12,9 +12,9 @@ import { customerName } from "@/lib/repairs";
 export const Route = createFileRoute("/_authenticated/clients/")({
   head: () => ({
     meta: [
-      { title: "Clients — ReprisePro" },
+      { title: "Clients — Trade-In Pro" },
       { name: "description", content: "Gérez vos clients, leurs appareils, leurs réparations et leurs factures." },
-      { property: "og:title", content: "Clients — ReprisePro" },
+      { property: "og:title", content: "Clients — Trade-In Pro" },
       { property: "og:description", content: "Fiches clients, historique de réparations et factures archivées." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

@@ -14,9 +14,9 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/reparations/")({
   head: () => ({
     meta: [
-      { title: "Réparations — ReprisePro" },
+      { title: "Réparations — Trade-In Pro" },
       { name: "description", content: "Suivez tous les dossiers de réparation de votre boutique en temps réel." },
-      { property: "og:title", content: "Réparations — ReprisePro" },
+      { property: "og:title", content: "Réparations — Trade-In Pro" },
       { property: "og:description", content: "Statuts, clients, appareils et montants en un coup d'œil." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

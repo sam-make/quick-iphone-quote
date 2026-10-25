@@ -13,9 +13,9 @@ import { formatEuro } from "@/lib/pricing";
 export const Route = createFileRoute("/_authenticated/clients/$id")({
   head: () => ({
     meta: [
-      { title: "Fiche client — ReprisePro" },
+      { title: "Fiche client — Trade-In Pro" },
       { name: "description", content: "Coordonnées, appareils, réparations et factures d'un client." },
-      { property: "og:title", content: "Fiche client — ReprisePro" },
+      { property: "og:title", content: "Fiche client — Trade-In Pro" },
       { property: "og:description", content: "Tout l'historique du client en un seul écran." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

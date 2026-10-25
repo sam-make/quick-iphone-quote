@@ -26,7 +26,7 @@ function MentionsLegalesPage() {
     <LegalLayout title="Mentions légales" updated="25 octobre 2026">
       <LegalSection title="Éditeur du service">
         <p>
-          Le service Trade-In Pro (également présenté sous le nom ReprisePro) est édité par :
+          Le service Trade-In Pro est édité par :
         </p>
         <p>
           <Missing>raison sociale et forme juridique (ex. SAS, EURL, entrepreneur individuel)</Missing>

@@ -28,9 +28,9 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/estimation")({
   head: () => ({
     meta: [
-      { title: "Nouvelle estimation — ReprisePro" },
+      { title: "Nouvelle estimation — Trade-In Pro" },
       { name: "description", content: "Estimez la reprise d'un iPhone en moins de deux minutes." },
-      { property: "og:title", content: "Nouvelle estimation — ReprisePro" },
+      { property: "og:title", content: "Nouvelle estimation — Trade-In Pro" },
       { property: "og:description", content: "Diagnostic guidé et prix de reprise calculé instantanément." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

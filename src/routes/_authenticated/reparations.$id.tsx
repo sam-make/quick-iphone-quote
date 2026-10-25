@@ -27,12 +27,12 @@ import { cn } from "@/lib/utils";
 export const Route = createFileRoute("/_authenticated/reparations/$id")({
   head: () => ({
     meta: [
-      { title: "Dossier de réparation — ReprisePro" },
+      { title: "Dossier de réparation — Trade-In Pro" },
       {
         name: "description",
         content: "Détail du dossier : appareil, prestations, photos et suivi de statut.",
       },
-      { property: "og:title", content: "Dossier de réparation — ReprisePro" },
+      { property: "og:title", content: "Dossier de réparation — Trade-In Pro" },
       { property: "og:description", content: "Suivi complet d'une réparation de votre boutique." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -160,7 +160,7 @@ function RepairDetailPage() {
 
         <div className="flex flex-wrap gap-2 pt-2">
           {REPAIR_STATUSES.map((value) => {
-            const rule = canChangeStatus(repair.status, value, { invoiced: !!data.invoice });
+            const rule = canChangeStatus(repair.status as RepairStatus, value, { invoiced: !!data.invoice });
             return (
             <button
               key={value}
@@ -172,7 +172,7 @@ function RepairDetailPage() {
                 "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
                 value === repair.status
                   ? "border-primary bg-primary/10 text-primary"
-                  : "border-border text-muted-foreground hover:bg-surface-2",
+                  : "border-border text-muted-foreground hover:bg-surface-2 disabled:cursor-not-allowed disabled:opacity-40",
               )}
             >
               {STATUS_LABELS[value]}
@@ -192,9 +192,9 @@ function RepairDetailPage() {
           ) : (
             <Button
               variant="outline"
-              disabled={invoiceMutation.isPending || !INVOICEABLE_STATUSES.includes(repair.status)}
+              disabled={invoiceMutation.isPending || !INVOICEABLE_STATUSES.includes(repair.status as RepairStatus)}
               title={
-                INVOICEABLE_STATUSES.includes(repair.status)
+                INVOICEABLE_STATUSES.includes(repair.status as RepairStatus)
                   ? undefined
                   : "Facturation possible une fois la réparation terminée"
               }

@@ -33,9 +33,9 @@ import { useEffect } from "react";
 export const Route = createFileRoute("/_authenticated/administration")({
   head: () => ({
     meta: [
-      { title: "Administration — ReprisePro" },
+      { title: "Administration — Trade-In Pro" },
       { name: "description", content: "Gérez vos règles de déduction, vos prix de base et les infos de la boutique." },
-      { property: "og:title", content: "Administration — ReprisePro" },
+      { property: "og:title", content: "Administration — Trade-In Pro" },
       { property: "og:description", content: "Règles de déduction 100 % personnalisables par boutique." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
