@@ -43,7 +43,7 @@ export function LegalLayout({
       <main className="mx-auto max-w-3xl px-5 py-10">
         <p className="rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
           Document préparatoire : les mentions signalées « À compléter » doivent être renseignées et
-          validées avant toute mise en ligne commerciale.
+          validées avant toute mise en ligne commerciale. Ce document n’a pas encore été validé par un professionnel du droit.
         </p>
         <h1 className="mt-8 text-3xl font-semibold text-ink">{title}</h1>
         <p className="mt-2 text-sm text-muted-foreground">Dernière mise à jour : {updated}</p>
