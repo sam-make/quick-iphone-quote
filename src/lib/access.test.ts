@@ -1,8 +1,10 @@
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, it } from "vitest";
 import {
   ACCESS_ACTIVATION_DATE,
   LEGACY_TRANSITION_END,
   resolveShopAccess,
+  accessEnvironmentFromToken,
+  pickSubscriptionForEnvironment,
 } from "./access";
 import type { SubscriptionState } from "./subscription";
 
