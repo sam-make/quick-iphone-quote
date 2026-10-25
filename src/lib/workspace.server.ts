@@ -18,7 +18,13 @@ export interface WorkspaceSignupInput {
 }
 
 export interface WorkspaceSnapshot {
-  shop: { id: string; name: string; address: string | null; phone: string | null; email: string | null };
+  shop: {
+    id: string;
+    name: string;
+    address: string | null;
+    phone: string | null;
+    email: string | null;
+  };
   profile: { id: string; full_name: string; email: string | null };
   role: "admin" | "employee";
 }
@@ -39,11 +45,12 @@ export async function ensureWorkspaceFor(
   userEmail: string | null,
   metadata: Record<string, unknown>,
 ): Promise<WorkspaceSnapshot> {
-  const { data: existing } = await admin
+  const { data: existing, error: existingError } = await admin
     .from("profiles")
     .select("id, full_name, email, shop_id")
     .eq("id", userId)
     .maybeSingle();
+  if (existingError) throw new Error(existingError.message);
 
   let shopId = existing?.shop_id as string | undefined;
 
@@ -70,8 +77,12 @@ export async function ensureWorkspaceFor(
     });
     if (profileError) throw new Error(profileError.message);
 
-    await admin.from("user_roles").insert({ user_id: userId, shop_id: shopId, role: "admin" });
-    await admin.rpc("seed_default_rules", { _shop_id: shopId });
+    const { error: roleError } = await admin
+      .from("user_roles")
+      .insert({ user_id: userId, shop_id: shopId, role: "admin" });
+    if (roleError) throw new Error(roleError.message);
+    const { error: seedError } = await admin.rpc("seed_default_rules", { _shop_id: shopId });
+    if (seedError) throw new Error(seedError.message);
   }
 
   const { data: shop, error } = await admin
@@ -81,22 +92,30 @@ export async function ensureWorkspaceFor(
     .single();
   if (error) throw new Error(error.message);
 
-  const { data: profile } = await admin
+  const { data: profile, error: profileError } = await admin
     .from("profiles")
     .select("id, full_name, email")
     .eq("id", userId)
     .single();
+  if (profileError || !profile) throw new Error("Profil boutique introuvable.");
 
-  const { data: roleRow } = await admin
+  const { data: roleRow, error: roleError } = await admin
     .from("user_roles")
     .select("role")
     .eq("user_id", userId)
+    .eq("shop_id", shopId)
     .maybeSingle();
+  if (roleError || !roleRow)
+    throw new Error("Rôle boutique introuvable. Contactez l’administrateur.");
 
   return {
     shop: shop as WorkspaceSnapshot["shop"],
-    profile: (profile ?? { id: userId, full_name: "", email: userEmail }) as WorkspaceSnapshot["profile"],
-    role: ((roleRow?.role as "admin" | "employee") ?? "employee"),
+    profile: (profile ?? {
+      id: userId,
+      full_name: "",
+      email: userEmail,
+    }) as WorkspaceSnapshot["profile"],
+    role: (roleRow?.role as "admin" | "employee") ?? "employee",
   };
 }
 
@@ -147,7 +166,12 @@ export async function saveEstimation(
     .eq("storage_gb", input.storageGb)
     .in("color", [input.color, "*"]);
 
-  const basePrice = resolveBasePrice(model.base_price, input.storageGb, input.color, overrides ?? []);
+  const basePrice = resolveBasePrice(
+    model.base_price,
+    input.storageGb,
+    input.color,
+    overrides ?? [],
+  );
 
   let rules: DeductionRule[] = [];
   if (input.ruleIds.length > 0) {

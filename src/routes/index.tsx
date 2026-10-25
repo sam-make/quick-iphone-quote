@@ -29,7 +29,8 @@ export const Route = createFileRoute("/")({
       { name: "twitter:card", content: "summary_large_image" },
       {
         property: "og:description",
-        content: "Estimez la reprise d'un iPhone en moins de 2 minutes. Règles de déduction 100 % personnalisables, historique complet, espace sécurisé par boutique.",
+        content:
+          "Estimez la reprise d'un iPhone en moins de 2 minutes. Règles de déduction 100 % personnalisables, historique complet, espace sécurisé par boutique.",
       },
     ],
   }),
@@ -106,8 +107,9 @@ function Landing() {
               <span className="text-gradient"> enfin sans appeler le responsable.</span>
             </h1>
             <p className="animate-rise mx-auto mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
-              ReprisePro donne à vos vendeurs un prix de reprise fiable en moins de deux minutes, calculé
-              automatiquement à partir des règles de déduction que vous définissez vous-même.
+              ReprisePro donne à vos vendeurs un prix de reprise fiable en moins de deux minutes,
+              calculé automatiquement à partir des règles de déduction que vous définissez
+              vous-même.
             </p>
             <div className="animate-rise mt-9 flex flex-wrap items-center justify-center gap-3">
               <Button asChild size="lg">
@@ -141,8 +143,8 @@ function Landing() {
               Tout ce qu'il faut au comptoir, rien de plus.
             </h2>
             <p className="mt-4 max-w-2xl text-muted-foreground">
-              Un module d'estimation guidé, un moteur de prix instantané et un panneau d'administration
-              complet pour piloter votre grille de reprise.
+              Un module d'estimation guidé, un moteur de prix instantané et un panneau
+              d'administration complet pour piloter votre grille de reprise.
             </p>
             <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {features.map((feature) => (
@@ -154,7 +156,9 @@ function Landing() {
                     <feature.icon className="size-5" />
                   </span>
                   <h3 className="mt-5 text-base font-semibold text-ink">{feature.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{feature.text}</p>
+                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                    {feature.text}
+                  </p>
                 </article>
               ))}
             </div>
@@ -164,10 +168,13 @@ function Landing() {
         <section id="apercu" className="py-20">
           <div className="mx-auto grid max-w-6xl items-center gap-12 px-5 lg:grid-cols-2">
             <div>
-              <h2 className="text-3xl font-semibold text-ink md:text-4xl">Un diagnostic guidé, pas un formulaire.</h2>
+              <h2 className="text-3xl font-semibold text-ink md:text-4xl">
+                Un diagnostic guidé, pas un formulaire.
+              </h2>
               <p className="mt-4 text-muted-foreground">
-                Le vendeur parcourt l'état esthétique, les vérifications techniques puis les blocages. Chaque
-                critère coché applique immédiatement la déduction configurée par la boutique.
+                Le vendeur parcourt l'état esthétique, les vérifications techniques puis les
+                blocages. Chaque critère coché applique immédiatement la déduction configurée par la
+                boutique.
               </p>
               <ul className="mt-8 space-y-4">
                 {[
@@ -198,7 +205,9 @@ function Landing() {
         <section className="border-t border-border/70 bg-surface-2/60 py-20">
           <div className="mx-auto max-w-6xl px-5">
             <div className="text-center">
-              <h2 className="text-3xl font-semibold text-ink md:text-4xl">Une offre unique, tout inclus</h2>
+              <h2 className="text-3xl font-semibold text-ink md:text-4xl">
+                Une offre unique, tout inclus
+              </h2>
               <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
                 Toutes les fonctionnalités de Trade-In Pro, sans palier ni option cachée.
               </p>
@@ -206,7 +215,9 @@ function Landing() {
             <div className="mx-auto mt-12 max-w-md">
               <article className="surface-card relative flex flex-col overflow-hidden p-8 ring-1 ring-primary">
                 <h3 className="text-lg font-semibold text-ink">Trade-In Pro</h3>
-                <p className="mt-1 text-sm text-muted-foreground">Toutes les fonctionnalités incluses</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Toutes les fonctionnalités incluses
+                </p>
                 <div className="mt-4 flex items-baseline gap-1">
                   <span className="text-5xl font-semibold text-ink">10,99</span>
                   <span className="text-sm text-muted-foreground">€/mois</span>
@@ -228,8 +239,11 @@ function Landing() {
                     </li>
                   ))}
                 </ul>
-                <Button className="mt-8 w-full" size="lg" asChild>
-                  <Link to="/inscription">Créer l'espace de ma boutique</Link>
+                <p className="mt-6 text-sm text-muted-foreground">
+                  Souscription disponible prochainement. Aucun paiement n’est actuellement proposé.
+                </p>
+                <Button className="mt-8 w-full" size="lg" disabled>
+                  Souscription prochainement disponible
                 </Button>
               </article>
             </div>
@@ -238,10 +252,12 @@ function Landing() {
 
         <section className="px-5 pb-24">
           <div className="mx-auto max-w-5xl rounded-3xl bg-[image:var(--gradient-primary)] px-8 py-14 text-center text-primary-foreground shadow-[var(--shadow-float)]">
-            <h2 className="text-3xl font-semibold md:text-4xl">Prêt à fiabiliser vos reprises&nbsp;?</h2>
+            <h2 className="text-3xl font-semibold md:text-4xl">
+              Prêt à fiabiliser vos reprises&nbsp;?
+            </h2>
             <p className="mx-auto mt-4 max-w-xl text-primary-foreground/80">
-              Créez l'espace de votre boutique, importez vos règles de déduction et lancez votre première
-              estimation dans la foulée.
+              Créez l'espace de votre boutique, importez vos règles de déduction et lancez votre
+              première estimation dans la foulée.
             </p>
             <Button asChild size="lg" variant="secondary" className="mt-8">
               <Link to="/inscription">

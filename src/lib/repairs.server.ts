@@ -91,13 +91,19 @@ export interface RepairInput {
   };
   condition?: string | null;
   issue: string;
-  services: { serviceId?: string | null; name?: string | null; unitPrice?: number | null; quantity: number }[];
+  services: {
+    serviceId?: string | null;
+    name?: string | null;
+    unitPrice?: number | null;
+    quantity: number;
+  }[];
 }
 
 /** Atomic per-shop yearly reference (REP-2026-0001 / FA-2026-0001), allocated by the database. */
 async function nextSequence(supabase: AnyClient, prefix: "REP" | "FA") {
   const { data, error } = await supabase.rpc("next_shop_reference", { _kind: prefix });
-  if (error || typeof data !== "string") throw new Error(error?.message ?? "Numérotation impossible.");
+  if (error || typeof data !== "string")
+    throw new Error(error?.message ?? "Numérotation impossible.");
   return data;
 }
 
@@ -222,15 +228,21 @@ export async function createRepairFor(
     throw new Error(itemsError.message);
   }
 
-  await admin.from("repair_status_history").insert({
+  const { error: historyError } = await admin.from("repair_status_history").insert({
     repair_id: repair.id,
     status: "recu",
     user_id: userId,
     employee_name: profile.full_name,
     comment: "Dossier créé",
   });
+  if (historyError)
+    throw new Error(`Dossier créé, mais historique non enregistré : ${historyError.message}`);
 
-  return { id: repair.id as string, reference: repair.reference as string, customerId: customer.id as string };
+  return {
+    id: repair.id as string,
+    reference: repair.reference as string,
+    customerId: customer.id as string,
+  };
 }
 
 /** Records a status change together with its author and timestamp. */
@@ -259,13 +271,15 @@ export async function changeStatusFor(
     .eq("shop_id", profile.shop_id);
   if (error) throw new Error(error.message);
 
-  await admin.from("repair_status_history").insert({
+  const { error: historyError } = await admin.from("repair_status_history").insert({
     repair_id: repairId,
     status,
     user_id: userId,
     employee_name: profile.full_name,
     comment: comment?.trim() || null,
   });
+  if (historyError)
+    throw new Error(`Statut modifié, mais historique non enregistré : ${historyError.message}`);
 
   return { status };
 }
@@ -289,12 +303,13 @@ export async function generateInvoiceFor(
   const { data: repair, error } = await supabase
     .from("repairs")
     .select(
-      "id, reference, customer_id, brand, model, color, storage, imei, issue, total_price, repair_items(name, unit_price, quantity)",
+      "id, status, reference, customer_id, brand, model, color, storage, imei, issue, total_price, repair_items(name, unit_price, quantity)",
     )
     .eq("id", repairId)
     .eq("shop_id", profile.shop_id)
     .single();
   if (error || !repair) throw new Error("Dossier introuvable.");
+  if (repair.status === "annule") throw new Error("Impossible de facturer une réparation annulée.");
 
   const { data: customer } = await supabase
     .from("customers")
@@ -308,8 +323,15 @@ export async function generateInvoiceFor(
     .eq("id", profile.shop_id)
     .single();
 
-  const items = (repair.repair_items ?? []) as { name: string; unit_price: number; quantity: number }[];
-  const total = items.reduce((sum, item) => sum + Number(item.unit_price) * Number(item.quantity), 0);
+  const items = (repair.repair_items ?? []) as {
+    name: string;
+    unit_price: number;
+    quantity: number;
+  }[];
+  const total = items.reduce(
+    (sum, item) => sum + Number(item.unit_price) * Number(item.quantity),
+    0,
+  );
   const number = await nextSequence(supabase, "FA");
 
   // Repair was read through RLS above, so it belongs to the caller's shop.
