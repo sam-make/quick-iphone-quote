@@ -63,7 +63,7 @@ function SubscriptionPage() {
   });
   const manage = useMutation({
     mutationFn: async () => {
-      const r = await portal({ data: { environment: "sandbox" } });
+      const r = await portal({ data: { environment: getStripeEnvironment() } });
       if ("error" in r) throw new Error(r.error);
       return r.url;
     },
@@ -102,7 +102,7 @@ function SubscriptionPage() {
               </span>
             </p>
             <p className="mt-3 text-sm">
-              Statut test :{" "}
+              Statut :{" "}
               <strong>{sub ? (labels[sub.status] ?? sub.status) : "Aucun abonnement"}</strong>
             </p>
             {sub?.current_period_end && (
