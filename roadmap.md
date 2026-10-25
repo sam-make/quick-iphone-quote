@@ -13,7 +13,8 @@
 - [x] Créer les pages légales préparatoires (mentions légales, CGV, confidentialité) avec mentions « À compléter »
 - [x] Activer le verrouillage des fonctionnalités selon l'abonnement (règle partagée base + serveur, transition boutiques existantes jusqu'au 25/11/2026)
 - [ ] Compléter les informations juridiques (raison sociale, SIRET, adresse, contacts) avant publication
-- [ ] Vérifier visuellement les bannières d'abonnement dans l'aperçu (vérification automatisée instable ; logique déjà couverte par tests et requêtes réelles)
+- [x] Vérifier visuellement les bannières d'abonnement (transition, blocage, abonné — captures validées)
+- [ ] Avant mise en production : passer Stripe en mode réel (vérification du compte), puis publier sur décision explicite
 - [x] Exécuter les tests, contrôler les accès et examiner le diff sans publier
 
 - [x] Bloquer insertions directes estimations / estimation_defects / invoices (serveur seulement)
