@@ -100,3 +100,36 @@ describe("resolveShopAccess — nouveaux comptes", () => {
     expect(resolveShopAccess(sub("active", FUTURE), NEW_SHOP, NOW).allowed).toBe(true);
   });
 });
+
+describe("séparation test / production", () => {
+  const NOW2 = Date.parse("2026-12-01T00:00:00.000Z"); // après la transition
+  const NEW = "2026-11-01T00:00:00.000Z";
+  const sandboxActive = {
+    environment: "sandbox",
+    status: "active",
+    current_period_end: "2027-01-01T00:00:00.000Z",
+    cancel_at_period_end: false,
+  };
+  it("la production (clé réelle) n'utilise que les abonnements réels", () => {
+    expect(accessEnvironmentFromToken("pk_live_x")).toBe("live");
+  });
+  it("une clé absente est traitée comme production, jamais comme test", () => {
+    expect(accessEnvironmentFromToken(undefined)).toBe("live");
+  });
+  it("un abonnement test actif ne déverrouille pas la production", () => {
+    const sub = pickSubscriptionForEnvironment([sandboxActive], "live");
+    expect(sub).toBeNull();
+    expect(resolveShopAccess(sub, NEW, NOW2).allowed).toBe(false);
+  });
+  it("un abonnement test actif déverrouille l'aperçu de test", () => {
+    const sub = pickSubscriptionForEnvironment([sandboxActive], "sandbox");
+    expect(resolveShopAccess(sub, NEW, NOW2).allowed).toBe(true);
+  });
+  it("un abonnement réel actif déverrouille la production malgré un test plus récent expiré", () => {
+    const rows = [
+      { ...sandboxActive, status: "canceled", current_period_end: "2026-11-02T00:00:00.000Z" },
+      { ...sandboxActive, environment: "live" },
+    ];
+    expect(resolveShopAccess(pickSubscriptionForEnvironment(rows, "live"), NEW, NOW2).allowed).toBe(true);
+  });
+});

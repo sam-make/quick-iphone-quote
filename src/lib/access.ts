@@ -39,3 +39,22 @@ export function resolveShopAccess(
 
 export const ACCESS_DENIED_MESSAGE =
   "Abonnement inactif : souscrivez à l’offre Trade-In Pro (10,99 €/mois) depuis la page Abonnement pour continuer à utiliser cette fonctionnalité.";
+
+export type AccessEnvironment = "sandbox" | "live";
+
+/**
+ * Environment whose subscriptions unlock this build. Only a test client token
+ * (preview) selects sandbox; anything else — including a missing token — is
+ * treated as production, so a test subscription can never unlock production.
+ */
+export function accessEnvironmentFromToken(token: string | undefined): AccessEnvironment {
+  return token?.startsWith("pk_test_") ? "sandbox" : "live";
+}
+
+/** Keeps only subscriptions of the given environment (latest first expected). */
+export function pickSubscriptionForEnvironment<T extends SubscriptionState & { environment: string }>(
+  rows: T[] | null | undefined,
+  environment: AccessEnvironment,
+): T | null {
+  return rows?.find((r) => r.environment === environment) ?? null;
+}
