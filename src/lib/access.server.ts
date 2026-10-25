@@ -6,7 +6,13 @@
  * shop_prices, estimation_market_analyses).
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { ACCESS_DENIED_MESSAGE, resolveShopAccess, type ShopAccess } from "./access";
+import {
+  ACCESS_DENIED_MESSAGE,
+  accessEnvironmentFromToken,
+  pickSubscriptionForEnvironment,
+  resolveShopAccess,
+  type ShopAccess,
+} from "./access";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type AnyClient = SupabaseClient<any, any, any>;
@@ -29,20 +35,24 @@ export async function getShopAccess(
     .single();
   if (shopError || !shop) throw new Error("Boutique introuvable.");
 
+  // Test (aperçu) et réel (production) sont strictement séparés : seul
+  // l'environnement de ce build compte. Même règle que shop_has_access(shop, env).
+  const environment = accessEnvironmentFromToken(import.meta.env.VITE_PAYMENTS_CLIENT_TOKEN);
   const { data: subs, error: subError } = await supabase
     .from("shop_subscriptions")
-    .select("status,current_period_end,cancel_at_period_end")
+    .select("environment,status,current_period_end,cancel_at_period_end")
     .eq("shop_id", profile.shop_id)
-    // Un abonnement valide en test (aperçu) ou en réel (production) donne accès :
-    // la même base sert les deux environnements. Règle identique à shop_has_access.
-    .in("environment", ["sandbox", "live"])
+    .eq("environment", environment)
     .order("updated_at", { ascending: false })
     .limit(1);
   if (subError) throw new Error(subError.message);
 
   return {
     shopId: profile.shop_id as string,
-    access: resolveShopAccess(subs?.[0] ?? null, shop.created_at as string),
+    access: resolveShopAccess(
+      pickSubscriptionForEnvironment(subs, environment),
+      shop.created_at as string,
+    ),
   };
 }
 
