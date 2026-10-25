@@ -102,7 +102,10 @@ function RepairDetailPage() {
       void queryClient.invalidateQueries({ queryKey: ["repair", id] });
       void queryClient.invalidateQueries({ queryKey: ["repairs"] });
     },
-    onError: () => toast.error("Mise à jour impossible."),
+    onError: (error) => {
+      toast.error(error.message || "Mise à jour impossible.");
+      void queryClient.invalidateQueries({ queryKey: ["repair", id] });
+    },
   });
 
   const invoiceMutation = useMutation({
@@ -111,7 +114,7 @@ function RepairDetailPage() {
       toast.success("Facture générée.");
       navigate({ to: "/factures/$id", params: { id: result.id } });
     },
-    onError: () => toast.error("Génération impossible."),
+    onError: (error) => toast.error(error.message || "Génération impossible."),
   });
 
   if (isLoading) return <p className="text-sm text-muted-foreground">Chargement…</p>;
@@ -173,7 +176,7 @@ function RepairDetailPage() {
               </Link>
             </Button>
           ) : (
-            <Button variant="outline" disabled={invoiceMutation.isPending} onClick={() => invoiceMutation.mutate()}>
+            <Button variant="outline" disabled={invoiceMutation.isPending || repair.status === "annule"} onClick={() => invoiceMutation.mutate()}>
               <FileText className="size-4" />
               {invoiceMutation.isPending ? "Génération…" : "Générer la facture"}
             </Button>
