@@ -7,8 +7,12 @@
 - [x] Créer et vérifier l'offre unique Stripe test 10,99 EUR/mois taxes incluses
 - [x] Ajouter parcours test, portail et synchronisation locale signée/idempotente
 - [x] Tester prix, accès directs refusés (403), statut et portail après actualisation ; 35 tests réussis
-- [ ] Valider un paiement Checkout complet : formulaire automatisé resté en traitement, paiement test manuel nécessaire
-- [ ] Valider livraison distante automatique : URL webhook test retourne 404 ; version distante à actualiser avec autorisation séparée, sans publication cette fois
+- [x] Valider un paiement Checkout complet : carte test 4242 payée, retour /abonnement?retour=1 confirmé
+- [x] Valider livraison distante automatique : webhook réel Stripe reçu (404 résolu), statut actif en base, idempotence et résiliation vérifiées
+- [x] Tester inscription/connexion/déconnexion/reconnexion + isolation inter-boutiques (403, zéro ligne étrangère) avec un 2e compte
+- [x] Créer les pages légales préparatoires (mentions légales, CGV, confidentialité) avec mentions « À compléter »
+- [ ] Décision de lancement : activer le verrouillage des fonctionnalités selon l'abonnement (logique prête et testée, non appliquée par conception)
+- [ ] Compléter les informations juridiques (raison sociale, SIRET, adresse, contacts) avant publication
 - [x] Exécuter les tests, contrôler les accès et examiner le diff sans publier
 
 - [x] Bloquer insertions directes estimations / estimation_defects / invoices (serveur seulement)
