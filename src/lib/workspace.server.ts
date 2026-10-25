@@ -26,6 +26,12 @@ export interface WorkspaceSnapshot {
 /**
  * Idempotently creates the tenant for a freshly signed-up user:
  * shop -> profile -> admin role -> default deduction rules.
+ *
+ * SECURITY: user_metadata is never trusted for shop attachment or roles.
+ * Invited members are attached exclusively through the profile/role rows
+ * pre-written server-side by `inviteMember`; this function only reuses an
+ * existing server-written profile, otherwise it creates a brand-new shop
+ * owned by the caller.
  */
 export async function ensureWorkspaceFor(
   admin: AnyClient,
@@ -40,25 +46,6 @@ export async function ensureWorkspaceFor(
     .maybeSingle();
 
   let shopId = existing?.shop_id as string | undefined;
-
-  // Utilisateur invité par un administrateur : on le rattache à la boutique
-  // existante en tant qu'employé, sans créer de nouvelle boutique.
-  if (!shopId && typeof metadata.invited_shop_id === "string") {
-    const invitedShopId = metadata.invited_shop_id as string;
-    const { data: target } = await admin.from("shops").select("id").eq("id", invitedShopId).maybeSingle();
-    if (target) {
-      shopId = target.id as string;
-      await admin.from("profiles").insert({
-        id: userId,
-        shop_id: shopId,
-        full_name: (metadata.full_name as string) || userEmail || "Employé",
-        email: userEmail,
-      });
-      await admin
-        .from("user_roles")
-        .insert({ user_id: userId, shop_id: shopId, role: (metadata.invited_role as string) === "admin" ? "admin" : "employee" });
-    }
-  }
 
   if (!shopId) {
     const shopName = (metadata.shop_name as string) || "Ma boutique";

@@ -85,25 +85,31 @@ export async function inviteMember(
 
   const { data, error } = await (admin as any).auth.admin.inviteUserByEmail(input.email.trim(), {
     redirectTo: input.redirectTo,
-    data: {
-      full_name: input.fullName.trim(),
-      invited_shop_id: shopId,
-      invited_role: input.role,
-    },
+    data: { full_name: input.fullName.trim() },
   });
   if (error) throw new Error(error.message);
 
   const invited = data?.user;
-  if (invited?.id) {
-    await admin.from("profiles").upsert({
-      id: invited.id,
-      shop_id: shopId,
-      full_name: input.fullName.trim() || input.email.trim(),
-      email: input.email.trim(),
-    });
-    await admin
-      .from("user_roles")
-      .upsert({ user_id: invited.id, shop_id: shopId, role: input.role }, { onConflict: "user_id,role" });
+  if (!invited?.id) throw new Error("L'invitation n'a pas retourné d'utilisateur.");
+
+  // Le rattachement à la boutique et le rôle sont écrits ici, côté serveur,
+  // AVANT la première connexion de l'invité. ensureWorkspaceFor ne fait
+  // confiance qu'à ces lignes — jamais aux métadonnées utilisateur.
+  const { error: profileError } = await admin.from("profiles").upsert({
+    id: invited.id,
+    shop_id: shopId,
+    full_name: input.fullName.trim() || input.email.trim(),
+    email: input.email.trim(),
+  });
+  if (profileError) throw new Error(`Invitation impossible (profil) : ${profileError.message}`);
+
+  const { error: roleError } = await admin
+    .from("user_roles")
+    .upsert({ user_id: invited.id, shop_id: shopId, role: input.role }, { onConflict: "user_id,role" });
+  if (roleError) {
+    // Évite un état incohérent (profil rattaché sans rôle) : on retire le profil.
+    await admin.from("profiles").delete().eq("id", invited.id).eq("shop_id", shopId);
+    throw new Error(`Invitation impossible (rôle) : ${roleError.message}`);
   }
   return { ok: true as const };
 }

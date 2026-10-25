@@ -14,3 +14,4 @@
 - REP/FA references come from the `next_shop_reference` database function (atomic per-shop yearly counter in `shop_sequences`); never compute them in app code.
 - Base-price priority lives in `resolveBasePrice` (src/lib/pricing.ts), shared by the estimate page and the server; covered by `src/lib/pricing.test.ts` (`bun run test`).
 - Market analysis uses the single pure `computeProfit` module; persist entered inputs rather than derived margins so calculations remain consistent across both resale scenarios.
+- user_metadata is never trusted for shop attachment or roles: `inviteMember` pre-writes `profiles`/`user_roles` server-side before first login, and `ensureWorkspaceFor` only reuses that server-written profile, otherwise it creates a new shop owned by the caller.
