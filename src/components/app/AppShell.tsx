@@ -1,11 +1,14 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useQueryClient } from "@tanstack/react-query";
+import { queryOptions, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, type ReactNode } from "react";
 import { AlertTriangle, CreditCard, Gauge, Loader2, History, LogOut, Menu, Settings, Sparkles, Users, Wrench, X } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useWorkspace } from "@/hooks/useWorkspace";
+import { getTestSubscription } from "@/lib/payments.functions";
+import { hasSubscriptionAccess } from "@/lib/subscription";
+import { LEGACY_TRANSITION_END, resolveShopAccess } from "@/lib/access";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -15,8 +18,14 @@ const NAV = [
   { to: "/estimation", label: "Nouvelle estimation", icon: Sparkles },
   { to: "/historique", label: "Historique", icon: History },
   { to: "/administration", label: "Administration", icon: Settings, adminOnly: true },
-  { to: "/abonnement", label: "Abonnement test", icon: CreditCard },
+  { to: "/abonnement", label: "Abonnement", icon: CreditCard },
 ] as const;
+
+const subscriptionOptions = queryOptions({
+  queryKey: ["test-subscription"],
+  queryFn: () => getTestSubscription({ data: { environment: "sandbox" } }),
+  staleTime: 30_000,
+});
 
 export function AppShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
