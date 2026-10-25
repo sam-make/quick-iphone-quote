@@ -115,13 +115,13 @@ function SubscriptionPage() {
             )}
             <p className="mt-2 text-sm text-muted-foreground">
               {hasSubscriptionAccess(sub)
-                ? "Période de test valide."
-                : "Aucune période payée de test valide."}
+                ? "Période payée valide."
+                : "Aucune période payée valide."}
             </p>
           </div>
           <Button
             variant="outline"
-            onClick={() => qc.invalidateQueries({ queryKey: ["test-subscription"] })}
+            onClick={() => qc.invalidateQueries({ queryKey: ["shop-subscription"] })}
           >
             <RefreshCw className="size-4" />
             Actualiser le statut
