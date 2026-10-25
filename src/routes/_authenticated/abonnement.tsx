@@ -139,12 +139,12 @@ function SubscriptionPage() {
                 ) : (
                   <CreditCard className="size-4" />
                 )}
-                Souscrire en test
+                Souscrire
               </Button>
             )}
             <Button variant="outline" disabled={manage.isPending} onClick={() => manage.mutate()}>
               <ExternalLink className="size-4" />
-              Portail client test
+              Portail client
             </Button>
           </div>
         ) : (
