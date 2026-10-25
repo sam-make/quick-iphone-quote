@@ -101,7 +101,7 @@ describe("Stripe webhook idempotency", () => {
 
   it("uses current Stripe state rather than the event payload", async () => {
     stripeSub = { status: "canceled", cancel_at_period_end: false };
-    await processEvent(event("evt_c", 300, "invoice.paid"), "sandbox");
+    await processEvent({ ...event("evt_c", 300), data: { object: { id: "sub_1", status: "active" } } }, "sandbox");
     expect(rpcCalls[0].p_status).toBe("canceled");
   });
 
