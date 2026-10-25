@@ -1,31 +1,36 @@
 import { describe, it, expect } from "vitest";
-import { hasSubscriptionAccess, assertTestPrice, testEnvironmentSchema } from "./subscription";
-import { eventSubscriptionId, verifyTestWebhook } from "./payment-webhook.server";
+import { hasSubscriptionAccess, assertPlanPrice, environmentSchema } from "./subscription";
+import { eventSubscriptionId, verifyWebhook } from "./payment-webhook.server";
 import { createStripeClient } from "./stripe.server";
 const now = Date.UTC(2026, 9, 25);
 const future = "2026-11-25T00:00:00.000Z";
 const past = "2026-10-24T00:00:00.000Z";
-describe("Stripe test rules", () => {
-  it("accepts only the exact 10.99 EUR monthly test price with included tax", () => {
-    const price = {
-      unit_amount: 1099,
-      currency: "eur",
-      livemode: false,
-      recurring: { interval: "month", interval_count: 1 },
-      tax_behavior: "inclusive",
-    };
-    expect(() => assertTestPrice(price)).not.toThrow();
+const basePrice = {
+  unit_amount: 1099,
+  currency: "eur",
+  recurring: { interval: "month", interval_count: 1 },
+  tax_behavior: "inclusive",
+};
+describe("Stripe plan rules", () => {
+  it("accepts only the exact 10.99 EUR monthly price with included tax, per environment", () => {
+    expect(() => assertPlanPrice({ ...basePrice, livemode: false }, "sandbox")).not.toThrow();
+    expect(() => assertPlanPrice({ ...basePrice, livemode: true }, "live")).not.toThrow();
     for (const change of [
       { unit_amount: 599 },
       { currency: "usd" },
-      { livemode: true },
       { recurring: { interval: "year", interval_count: 1 } },
       { tax_behavior: "exclusive" },
     ])
-      expect(() => assertTestPrice({ ...price, ...change })).toThrow();
+      expect(() => assertPlanPrice({ ...basePrice, livemode: false, ...change }, "sandbox")).toThrow();
   });
-  it("rejects live requests", () => {
-    expect(testEnvironmentSchema.safeParse("live").success).toBe(false);
+  it("rejects a price whose mode does not match the environment", () => {
+    expect(() => assertPlanPrice({ ...basePrice, livemode: true }, "sandbox")).toThrow();
+    expect(() => assertPlanPrice({ ...basePrice, livemode: false }, "live")).toThrow();
+  });
+  it("accepts sandbox and live environments, rejects anything else", () => {
+    expect(environmentSchema.safeParse("sandbox").success).toBe(true);
+    expect(environmentSchema.safeParse("live").success).toBe(true);
+    expect(environmentSchema.safeParse("production").success).toBe(false);
   });
   it("preserves paid access until cancellation period ends", () => {
     expect(
@@ -73,7 +78,7 @@ describe("Stripe test rules", () => {
     }
   });
   it("maps lifecycle and invoice notification subscriptions", () => {
-    const base = { id: "evt_test", created: 1, livemode: false as const };
+    const base = { id: "evt_test", created: 1, livemode: false };
     expect(
       eventSubscriptionId({
         ...base,
@@ -96,54 +101,74 @@ describe("Stripe test rules", () => {
       }),
     ).toBe("sub_1");
   });
-  it("verifies signed bodies and rejects forged, expired and live notifications", async () => {
+  it("verifies signed bodies per environment and rejects forged, expired and mismatched notifications", async () => {
     const secret = "whsec_unit_test_only";
-    const saved = process.env["PAYMENTS_SANDBOX_WEBHOOK_SECRET"];
-    process.env["PAYMENTS_SANDBOX_WEBHOOK_SECRET"] = secret;
-    const oldConnection = process.env["STRIPE_SANDBOX_API_KEY"],
-      oldLovable = process.env["LOVABLE_API_KEY"];
-    process.env["STRIPE_SANDBOX_API_KEY"] = "test";
-    process.env["LOVABLE_API_KEY"] = "test";
+    const liveSecret = "whsec_unit_test_live";
+    const saved: Record<string, string | undefined> = {};
+    for (const key of [
+      "PAYMENTS_SANDBOX_WEBHOOK_SECRET",
+      "PAYMENTS_LIVE_WEBHOOK_SECRET",
+      "STRIPE_SANDBOX_API_KEY",
+      "STRIPE_LIVE_API_KEY",
+      "LOVABLE_API_KEY",
+    ]) {
+      saved[key] = process.env[key];
+      process.env[key] = key.includes("WEBHOOK")
+        ? key.includes("LIVE")
+          ? liveSecret
+          : secret
+        : "test";
+    }
     try {
-      const stripe = createStripeClient("sandbox");
-      const body = JSON.stringify({
-        id: "evt_test",
-        type: "customer.subscription.updated",
-        created: 1,
-        livemode: false,
-        data: { object: { id: "sub_1" } },
-      });
-      const signature = stripe.webhooks.generateTestHeaderString({ payload: body, secret });
-      const req = (text = body, sig = signature) =>
+      const body = (livemode: boolean) =>
+        JSON.stringify({
+          id: "evt_test",
+          type: "customer.subscription.updated",
+          created: 1,
+          livemode,
+          data: { object: { id: "sub_1" } },
+        });
+      const req = (text: string, sig: string) =>
         new Request("https://example.test", {
           method: "POST",
           body: text,
           headers: { "stripe-signature": sig },
         });
-      expect((await verifyTestWebhook(req())).id).toBe("evt_test");
-      await expect(verifyTestWebhook(req(body + " "))).rejects.toThrow();
+      const sign = (payload: string, sec: string, timestamp?: number) =>
+        createStripeClient("sandbox").webhooks.generateTestHeaderString({
+          payload,
+          secret: sec,
+          ...(timestamp ? { timestamp } : {}),
+        });
+      // Sandbox: signed test event accepted.
+      const testBody = body(false);
+      expect((await verifyWebhook(req(testBody, sign(testBody, secret)), "sandbox")).id).toBe(
+        "evt_test",
+      );
+      // Live: signed live event accepted with the live secret.
+      const liveBody = body(true);
+      expect((await verifyWebhook(req(liveBody, sign(liveBody, liveSecret)), "live")).id).toBe(
+        "evt_test",
+      );
+      // Tampered body rejected.
       await expect(
-        verifyTestWebhook(
-          req(
-            body,
-            stripe.webhooks.generateTestHeaderString({ payload: body, secret, timestamp: 1 }),
-          ),
-        ),
+        verifyWebhook(req(testBody + " ", sign(testBody, secret)), "sandbox"),
       ).rejects.toThrow();
-      const live = body.replace('"livemode":false', '"livemode":true');
+      // Expired timestamp rejected.
       await expect(
-        verifyTestWebhook(
-          req(live, stripe.webhooks.generateTestHeaderString({ payload: live, secret })),
-        ),
+        verifyWebhook(req(testBody, sign(testBody, secret, 1)), "sandbox"),
+      ).rejects.toThrow();
+      // Cross-environment events rejected both ways.
+      await expect(
+        verifyWebhook(req(liveBody, sign(liveBody, liveSecret)), "sandbox"),
+      ).rejects.toThrow();
+      await expect(
+        verifyWebhook(req(testBody, sign(testBody, secret)), "live"),
       ).rejects.toThrow();
     } finally {
-      for (const [key, val] of [
-        ["PAYMENTS_SANDBOX_WEBHOOK_SECRET", saved],
-        ["STRIPE_SANDBOX_API_KEY", oldConnection],
-        ["LOVABLE_API_KEY", oldLovable],
-      ]) {
-        if (val === undefined) delete process.env[key as string];
-        else process.env[key as string] = val;
+      for (const [key, val] of Object.entries(saved)) {
+        if (val === undefined) delete process.env[key];
+        else process.env[key] = val;
       }
     }
   });
