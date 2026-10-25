@@ -24,6 +24,7 @@ export interface WorkspaceSnapshot {
     address: string | null;
     phone: string | null;
     email: string | null;
+    created_at: string;
   };
   profile: { id: string; full_name: string; email: string | null };
   role: "admin" | "employee";
@@ -87,7 +88,7 @@ export async function ensureWorkspaceFor(
 
   const { data: shop, error } = await admin
     .from("shops")
-    .select("id, name, address, phone, email")
+    .select("id, name, address, phone, email, created_at")
     .eq("id", shopId)
     .single();
   if (error) throw new Error(error.message);

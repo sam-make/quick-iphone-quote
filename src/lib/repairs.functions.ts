@@ -49,6 +49,8 @@ export const saveCustomer = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => customerSchema.parse(data))
   .handler(async ({ data, context }) => {
+    const { requireShopAccess } = await import("./access.server");
+    await requireShopAccess(context.supabase, context.userId);
     const { upsertCustomerFor } = await import("./repairs.server");
     return upsertCustomerFor(context.supabase, context.userId, data);
   });
@@ -57,6 +59,8 @@ export const createRepair = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => repairSchema.parse(data))
   .handler(async ({ data, context }) => {
+    const { requireShopAccess } = await import("./access.server");
+    await requireShopAccess(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { createRepairFor } = await import("./repairs.server");
     return createRepairFor(context.supabase, supabaseAdmin, context.userId, data);
@@ -66,6 +70,8 @@ export const changeRepairStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => statusSchema.parse(data))
   .handler(async ({ data, context }) => {
+    const { requireShopAccess } = await import("./access.server");
+    await requireShopAccess(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { changeStatusFor } = await import("./repairs.server");
     return changeStatusFor(context.supabase, supabaseAdmin, context.userId, data.repairId, data.status, data.comment);
@@ -75,6 +81,8 @@ export const generateInvoice = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => z.object({ repairId: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
+    const { requireShopAccess } = await import("./access.server");
+    await requireShopAccess(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { generateInvoiceFor } = await import("./repairs.server");
     return generateInvoiceFor(context.supabase, supabaseAdmin, context.userId, data.repairId);

@@ -11,8 +11,9 @@
 - [x] Valider livraison distante automatique : webhook réel Stripe reçu (404 résolu), statut actif en base, idempotence et résiliation vérifiées
 - [x] Tester inscription/connexion/déconnexion/reconnexion + isolation inter-boutiques (403, zéro ligne étrangère) avec un 2e compte
 - [x] Créer les pages légales préparatoires (mentions légales, CGV, confidentialité) avec mentions « À compléter »
-- [ ] Décision de lancement : activer le verrouillage des fonctionnalités selon l'abonnement (logique prête et testée, non appliquée par conception)
+- [x] Activer le verrouillage des fonctionnalités selon l'abonnement (règle partagée base + serveur, transition boutiques existantes jusqu'au 25/11/2026)
 - [ ] Compléter les informations juridiques (raison sociale, SIRET, adresse, contacts) avant publication
+- [ ] Vérifier visuellement les bannières d'abonnement dans l'aperçu (vérification automatisée instable ; logique déjà couverte par tests et requêtes réelles)
 - [x] Exécuter les tests, contrôler les accès et examiner le diff sans publier
 
 - [x] Bloquer insertions directes estimations / estimation_defects / invoices (serveur seulement)
