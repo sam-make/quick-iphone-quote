@@ -29,6 +29,13 @@
       "when": 1792959326573,
       "tag": "0003_lock_profile_membership",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1792960122936,
+      "tag": "0004_stripe_test_subscriptions",
+      "breakpoints": true
     }
   ]
 }

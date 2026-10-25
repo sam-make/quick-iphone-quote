@@ -463,6 +463,27 @@ export type Database = {
           },
         ]
       }
+      payment_webhook_events: {
+        Row: {
+          environment: string
+          event_id: string
+          event_type: string
+          processed_at: string
+        }
+        Insert: {
+          environment: string
+          event_id: string
+          event_type: string
+          processed_at?: string
+        }
+        Update: {
+          environment?: string
+          event_id?: string
+          event_type?: string
+          processed_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -828,6 +849,66 @@ export type Database = {
           },
         ]
       }
+      shop_subscriptions: {
+        Row: {
+          cancel_at_period_end: boolean
+          current_period_end: string | null
+          environment: string
+          id: string
+          last_event_created: number
+          price_id: string
+          shop_id: string
+          status: string
+          stripe_customer_id: string
+          stripe_subscription_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cancel_at_period_end?: boolean
+          current_period_end?: string | null
+          environment: string
+          id?: string
+          last_event_created?: number
+          price_id: string
+          shop_id: string
+          status: string
+          stripe_customer_id: string
+          stripe_subscription_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cancel_at_period_end?: boolean
+          current_period_end?: string | null
+          environment?: string
+          id?: string
+          last_event_created?: number
+          price_id?: string
+          shop_id?: string
+          status?: string
+          stripe_customer_id?: string
+          stripe_subscription_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_subscriptions_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "shop_subscriptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shops: {
         Row: {
           address: string | null
@@ -895,6 +976,21 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      apply_test_subscription_event: {
+        Args: {
+          p_cancel: boolean
+          p_customer_id: string
+          p_event_created: number
+          p_event_id: string
+          p_event_type: string
+          p_period_end: string
+          p_shop_id: string
+          p_status: string
+          p_subscription_id: string
+          p_user_id: string
+        }
+        Returns: boolean
+      }
       current_shop_id: { Args: never; Returns: string }
       has_role: {
         Args: {

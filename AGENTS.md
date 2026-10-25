@@ -16,3 +16,4 @@
 - Market analysis uses the single pure `computeProfit` module; persist entered inputs rather than derived margins so calculations remain consistent across both resale scenarios.
 - user_metadata is never trusted for shop attachment or roles: `inviteMember` pre-writes `profiles`/`user_roles` server-side before first login, and `ensureWorkspaceFor` only reuses that server-written profile, otherwise it creates a new shop owned by the caller.
 - Profile identity and shop membership are immutable in the database; invitations insert new profiles/roles, never upsert existing membership, and role checks bind roles to the profile's shop to prevent tenant reassignment.
+- Billing preparation is sandbox-only: authenticated admin checkout owns the shop, signed webhooks re-read Stripe state and persist through an atomic idempotent RPC; existing business access remains unchanged until a separately authorized commercial launch.
