@@ -117,3 +117,31 @@ export function normalizePhone(phone: string): string {
 export function formatDateTime(value: string): string {
   return new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
 }
+
+/** Statuses after which a repair file is closed and can no longer change. */
+export const FINAL_STATUSES: readonly RepairStatus[] = ["restitue", "annule"];
+
+/**
+ * Status workflow rule, shared by the server (authoritative) and the UI.
+ * - closed files (restitué, annulé) never change;
+ * - "restitué" is only reachable once the repair is "terminé";
+ * - an invoiced repair can no longer be cancelled;
+ * - the current status cannot be re-applied.
+ */
+export function canChangeStatus(
+  from: RepairStatus,
+  to: RepairStatus,
+  options: { invoiced?: boolean } = {},
+): { ok: true } | { ok: false; reason: string } {
+  if (from === to) return { ok: false, reason: "Le dossier a déjà ce statut." };
+  if (FINAL_STATUSES.includes(from))
+    return { ok: false, reason: `Dossier clôturé (${STATUS_LABELS[from]}) : statut non modifiable.` };
+  if (to === "restitue" && from !== "termine")
+    return { ok: false, reason: "Un appareil ne peut être restitué qu’après le statut « Terminé »." };
+  if (to === "annule" && options.invoiced)
+    return { ok: false, reason: "Impossible d’annuler une réparation déjà facturée." };
+  return { ok: true };
+}
+
+/** Only finished work can be invoiced (never a cancelled or in-progress file). */
+export const INVOICEABLE_STATUSES: readonly RepairStatus[] = ["termine", "restitue"];

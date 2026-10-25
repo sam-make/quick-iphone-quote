@@ -12,9 +12,9 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/connexion")({
   head: () => ({
     meta: [
-      { title: "Connexion — ReprisePro" },
-      { name: "description", content: "Connectez-vous à l'espace sécurisé de votre boutique ReprisePro." },
-      { property: "og:title", content: "Connexion — ReprisePro" },
+      { title: "Connexion — Trade-In Pro" },
+      { name: "description", content: "Connectez-vous à l'espace sécurisé de votre boutique Trade-In Pro." },
+      { property: "og:title", content: "Connexion — Trade-In Pro" },
       { property: "og:description", content: "Accédez à l'espace de votre boutique de reprise iPhone." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

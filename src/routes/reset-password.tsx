@@ -10,9 +10,9 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/reset-password")({
   head: () => ({
     meta: [
-      { title: "Nouveau mot de passe — ReprisePro" },
-      { name: "description", content: "Définissez un nouveau mot de passe pour votre compte ReprisePro." },
-      { property: "og:title", content: "Nouveau mot de passe — ReprisePro" },
+      { title: "Nouveau mot de passe — Trade-In Pro" },
+      { name: "description", content: "Définissez un nouveau mot de passe pour votre compte Trade-In Pro." },
+      { property: "og:title", content: "Nouveau mot de passe — Trade-In Pro" },
       { property: "og:description", content: "Choisissez un nouveau mot de passe sécurisé." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

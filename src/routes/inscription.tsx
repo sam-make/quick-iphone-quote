@@ -11,12 +11,12 @@ import { supabase } from "@/integrations/supabase/client";
 export const Route = createFileRoute("/inscription")({
   head: () => ({
     meta: [
-      { title: "Créer un espace boutique — ReprisePro" },
+      { title: "Créer un espace boutique — Trade-In Pro" },
       {
         name: "description",
         content: "Créez l'espace sécurisé de votre boutique de réparation et lancez vos estimations iPhone.",
       },
-      { property: "og:title", content: "Créer un espace boutique — ReprisePro" },
+      { property: "og:title", content: "Créer un espace boutique — Trade-In Pro" },
       { property: "og:description", content: "Ouvrez l'espace de votre boutique en moins d'une minute." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

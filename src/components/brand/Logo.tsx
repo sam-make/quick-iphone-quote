@@ -12,7 +12,7 @@ export function Logo({ className, compact = false }: { className?: string; compa
       </span>
       {!compact && (
         <span className="font-[family-name:var(--font-display)] text-[1.05rem] font-semibold tracking-tight text-ink">
-          Reprise<span className="text-primary">Pro</span>
+          Trade-In <span className="text-primary">Pro</span>
         </span>
       )}
     </span>

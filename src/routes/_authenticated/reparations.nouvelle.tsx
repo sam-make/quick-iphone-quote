@@ -34,9 +34,9 @@ export const Route = createFileRoute("/_authenticated/reparations/nouvelle")({
   validateSearch: searchSchema,
   head: () => ({
     meta: [
-      { title: "Nouvelle réparation — ReprisePro" },
+      { title: "Nouvelle réparation — Trade-In Pro" },
       { name: "description", content: "Créez un dossier de réparation en quelques clics : client, appareil, prestations, photos." },
-      { property: "og:title", content: "Nouvelle réparation — ReprisePro" },
+      { property: "og:title", content: "Nouvelle réparation — Trade-In Pro" },
       { property: "og:description", content: "Assistant guidé pour ouvrir un dossier atelier en moins d'une minute." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

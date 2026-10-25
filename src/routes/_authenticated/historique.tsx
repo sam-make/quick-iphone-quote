@@ -10,12 +10,12 @@ import { MarketAnalysisPanel } from "@/components/estimation/MarketAnalysisPanel
 export const Route = createFileRoute("/_authenticated/historique")({
   head: () => ({
     meta: [
-      { title: "Historique des estimations — ReprisePro" },
+      { title: "Historique des estimations — Trade-In Pro" },
       {
         name: "description",
         content: "Retrouvez toutes les estimations de reprise réalisées par votre boutique.",
       },
-      { property: "og:title", content: "Historique des estimations — ReprisePro" },
+      { property: "og:title", content: "Historique des estimations — Trade-In Pro" },
       { property: "og:description", content: "Date, employé, appareil, défauts et prix proposé." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },

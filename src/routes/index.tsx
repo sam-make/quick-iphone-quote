@@ -18,13 +18,13 @@ import estimationShot from "@/assets/screen-estimation.jpg";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "ReprisePro — Logiciel d'estimation de reprise iPhone" },
+      { title: "Trade-In Pro — Logiciel d'estimation de reprise iPhone" },
       {
         name: "description",
         content:
           "Estimez la reprise d'un iPhone en moins de 2 minutes. Règles de déduction 100 % personnalisables, historique complet, espace sécurisé par boutique.",
       },
-      { property: "og:title", content: "ReprisePro — Logiciel d'estimation de reprise iPhone" },
+      { property: "og:title", content: "Trade-In Pro — Logiciel d'estimation de reprise iPhone" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       {
@@ -107,7 +107,7 @@ function Landing() {
               <span className="text-gradient"> enfin sans appeler le responsable.</span>
             </h1>
             <p className="animate-rise mx-auto mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
-              ReprisePro donne à vos vendeurs un prix de reprise fiable en moins de deux minutes,
+              Trade-In Pro donne à vos vendeurs un prix de reprise fiable en moins de deux minutes,
               calculé automatiquement à partir des règles de déduction que vous définissez
               vous-même.
             </p>
@@ -127,7 +127,7 @@ function Landing() {
               <div className="surface-card overflow-hidden p-2 shadow-[var(--shadow-float)]">
                 <img
                   src={dashboardShot}
-                  alt="Aperçu du tableau de bord ReprisePro avec le prix de reprise calculé"
+                  alt="Aperçu du tableau de bord Trade-In Pro avec le prix de reprise calculé"
                   width={1600}
                   height={1008}
                   className="w-full rounded-[calc(var(--radius-xl)-4px)]"
@@ -192,7 +192,7 @@ function Landing() {
             <div className="surface-card overflow-hidden p-2">
               <img
                 src={estimationShot}
-                alt="Aperçu du module de diagnostic technique de ReprisePro"
+                alt="Aperçu du module de diagnostic technique de Trade-In Pro"
                 loading="lazy"
                 width={1600}
                 height={1008}
@@ -283,7 +283,7 @@ function Landing() {
               Confidentialité
             </Link>
           </nav>
-          <p>© {new Date().getFullYear()} ReprisePro. Tous droits réservés.</p>
+          <p>© {new Date().getFullYear()} Trade-In Pro. Tous droits réservés.</p>
         </div>
       </footer>
     </div>

@@ -18,3 +18,4 @@
 - Profile identity and shop membership are immutable in the database; invitations insert new profiles/roles, never upsert existing membership, and role checks bind roles to the profile's shop to prevent tenant reassignment.
 - Billing: admin-only checkout, signed webhooks re-read Stripe state and persist via the idempotent `apply_subscription_event` RPC, which also requires the subscriber to be a shop admin (creation) / member (access-granting updates).
 - Subscription access is environment-scoped: the server gate uses only the build's environment (test token → sandbox, otherwise live) and `shop_has_access(shop)` used by RLS counts live only, so a test subscription never unlocks production.
+- Repair status workflow and invoice eligibility live in `canChangeStatus` / `INVOICEABLE_STATUSES` (src/lib/repairs.ts), enforced by the server with a compare-and-set on the previous status; the UI only mirrors them.

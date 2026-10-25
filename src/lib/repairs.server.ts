@@ -4,7 +4,13 @@
  * the browser is never trusted with money.
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { totalsOf, type RepairLine, type RepairStatus } from "./repairs";
+import {
+  canChangeStatus,
+  INVOICEABLE_STATUSES,
+  totalsOf,
+  type RepairLine,
+  type RepairStatus,
+} from "./repairs";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type AnyClient = SupabaseClient<any, any, any>;
@@ -258,18 +264,31 @@ export async function changeStatusFor(
   // Read through RLS: only a repair of the caller's shop is found.
   const { data: owned } = await supabase
     .from("repairs")
-    .select("id")
+    .select("id, status")
     .eq("id", repairId)
     .eq("shop_id", profile.shop_id)
     .maybeSingle();
   if (!owned) throw new Error("Dossier introuvable.");
 
-  const { error } = await admin
+  const { data: invoice } = await supabase
+    .from("invoices")
+    .select("id")
+    .eq("repair_id", repairId)
+    .maybeSingle();
+  const rule = canChangeStatus(owned.status as RepairStatus, status, { invoiced: !!invoice });
+  if (!rule.ok) throw new Error(rule.reason);
+
+  // Compare-and-set on the previous status: a concurrent change cannot be overwritten.
+  const { data: updated, error } = await admin
     .from("repairs")
     .update({ status })
     .eq("id", repairId)
-    .eq("shop_id", profile.shop_id);
+    .eq("shop_id", profile.shop_id)
+    .eq("status", owned.status)
+    .select("id");
   if (error) throw new Error(error.message);
+  if (!updated || (Array.isArray(updated) && updated.length === 0))
+    throw new Error("Le statut a été modifié entre-temps. Rechargez le dossier.");
 
   const { error: historyError } = await admin.from("repair_status_history").insert({
     repair_id: repairId,
@@ -310,6 +329,8 @@ export async function generateInvoiceFor(
     .single();
   if (error || !repair) throw new Error("Dossier introuvable.");
   if (repair.status === "annule") throw new Error("Impossible de facturer une réparation annulée.");
+  if (!INVOICEABLE_STATUSES.includes(repair.status as RepairStatus))
+    throw new Error("Seule une réparation « Terminé » ou « Restitué » peut être facturée.");
 
   const { data: customer } = await supabase
     .from("customers")
@@ -358,7 +379,14 @@ export async function generateInvoiceFor(
     })
     .select("id")
     .single();
-  if (invoiceError) throw new Error(invoiceError.message);
+  if (invoiceError) {
+    // Unique repair_id: a concurrent request already created the invoice.
+    if (invoiceError.code === "23505") {
+      const { data: again } = await supabase.from("invoices").select("id").eq("repair_id", repairId).maybeSingle();
+      if (again) return { id: again.id as string, existed: true };
+    }
+    throw new Error(invoiceError.message);
+  }
 
   return { id: invoice.id as string, existed: false };
 }
