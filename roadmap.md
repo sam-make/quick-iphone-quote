@@ -3,7 +3,10 @@
 - [x] Verrouiller le rattachement des profils et les rôles, vérifier les invitations et leurs échecs
 - [x] Corriger uniquement les bugs bloquants identifiés et tester les parcours disponibles
 - [x] Vérifier l’offre unique 10,99 EUR/mois et annoncer la souscription indisponible
-- [ ] Activer Stripe après confirmation de l'utilisateur (Pro actif, intégration non activée)
+- [x] Activer Stripe test après confirmation de l'utilisateur
+- [ ] Créer et vérifier l'offre unique Stripe test 10,99 EUR/mois
+- [ ] Ajouter parcours test, portail et synchronisation signée/idempotente
+- [ ] Tester prix, accès directs refusés, abonnement et erreurs sans publier
 - [x] Exécuter les tests, contrôler les accès et examiner le diff sans publier
 
 - [x] Bloquer insertions directes estimations / estimation_defects / invoices (serveur seulement)
