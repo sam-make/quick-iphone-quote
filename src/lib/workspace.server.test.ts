@@ -114,7 +114,7 @@ describe("inviteMember — erreurs d'écriture non silencieuses", () => {
     });
     admin.auth = {
       admin: {
-        inviteUserByEmail: async () => ok({ user: { id: "inv-1" } }),
+        inviteUserByEmail: async () => ok({ user: { id: "inv-1", email: "new@x.fr", invited_at: "2026-10-25T00:00:00Z" } }),
       },
     };
 

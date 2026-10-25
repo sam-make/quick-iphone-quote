@@ -228,8 +228,9 @@ function Landing() {
                     </li>
                   ))}
                 </ul>
-                <Button className="mt-8 w-full" size="lg" asChild>
-                  <Link to="/inscription">Créer l'espace de ma boutique</Link>
+                <p className="mt-6 text-sm text-muted-foreground">Souscription disponible prochainement. Aucun paiement n’est actuellement proposé.</p>
+                <Button className="mt-8 w-full" size="lg" disabled>
+                  Souscription prochainement disponible
                 </Button>
               </article>
             </div>

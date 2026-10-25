@@ -91,11 +91,17 @@ export async function inviteMember(
 
   const invited = data?.user;
   if (!invited?.id) throw new Error("L'invitation n'a pas retourné d'utilisateur.");
+  if (!invited.invited_at || invited.email?.toLowerCase() !== input.email.trim().toLowerCase()) {
+    throw new Error("Invitation non valide.");
+  }
+  const { data: existing, error: existingError } = await admin.from("profiles").select("id").eq("id", invited.id).maybeSingle();
+  if (existingError) throw new Error(existingError.message);
+  if (existing) throw new Error("Cet utilisateur est déjà rattaché à une boutique.");
 
   // Le rattachement à la boutique et le rôle sont écrits ici, côté serveur,
   // AVANT la première connexion de l'invité. ensureWorkspaceFor ne fait
   // confiance qu'à ces lignes — jamais aux métadonnées utilisateur.
-  const { error: profileError } = await admin.from("profiles").upsert({
+  const { error: profileError } = await admin.from("profiles").insert({
     id: invited.id,
     shop_id: shopId,
     full_name: input.fullName.trim() || input.email.trim(),
@@ -105,7 +111,7 @@ export async function inviteMember(
 
   const { error: roleError } = await admin
     .from("user_roles")
-    .upsert({ user_id: invited.id, shop_id: shopId, role: input.role }, { onConflict: "user_id,role" });
+    .insert({ user_id: invited.id, shop_id: shopId, role: input.role });
   if (roleError) {
     // Évite un état incohérent (profil rattaché sans rôle) : on retire le profil.
     await admin.from("profiles").delete().eq("id", invited.id).eq("shop_id", shopId);
