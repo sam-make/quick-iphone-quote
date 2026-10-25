@@ -1003,7 +1003,9 @@ export type Database = {
       next_shop_reference: { Args: { _kind: string }; Returns: string }
       seed_default_rules: { Args: { _shop_id: string }; Returns: undefined }
       seed_default_services: { Args: { _shop_id: string }; Returns: undefined }
-      shop_has_access: { Args: { _shop_id: string }; Returns: boolean }
+      shop_has_access:
+        | { Args: { _shop_id: string }; Returns: boolean }
+        | { Args: { _environment: string; _shop_id: string }; Returns: boolean }
       storage_step: { Args: { _gb: number }; Returns: number }
     }
     Enums: {

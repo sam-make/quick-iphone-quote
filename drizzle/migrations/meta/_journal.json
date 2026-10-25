@@ -43,6 +43,13 @@
       "when": 1792962459914,
       "tag": "0005_subscription_access_gate",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792966060199,
+      "tag": "0006_separate_live_access_and_harden_subscription_event",
+      "breakpoints": true
     }
   ]
 }
