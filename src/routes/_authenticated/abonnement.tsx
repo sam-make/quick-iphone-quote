@@ -22,15 +22,15 @@ const options = queryOptions({
 export const Route = createFileRoute("/_authenticated/abonnement")({
   head: () => ({
     meta: [
-      { title: "Abonnement test — Trade-In Pro" },
+      { title: "Abonnement — Trade-In Pro" },
       {
         name: "description",
-        content: "Abonnement unique Trade-In Pro à 10,99 EUR/mois en environnement test.",
+        content: "Abonnement unique Trade-In Pro à 10,99 EUR/mois, toutes fonctionnalités incluses.",
       },
-      { property: "og:title", content: "Abonnement test — Trade-In Pro" },
+      { property: "og:title", content: "Abonnement — Trade-In Pro" },
       {
         property: "og:description",
-        content: "Gestion de l’abonnement et du statut de test de votre boutique.",
+        content: "Gestion de l’abonnement et du statut de votre boutique.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
@@ -45,13 +45,13 @@ function SubscriptionPage() {
   const sub = rows.find((s) => hasSubscriptionAccess(s)) ?? rows[0] ?? null;
   const [secret, setSecret] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const checkout = useServerFn(createTestCheckout);
-  const portal = useServerFn(createTestPortal);
+  const checkout = useServerFn(createCheckout);
+  const portal = useServerFn(createPortal);
   const qc = useQueryClient();
   const purchase = useMutation({
     mutationFn: async () => {
-      getTestStripe();
-      const r = await checkout({ data: { environment: "sandbox" } });
+      getStripe();
+      const r = await checkout({ data: { environment: getStripeEnvironment() } });
       if ("error" in r) throw new Error(r.error);
       return r.clientSecret;
     },
