@@ -272,6 +272,17 @@ function Landing() {
       <footer className="border-t border-border/70 py-8">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-5 text-sm text-muted-foreground sm:flex-row">
           <Logo />
+          <nav className="flex flex-wrap items-center justify-center gap-4">
+            <Link to="/mentions-legales" className="hover:text-ink">
+              Mentions légales
+            </Link>
+            <Link to="/cgv" className="hover:text-ink">
+              CGV
+            </Link>
+            <Link to="/confidentialite" className="hover:text-ink">
+              Confidentialité
+            </Link>
+          </nav>
           <p>© {new Date().getFullYear()} ReprisePro. Tous droits réservés.</p>
         </div>
       </footer>

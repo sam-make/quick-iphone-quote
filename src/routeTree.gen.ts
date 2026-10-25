@@ -11,8 +11,11 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as CgvRouteImport } from './routes/cgv'
+import { Route as ConfidentialiteRouteImport } from './routes/confidentialite'
 import { Route as ConnexionRouteImport } from './routes/connexion'
 import { Route as InscriptionRouteImport } from './routes/inscription'
+import { Route as MentionsLegalesRouteImport } from './routes/mentions-legales'
 import { Route as MotDePasseOublieRouteImport } from './routes/mot-de-passe-oublie'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as AuthenticatedAbonnementRouteImport } from './routes/_authenticated/abonnement'
@@ -37,6 +40,16 @@ const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CgvRoute = CgvRouteImport.update({
+  id: '/cgv',
+  path: '/cgv',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ConfidentialiteRoute = ConfidentialiteRouteImport.update({
+  id: '/confidentialite',
+  path: '/confidentialite',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ConnexionRoute = ConnexionRouteImport.update({
   id: '/connexion',
   path: '/connexion',
@@ -45,6 +58,11 @@ const ConnexionRoute = ConnexionRouteImport.update({
 const InscriptionRoute = InscriptionRouteImport.update({
   id: '/inscription',
   path: '/inscription',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MentionsLegalesRoute = MentionsLegalesRouteImport.update({
+  id: '/mentions-legales',
+  path: '/mentions-legales',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MotDePasseOublieRoute = MotDePasseOublieRouteImport.update({
@@ -127,8 +145,11 @@ const ApiPublicPaymentsWebhookRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/cgv': typeof CgvRoute
+  '/confidentialite': typeof ConfidentialiteRoute
   '/connexion': typeof ConnexionRoute
   '/inscription': typeof InscriptionRoute
+  '/mentions-legales': typeof MentionsLegalesRoute
   '/mot-de-passe-oublie': typeof MotDePasseOublieRoute
   '/reset-password': typeof ResetPasswordRoute
   '/abonnement': typeof AuthenticatedAbonnementRoute
@@ -146,8 +167,11 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/cgv': typeof CgvRoute
+  '/confidentialite': typeof ConfidentialiteRoute
   '/connexion': typeof ConnexionRoute
   '/inscription': typeof InscriptionRoute
+  '/mentions-legales': typeof MentionsLegalesRoute
   '/mot-de-passe-oublie': typeof MotDePasseOublieRoute
   '/reset-password': typeof ResetPasswordRoute
   '/abonnement': typeof AuthenticatedAbonnementRoute
@@ -167,8 +191,11 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/cgv': typeof CgvRoute
+  '/confidentialite': typeof ConfidentialiteRoute
   '/connexion': typeof ConnexionRoute
   '/inscription': typeof InscriptionRoute
+  '/mentions-legales': typeof MentionsLegalesRoute
   '/mot-de-passe-oublie': typeof MotDePasseOublieRoute
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/abonnement': typeof AuthenticatedAbonnementRoute
@@ -188,8 +215,11 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/cgv'
+    | '/confidentialite'
     | '/connexion'
     | '/inscription'
+    | '/mentions-legales'
     | '/mot-de-passe-oublie'
     | '/reset-password'
     | '/abonnement'
@@ -207,8 +237,11 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/cgv'
+    | '/confidentialite'
     | '/connexion'
     | '/inscription'
+    | '/mentions-legales'
     | '/mot-de-passe-oublie'
     | '/reset-password'
     | '/abonnement'
@@ -227,8 +260,11 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/cgv'
+    | '/confidentialite'
     | '/connexion'
     | '/inscription'
+    | '/mentions-legales'
     | '/mot-de-passe-oublie'
     | '/reset-password'
     | '/_authenticated/abonnement'
@@ -248,8 +284,11 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  CgvRoute: typeof CgvRoute
+  ConfidentialiteRoute: typeof ConfidentialiteRoute
   ConnexionRoute: typeof ConnexionRoute
   InscriptionRoute: typeof InscriptionRoute
+  MentionsLegalesRoute: typeof MentionsLegalesRoute
   MotDePasseOublieRoute: typeof MotDePasseOublieRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
@@ -271,6 +310,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cgv': {
+      id: '/cgv'
+      path: '/cgv'
+      fullPath: '/cgv'
+      preLoaderRoute: typeof CgvRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/confidentialite': {
+      id: '/confidentialite'
+      path: '/confidentialite'
+      fullPath: '/confidentialite'
+      preLoaderRoute: typeof ConfidentialiteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/connexion': {
       id: '/connexion'
       path: '/connexion'
@@ -283,6 +336,13 @@ declare module '@tanstack/react-router' {
       path: '/inscription'
       fullPath: '/inscription'
       preLoaderRoute: typeof InscriptionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mentions-legales': {
+      id: '/mentions-legales'
+      path: '/mentions-legales'
+      fullPath: '/mentions-legales'
+      preLoaderRoute: typeof MentionsLegalesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mot-de-passe-oublie': {
@@ -420,8 +480,11 @@ const AuthenticatedRouteRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  CgvRoute: CgvRoute,
+  ConfidentialiteRoute: ConfidentialiteRoute,
   ConnexionRoute: ConnexionRoute,
   InscriptionRoute: InscriptionRoute,
+  MentionsLegalesRoute: MentionsLegalesRoute,
   MotDePasseOublieRoute: MotDePasseOublieRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
