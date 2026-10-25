@@ -142,3 +142,6 @@ export function canChangeStatus(
     return { ok: false, reason: "Impossible d’annuler une réparation déjà facturée." };
   return { ok: true };
 }
+
+/** Only finished work can be invoiced (never a cancelled or in-progress file). */
+export const INVOICEABLE_STATUSES: readonly RepairStatus[] = ["termine", "restitue"];

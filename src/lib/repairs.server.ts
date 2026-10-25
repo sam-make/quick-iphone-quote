@@ -4,7 +4,13 @@
  * the browser is never trusted with money.
  */
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { totalsOf, type RepairLine, type RepairStatus } from "./repairs";
+import {
+  canChangeStatus,
+  INVOICEABLE_STATUSES,
+  totalsOf,
+  type RepairLine,
+  type RepairStatus,
+} from "./repairs";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type AnyClient = SupabaseClient<any, any, any>;
