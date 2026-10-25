@@ -37,9 +37,10 @@ describe("repair server safeguards", () => {
   it("reports status history write failures instead of claiming success", async () => {
     const user = client({
       profiles: { data: { shop_id: "shop-A" }, error: null },
-      repairs: { data: { id: "repair-A" }, error: null },
+      repairs: { data: { id: "repair-A", status: "en_reparation" }, error: null },
     });
     const admin = client({
+      repairs: { data: [{ id: "repair-A" }], error: null },
       repair_status_history: { data: null, error: { message: "history unavailable" } },
     });
     await expect(
