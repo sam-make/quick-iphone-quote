@@ -92,6 +92,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         content: "Estimez la reprise d'un iPhone en moins de 2 minutes. Règles de déduction 100 % personnalisables, historique complet, espace sécurisé par boutique.",
       },
       { property: "og:type", content: "website" },
+      {
+        name: "google-site-verification",
+        content: "iedSLi3C05zPZ4rafSXYCvHhK50ASJtYIfn_3AAxhBE",
+      },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Trade-In Pro — Logiciel d'estimation de reprise iPhone" },
       { name: "twitter:description", content: "Estimez la reprise d'un iPhone en moins de 2 minutes. Règles de déduction 100 % personnalisables, historique complet, espace sécurisé par boutique." },
