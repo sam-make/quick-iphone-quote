@@ -25,8 +25,6 @@ export const updateShopSettings = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => shopSchema.parse(data))
   .handler(async ({ data, context }) => {
-    const { requireShopAccess } = await import("./access.server");
-    await requireShopAccess(context.supabase, context.userId);
     const { saveShopSettings } = await import("./team.server");
     return saveShopSettings(context.supabase, context.userId, {
       name: data.name,
@@ -47,8 +45,6 @@ export const inviteEmployee = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => inviteSchema.parse(data))
   .handler(async ({ data, context }) => {
-    const { requireShopAccess } = await import("./access.server");
-    await requireShopAccess(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { inviteMember } = await import("./team.server");
     return inviteMember(context.supabase, supabaseAdmin, context.userId, data);
@@ -58,8 +54,6 @@ export const changeEmployeeRole = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => roleSchema.parse(data))
   .handler(async ({ data, context }) => {
-    const { requireShopAccess } = await import("./access.server");
-    await requireShopAccess(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { setMemberRole } = await import("./team.server");
     return setMemberRole(context.supabase, supabaseAdmin, context.userId, data);
@@ -69,8 +63,6 @@ export const deleteEmployee = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => z.object({ memberId: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
-    const { requireShopAccess } = await import("./access.server");
-    await requireShopAccess(context.supabase, context.userId);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { removeMember } = await import("./team.server");
     return removeMember(context.supabase, supabaseAdmin, context.userId, data.memberId);

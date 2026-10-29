@@ -49,11 +49,6 @@ function ConfidentialitePage() {
           factures, règles de prix, comptes des employés invités (nom, e-mail, rôle).
         </p>
         <p>
-          <strong>Données de paiement :</strong> traitées intégralement par Stripe ; nous ne
-          stockons aucun numéro de carte. Nous conservons uniquement le statut d’abonnement et les
-          dates de période.
-        </p>
-        <p>
           <strong>Données techniques :</strong> journaux de connexion et d’erreurs nécessaires à la
           sécurité et au bon fonctionnement.
         </p>
@@ -62,8 +57,7 @@ function ConfidentialitePage() {
       <LegalSection title="3. Finalités et bases légales">
         <p>
           Fourniture du service et gestion du compte (exécution du contrat), gestion des accès des
-          employés (exécution du contrat), facturation de
-          l’abonnement (exécution du contrat), sécurité et prévention de la fraude (intérêt
+          employés (exécution du contrat), sécurité et prévention de la fraude (intérêt
           légitime), obligations comptables et fiscales (obligation légale).
         </p>
       </LegalSection>
@@ -71,19 +65,18 @@ function ConfidentialitePage() {
       <LegalSection title="4. Sous-traitants et destinataires">
         <p>
           Hébergement de l’application, de la base de données, des photos et envoi des e-mails de
-          connexion : Lovable (Lovable Cloud, qui s’appuie sur Supabase). Paiement et abonnement :
-          Stripe. Aucun outil d’intelligence artificielle ni de mesure d’audience n’est utilisé. Aucune donnée n’est vendue ni partagée à des tiers à des fins
+          connexion : Lovable (Lovable Cloud, qui s’appuie sur Supabase). Aucun outil d’intelligence artificielle ni de mesure d’audience n’est utilisé. Aucune donnée n’est vendue ni partagée à des tiers à des fins
           commerciales.
         </p>
         <p>
-          <Missing>pays d’hébergement des données et garanties en cas de transfert hors Union européenne, à confirmer auprès de Lovable et Stripe</Missing>
+          <Missing>pays d’hébergement des données et garanties en cas de transfert hors Union européenne, à confirmer auprès de Lovable</Missing>
         </p>
       </LegalSection>
 
       <LegalSection title="5. Durées de conservation">
         <p>
-          Compte et données de boutique : pendant toute la durée de l’abonnement, puis{" "}
-          <Missing>délai après résiliation</Missing>. Données de facturation : 10 ans (obligations
+          Compte et données de boutique : pendant toute la durée d’utilisation du service, puis{" "}
+          <Missing>délai après fermeture du compte</Missing>. Données de facturation : 10 ans (obligations
           comptables). Journaux techniques : <Missing>durée de conservation des journaux</Missing>
         </p>
       </LegalSection>
