@@ -976,22 +976,6 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      apply_subscription_event: {
-        Args: {
-          p_cancel: boolean
-          p_customer_id: string
-          p_environment: string
-          p_event_created: number
-          p_event_id: string
-          p_event_type: string
-          p_period_end: string
-          p_shop_id: string
-          p_status: string
-          p_subscription_id: string
-          p_user_id: string
-        }
-        Returns: boolean
-      }
       current_shop_id: { Args: never; Returns: string }
       has_role: {
         Args: {
@@ -1003,9 +987,6 @@ export type Database = {
       next_shop_reference: { Args: { _kind: string }; Returns: string }
       seed_default_rules: { Args: { _shop_id: string }; Returns: undefined }
       seed_default_services: { Args: { _shop_id: string }; Returns: undefined }
-      shop_has_access:
-        | { Args: { _shop_id: string }; Returns: boolean }
-        | { Args: { _environment: string; _shop_id: string }; Returns: boolean }
       storage_step: { Args: { _gb: number }; Returns: number }
     }
     Enums: {
