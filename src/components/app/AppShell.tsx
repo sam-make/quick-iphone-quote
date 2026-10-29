@@ -1,15 +1,11 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { queryOptions, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useState, type ReactNode } from "react";
-import { AlertTriangle, CreditCard, Gauge, Loader2, History, LogOut, Menu, Settings, Sparkles, Users, Wrench, X } from "lucide-react";
+import { AlertTriangle, Gauge, Loader2, History, LogOut, Menu, Settings, Sparkles, Users, Wrench, X } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useWorkspace } from "@/hooks/useWorkspace";
-import { getShopSubscription } from "@/lib/payments.functions";
-import { getStripeEnvironment } from "@/lib/stripe";
-import { hasSubscriptionAccess } from "@/lib/subscription";
-import { LEGACY_TRANSITION_END, resolveShopAccess } from "@/lib/access";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -19,30 +15,14 @@ const NAV = [
   { to: "/estimation", label: "Nouvelle estimation", icon: Sparkles },
   { to: "/historique", label: "Historique", icon: History },
   { to: "/administration", label: "Administration", icon: Settings, adminOnly: true },
-  { to: "/abonnement", label: "Abonnement", icon: CreditCard },
 ] as const;
-
-const subscriptionOptions = queryOptions({
-  queryKey: ["shop-subscription"],
-  queryFn: () => getShopSubscription({ data: { environment: getStripeEnvironment() } }),
-  staleTime: 30_000,
-});
 
 export function AppShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { data: workspace, isLoading: workspaceLoading, isError: workspaceError, refetch } = useWorkspace();
-  const { data: subscriptionRows } = useQuery(subscriptionOptions);
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const [open, setOpen] = useState(false);
-
-  const subscription = subscriptionRows?.find((s) => hasSubscriptionAccess(s)) ?? subscriptionRows?.[0] ?? null;
-  const access = workspace ? resolveShopAccess(subscription, workspace.shop.created_at) : null;
-  const transitionEndLabel = new Date(LEGACY_TRANSITION_END).toLocaleDateString("fr-FR", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
 
   async function handleSignOut() {
     await queryClient.cancelQueries();
@@ -140,32 +120,6 @@ export function AppShell({ children }: { children: ReactNode }) {
             <span className="flex-1">Impossible de charger votre boutique. Certaines rubriques peuvent être indisponibles.</span>
             <Button size="sm" variant="outline" onClick={() => refetch()}>
               Réessayer
-            </Button>
-          </div>
-        )}
-
-        {access?.allowed && access.reason === "legacy_transition" && (
-          <div className="flex flex-wrap items-center gap-3 border-b border-amber-300 bg-amber-50 px-5 py-3 text-sm text-amber-900 lg:px-8">
-            <AlertTriangle className="size-4" />
-            <span className="flex-1">
-              Période de transition : les fonctionnalités de votre boutique restent accessibles jusqu’au {transitionEndLabel}.
-              Souscrivez à l’offre Trade-In Pro (10,99 €/mois) pour conserver l’accès ensuite.
-            </span>
-            <Button asChild size="sm" variant="outline">
-              <Link to="/abonnement">Voir l’abonnement</Link>
-            </Button>
-          </div>
-        )}
-
-        {access && !access.allowed && (
-          <div role="alert" className="flex flex-wrap items-center gap-3 border-b border-destructive/30 bg-destructive/10 px-5 py-3 text-sm text-destructive lg:px-8">
-            <AlertTriangle className="size-4" />
-            <span className="flex-1">
-              Abonnement inactif : les fonctionnalités de la boutique sont suspendues. Vos données sont conservées —
-              souscrivez à l’offre Trade-In Pro (10,99 €/mois) pour réactiver l’accès.
-            </span>
-            <Button asChild size="sm" variant="outline">
-              <Link to="/abonnement">Gérer l’abonnement</Link>
             </Button>
           </div>
         )}

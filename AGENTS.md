@@ -16,6 +16,6 @@
 - Market analysis uses the single pure `computeProfit` module; persist entered inputs rather than derived margins so calculations remain consistent across both resale scenarios.
 - user_metadata is never trusted for shop attachment or roles: `inviteMember` pre-writes `profiles`/`user_roles` server-side before first login, and `ensureWorkspaceFor` only reuses that server-written profile, otherwise it creates a new shop owned by the caller.
 - Profile identity and shop membership are immutable in the database; invitations insert new profiles/roles, never upsert existing membership, and role checks bind roles to the profile's shop to prevent tenant reassignment.
-- Billing: admin-only checkout, signed webhooks re-read Stripe state and persist via the idempotent `apply_subscription_event` RPC, which also requires the subscriber to be a shop admin (creation) / member (access-granting updates).
-- Subscription access is environment-scoped: the server gate uses only the build's environment (test token → sandbox, otherwise live) and `shop_has_access(shop)` used by RLS counts live only, so a test subscription never unlocks production.
 - Repair status workflow and invoice eligibility live in `canChangeStatus` / `INVOICEABLE_STATUSES` (src/lib/repairs.ts), enforced by the server with a compare-and-set on the previous status; the UI only mirrors them.
+
+- Business access requires authentication, shop membership and existing role checks only; no payment dependency remains. Historical payment tables and applied migrations are retired but retained to preserve data and migration history.

@@ -2,7 +2,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import {
   ArrowRight,
   Building2,
-  Check,
   Gauge,
   History,
   Lock,
@@ -198,54 +197,6 @@ function Landing() {
                 height={1008}
                 className="w-full rounded-[calc(var(--radius-xl)-4px)]"
               />
-            </div>
-          </div>
-        </section>
-
-        <section className="border-t border-border/70 bg-surface-2/60 py-20">
-          <div className="mx-auto max-w-6xl px-5">
-            <div className="text-center">
-              <h2 className="text-3xl font-semibold text-ink md:text-4xl">
-                Une offre unique, tout inclus
-              </h2>
-              <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
-                Toutes les fonctionnalités de Trade-In Pro, sans palier ni option cachée.
-              </p>
-            </div>
-            <div className="mx-auto mt-12 max-w-md">
-              <article className="surface-card relative flex flex-col overflow-hidden p-8 ring-1 ring-primary">
-                <h3 className="text-lg font-semibold text-ink">Trade-In Pro</h3>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Toutes les fonctionnalités incluses
-                </p>
-                <div className="mt-4 flex items-baseline gap-1">
-                  <span className="text-5xl font-semibold text-ink">10,99</span>
-                  <span className="text-sm text-muted-foreground">€/mois</span>
-                </div>
-                <ul className="mt-6 flex-1 space-y-3">
-                  {[
-                    "Estimations illimitées",
-                    "Historique complet",
-                    "Utilisateurs illimités",
-                    "Règles de déduction personnalisables",
-                    "Gestion clients & dossiers de réparation",
-                    "Facturation intégrée",
-                    "Analyse du marché et rentabilité",
-                    "Support prioritaire",
-                  ].map((item) => (
-                    <li key={item} className="flex items-start gap-2.5 text-sm text-foreground">
-                      <Check className="mt-0.5 size-4 shrink-0 text-primary" />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-                <p className="mt-6 text-sm text-muted-foreground">
-                  Souscription disponible prochainement. Aucun paiement n’est actuellement proposé.
-                </p>
-                <Button className="mt-8 w-full" size="lg" disabled>
-                  Souscription prochainement disponible
-                </Button>
-              </article>
             </div>
           </div>
         </section>
