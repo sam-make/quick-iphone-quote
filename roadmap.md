@@ -1,7 +1,7 @@
 # Roadmap — Phase 1 sécurité & fiabilité
 ## Suppression des paiements et abonnements
-- [ ] Retirer code, routes, dépendances, liens et restrictions d'abonnement sans toucher aux fonctionnalités métier
-- [ ] Vérifier les tests et les parcours sans publier
+- [x] Retirer code, routes, dépendances, liens et restrictions d'abonnement sans toucher aux fonctionnalités métier
+- [x] Vérifier les tests et les parcours sans publier
 ## Corrections avant commercialisation
 - [x] Verrouiller le rattachement des profils et les rôles, vérifier les invitations et leurs échecs
 - [x] Corriger uniquement les bugs bloquants identifiés et tester les parcours disponibles
@@ -17,7 +17,6 @@
 - [x] Activer le verrouillage des fonctionnalités selon l'abonnement (règle partagée base + serveur, transition boutiques existantes jusqu'au 25/11/2026)
 - [ ] Compléter les informations juridiques (raison sociale, SIRET, adresse, contacts) avant publication
 - [x] Vérifier visuellement les bannières d'abonnement (transition, blocage, abonné — captures validées)
-- [ ] Avant mise en production : passer Stripe en mode réel (vérification du compte), puis publier sur décision explicite
 - [x] Exécuter les tests, contrôler les accès et examiner le diff sans publier
 
 - [x] Bloquer insertions directes estimations / estimation_defects / invoices (serveur seulement)
