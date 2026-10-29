@@ -1,4 +1,7 @@
 # Roadmap — Phase 1 sécurité & fiabilité
+## Suppression des paiements et abonnements
+- [ ] Retirer code, routes, dépendances, liens et restrictions d'abonnement sans toucher aux fonctionnalités métier
+- [ ] Vérifier les tests et les parcours sans publier
 ## Corrections avant commercialisation
 - [x] Verrouiller le rattachement des profils et les rôles, vérifier les invitations et leurs échecs
 - [x] Corriger uniquement les bugs bloquants identifiés et tester les parcours disponibles
