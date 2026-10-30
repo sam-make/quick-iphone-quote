@@ -79,3 +79,35 @@ export const generateInvoice = createServerFn({ method: "POST" })
     const { generateInvoiceFor } = await import("./repairs.server");
     return generateInvoiceFor(context.supabase, supabaseAdmin, context.userId, data.repairId);
   });
+
+/**
+ * Public follow-up page — intentionally NOT behind requireSupabaseAuth.
+ * The secret tracking token is the capability; the handler validates its
+ * format and returns only a whitelisted DTO (never raw rows).
+ */
+export const getPublicTracking = createServerFn({ method: "POST" })
+  .inputValidator((data: unknown) => z.object({ token: z.string().max(128) }).parse(data))
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { getPublicTrackingFor } = await import("./repairs.server");
+    return getPublicTrackingFor(supabaseAdmin, data.token);
+  });
+
+/** Counter scan: reference → repair of the caller's shop (RLS-scoped). */
+export const findRepairByReference = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => z.object({ reference: z.string().max(40) }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { findRepairByReferenceFor } = await import("./repairs.server");
+    return findRepairByReferenceFor(context.supabase, context.userId, data.reference);
+  });
+
+/** Revokes the public tracking link and issues a fresh token. */
+export const regenerateTrackingToken = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => z.object({ repairId: z.string().uuid() }).parse(data))
+  .handler(async ({ data, context }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { regenerateTrackingTokenFor } = await import("./repairs.server");
+    return regenerateTrackingTokenFor(context.supabase, supabaseAdmin, context.userId, data.repairId);
+  });

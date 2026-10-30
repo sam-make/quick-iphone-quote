@@ -57,6 +57,13 @@
       "when": 1793258256534,
       "tag": "0007_remove_subscription_enforcement",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1793363435525,
+      "tag": "0008_add_repair_tracking_token",
+      "breakpoints": true
     }
   ]
 }
