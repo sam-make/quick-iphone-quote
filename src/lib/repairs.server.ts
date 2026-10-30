@@ -412,7 +412,7 @@ export async function getPublicTrackingFor(
 
   const { data: repair } = await admin
     .from("repairs")
-    .select("reference, status, brand, model, storage, color, shop_id")
+    .select("id, reference, status, brand, model, storage, color, shop_id")
     .eq("tracking_token", token)
     .maybeSingle();
   if (!repair) return null;
@@ -421,7 +421,7 @@ export async function getPublicTrackingFor(
     admin
       .from("repair_status_history")
       .select("status, created_at")
-      .eq("repair_id", (repair as { id?: string }).id ?? "")
+      .eq("repair_id", repair.id)
       .order("created_at", { ascending: true }),
     admin
       .from("shops")
@@ -478,9 +478,14 @@ export async function regenerateTrackingTokenFor(
     .maybeSingle();
   if (!owned) throw new Error("Dossier introuvable.");
 
+  // Cryptographically secure token, generated server-side (Web Crypto).
+  const bytes = new Uint8Array(24);
+  crypto.getRandomValues(bytes);
+  const newToken = Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+
   const { data, error } = await admin
     .from("repairs")
-    .update({ tracking_token: undefined as never, updated_at: new Date().toISOString() })
+    .update({ tracking_token: newToken })
     .eq("id", repairId)
     .eq("shop_id", profile.shop_id)
     .select("tracking_token")
