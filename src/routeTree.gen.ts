@@ -22,6 +22,7 @@ import { Route as AuthenticatedAdministrationRouteImport } from './routes/_authe
 import { Route as AuthenticatedEstimationRouteImport } from './routes/_authenticated/estimation'
 import { Route as AuthenticatedHistoriqueRouteImport } from './routes/_authenticated/historique'
 import { Route as AuthenticatedTableauDeBordRouteImport } from './routes/_authenticated/tableau-de-bord'
+import { Route as SuiviTokenRouteImport } from './routes/suivi.$token'
 import { Route as AuthenticatedClientsIndexRouteImport } from './routes/_authenticated/clients.index'
 import { Route as AuthenticatedClientsIdRouteImport } from './routes/_authenticated/clients.$id'
 import { Route as AuthenticatedFacturesIdRouteImport } from './routes/_authenticated/factures.$id'
@@ -95,6 +96,11 @@ const AuthenticatedTableauDeBordRoute =
     path: '/tableau-de-bord',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const SuiviTokenRoute = SuiviTokenRouteImport.update({
+  id: '/suivi/$token',
+  path: '/suivi/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedClientsIndexRoute =
   AuthenticatedClientsIndexRouteImport.update({
     id: '/clients/',
@@ -143,6 +149,7 @@ export interface FileRoutesByFullPath {
   '/estimation': typeof AuthenticatedEstimationRoute
   '/historique': typeof AuthenticatedHistoriqueRoute
   '/tableau-de-bord': typeof AuthenticatedTableauDeBordRoute
+  '/suivi/$token': typeof SuiviTokenRoute
   '/clients/$id': typeof AuthenticatedClientsIdRoute
   '/factures/$id': typeof AuthenticatedFacturesIdRoute
   '/reparations/$id': typeof AuthenticatedReparationsIdRoute
@@ -163,6 +170,7 @@ export interface FileRoutesByTo {
   '/estimation': typeof AuthenticatedEstimationRoute
   '/historique': typeof AuthenticatedHistoriqueRoute
   '/tableau-de-bord': typeof AuthenticatedTableauDeBordRoute
+  '/suivi/$token': typeof SuiviTokenRoute
   '/clients/$id': typeof AuthenticatedClientsIdRoute
   '/factures/$id': typeof AuthenticatedFacturesIdRoute
   '/reparations/$id': typeof AuthenticatedReparationsIdRoute
@@ -185,6 +193,7 @@ export interface FileRoutesById {
   '/_authenticated/estimation': typeof AuthenticatedEstimationRoute
   '/_authenticated/historique': typeof AuthenticatedHistoriqueRoute
   '/_authenticated/tableau-de-bord': typeof AuthenticatedTableauDeBordRoute
+  '/suivi/$token': typeof SuiviTokenRoute
   '/_authenticated/clients/$id': typeof AuthenticatedClientsIdRoute
   '/_authenticated/factures/$id': typeof AuthenticatedFacturesIdRoute
   '/_authenticated/reparations/$id': typeof AuthenticatedReparationsIdRoute
@@ -207,6 +216,7 @@ export interface FileRouteTypes {
     | '/estimation'
     | '/historique'
     | '/tableau-de-bord'
+    | '/suivi/$token'
     | '/clients/$id'
     | '/factures/$id'
     | '/reparations/$id'
@@ -227,6 +237,7 @@ export interface FileRouteTypes {
     | '/estimation'
     | '/historique'
     | '/tableau-de-bord'
+    | '/suivi/$token'
     | '/clients/$id'
     | '/factures/$id'
     | '/reparations/$id'
@@ -248,6 +259,7 @@ export interface FileRouteTypes {
     | '/_authenticated/estimation'
     | '/_authenticated/historique'
     | '/_authenticated/tableau-de-bord'
+    | '/suivi/$token'
     | '/_authenticated/clients/$id'
     | '/_authenticated/factures/$id'
     | '/_authenticated/reparations/$id'
@@ -266,6 +278,7 @@ export interface RootRouteChildren {
   MentionsLegalesRoute: typeof MentionsLegalesRoute
   MotDePasseOublieRoute: typeof MotDePasseOublieRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  SuiviTokenRoute: typeof SuiviTokenRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -361,6 +374,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTableauDeBordRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/suivi/$token': {
+      id: '/suivi/$token'
+      path: '/suivi/$token'
+      fullPath: '/suivi/$token'
+      preLoaderRoute: typeof SuiviTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/clients/': {
       id: '/_authenticated/clients/'
       path: '/clients'
@@ -445,6 +465,7 @@ const rootRouteChildren: RootRouteChildren = {
   MentionsLegalesRoute: MentionsLegalesRoute,
   MotDePasseOublieRoute: MotDePasseOublieRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  SuiviTokenRoute: SuiviTokenRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
