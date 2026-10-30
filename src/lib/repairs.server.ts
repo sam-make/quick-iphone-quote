@@ -11,6 +11,13 @@ import {
   type RepairLine,
   type RepairStatus,
 } from "./repairs";
+import {
+  buildPublicTrackingDto,
+  isValidTrackingToken,
+  normalizeReference,
+  isValidReference,
+  type PublicTrackingDto,
+} from "./tracking";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type AnyClient = SupabaseClient<any, any, any>;
