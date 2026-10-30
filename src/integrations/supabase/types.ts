@@ -703,6 +703,7 @@ export type Database = {
           storage: string | null
           total_minutes: number
           total_price: number
+          tracking_token: string
           unlock_code: string | null
           updated_at: string
           user_id: string
@@ -725,6 +726,7 @@ export type Database = {
           storage?: string | null
           total_minutes?: number
           total_price?: number
+          tracking_token?: string
           unlock_code?: string | null
           updated_at?: string
           user_id: string
@@ -747,6 +749,7 @@ export type Database = {
           storage?: string | null
           total_minutes?: number
           total_price?: number
+          tracking_token?: string
           unlock_code?: string | null
           updated_at?: string
           user_id?: string
