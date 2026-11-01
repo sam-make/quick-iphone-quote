@@ -1,8 +1,8 @@
 # Roadmap — Phase 1 sécurité & fiabilité
 ## Impression et scan des réparations
-- [ ] Afficher les boutons étiquette et ticket sur la fiche réparation
-- [ ] Afficher le scan sur le tableau de bord et la liste des réparations
-- [ ] Vérifier scan et impressions dans un navigateur connecté, sans publier
+- [x] Afficher les boutons étiquette et ticket sur la fiche réparation
+- [x] Afficher le scan sur le tableau de bord et la liste des réparations
+- [x] Vérifier scan et aperçus d’impression dans un navigateur connecté, sans publier (44 tests réussis ; impression physique non testée)
 ## Suppression des paiements et abonnements
 - [x] Retirer code, routes, dépendances, liens et restrictions d'abonnement sans toucher aux fonctionnalités métier
 - [x] Vérifier les tests et les parcours sans publier
