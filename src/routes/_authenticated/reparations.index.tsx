@@ -7,6 +7,7 @@ import { useWorkspace } from "@/hooks/useWorkspace";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { StatusBadge } from "@/components/repairs/StatusBadge";
+import { ScanSearch } from "@/components/repairs/ScanSearch";
 import { customerName, formatDateTime, REPAIR_STATUSES, STATUS_LABELS, type RepairStatus } from "@/lib/repairs";
 import { formatEuro } from "@/lib/pricing";
 import { cn } from "@/lib/utils";
@@ -80,6 +81,8 @@ function RepairsPage() {
           </Link>
         </Button>
       </div>
+
+      <ScanSearch />
 
       <div className="relative">
         <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />

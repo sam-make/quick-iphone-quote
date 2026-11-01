@@ -7,6 +7,9 @@ import { ArrowLeft, FileText } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/repairs/StatusBadge";
+import { RepairLabelPrint } from "@/components/repairs/RepairLabelPrint";
+import { DepositTicketPrint } from "@/components/repairs/DepositTicketPrint";
+import { useWorkspace } from "@/hooks/useWorkspace";
 import { changeRepairStatus, generateInvoice } from "@/lib/repairs.functions";
 import { signedPhotoUrl } from "@/lib/repair-photos";
 import {
@@ -51,9 +54,15 @@ function RepairDetailPage() {
   const { id } = Route.useParams();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { data: workspace } = useWorkspace();
+  const [origin, setOrigin] = useState("");
   const setStatus = useServerFn(changeRepairStatus);
   const makeInvoice = useServerFn(generateInvoice);
   const [photoUrls, setPhotoUrls] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    setOrigin(window.location.origin);
+  }, []);
 
   const { data, isLoading } = useQuery({
     queryKey: ["repair", id],
@@ -62,7 +71,7 @@ function RepairDetailPage() {
         supabase
           .from("repairs")
           .select(
-            "id, reference, brand, model, color, storage, imei, condition, issue, status, total_price, total_minutes, created_at, employee_name, customer_id, customers(first_name, last_name, phone, email)",
+            "id, reference, tracking_token, brand, model, color, storage, imei, condition, issue, status, total_price, total_minutes, created_at, employee_name, customer_id, customers(first_name, last_name, phone, email)",
           )
           .eq("id", id)
           .maybeSingle(),
@@ -181,7 +190,34 @@ function RepairDetailPage() {
           })}
         </div>
 
-        <div className="pt-2">
+        <div className="flex flex-wrap gap-2 pt-2">
+          {origin && (
+            <RepairLabelPrint
+              key={repair.id}
+              reference={repair.reference}
+              deviceLabel={[repair.brand, repair.model, repair.storage, repair.color].filter(Boolean).join(" · ")}
+              customerFirstName={repair.customers?.first_name ?? ""}
+              depositDate={formatDateTime(repair.created_at)}
+              issue={repair.issue ?? ""}
+              internalUrl={`${origin}/reparations/${repair.id}`}
+            />
+          )}
+          {origin && workspace?.shop && repair.tracking_token && (
+            <DepositTicketPrint
+              key={repair.id}
+              repairId={repair.id}
+              reference={repair.reference}
+              deviceLabel={[repair.brand, repair.model, repair.storage, repair.color].filter(Boolean).join(" · ")}
+              issue={repair.issue ?? ""}
+              totalPrice={Number(repair.total_price)}
+              depositDate={formatDateTime(repair.created_at)}
+              trackingToken={repair.tracking_token}
+              shop={workspace.shop}
+              onTokenRegenerated={() => {
+                void queryClient.invalidateQueries({ queryKey: ["repair", id] });
+              }}
+            />
+          )}
           {data.invoice ? (
             <Button variant="outline" asChild>
               <Link to="/factures/$id" params={{ id: data.invoice.id }}>
