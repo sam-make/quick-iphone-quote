@@ -21,6 +21,7 @@ import { useWorkspace } from "@/hooks/useWorkspace";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { StatusBadge } from "@/components/repairs/StatusBadge";
+import { ScanSearch } from "@/components/repairs/ScanSearch";
 import { formatEuro, formatStorage } from "@/lib/pricing";
 import { customerName, type RepairStatus } from "@/lib/repairs";
 import { cn } from "@/lib/utils";
@@ -154,6 +155,8 @@ function DashboardPage() {
         </h1>
         <p className="mt-1 text-sm text-muted-foreground">Voici l'activité de votre boutique.</p>
       </div>
+
+      <ScanSearch />
 
       <div
         role="tablist"

@@ -19,3 +19,4 @@
 - Repair status workflow and invoice eligibility live in `canChangeStatus` / `INVOICEABLE_STATUSES` (src/lib/repairs.ts), enforced by the server with a compare-and-set on the previous status; the UI only mirrors them.
 
 - Business access requires authentication, shop membership and existing role checks only; no payment dependency remains. Historical payment tables and applied migrations are retired but retained to preserve data and migration history.
+- Repair detail uses the shared RepairLabelPrint and DepositTicketPrint dialogs; dashboard and repair list reuse ScanSearch, keeping printing and tenant-scoped reference lookup consistent.
