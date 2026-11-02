@@ -1,5 +1,4 @@
 import { printSheet } from "@/lib/print-sheet";
-import { useRef } from "react";
 import { useEffect, useRef, useState } from "react";
 import JsBarcode from "jsbarcode";
 import { QRCodeSVG } from "qrcode.react";
