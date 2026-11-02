@@ -1,3 +1,5 @@
+import { printSheet } from "@/lib/print-sheet";
+import { useRef } from "react";
 import { useEffect, useRef, useState } from "react";
 import JsBarcode from "jsbarcode";
 import { QRCodeSVG } from "qrcode.react";
@@ -57,6 +59,7 @@ export function RepairLabelPrint({
 }: RepairLabelPrintProps) {
   const [format, setFormat] = useState<LabelFormat>("54x25");
   const [open, setOpen] = useState(false);
+  const sheetRef = useRef<HTMLDivElement>(null);
   const small = format === "54x25";
 
   return (
@@ -67,7 +70,7 @@ export function RepairLabelPrint({
           {triggerLabel}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Étiquette thermique</DialogTitle>
           <DialogDescription>
@@ -96,6 +99,7 @@ export function RepairLabelPrint({
         {/* Preview + print sheet (only this area is printed) */}
         <div className="overflow-auto rounded-xl border border-border bg-white p-4">
           <div
+            ref={sheetRef}
             className="print-sheet mx-auto flex flex-col bg-white text-black"
             style={{
               width: "54mm",
@@ -133,7 +137,7 @@ export function RepairLabelPrint({
           </div>
         </div>
 
-        <Button onClick={() => window.print()}>
+        <Button onClick={() => printSheet(sheetRef.current, small ? "54mm 25mm" : "54mm 70mm")}>
           <Printer className="size-4" />
           Imprimer
         </Button>

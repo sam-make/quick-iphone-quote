@@ -1,3 +1,5 @@
+import { printSheet } from "@/lib/print-sheet";
+import { useRef } from "react";
 import { useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { Printer, RefreshCw } from "lucide-react";
@@ -50,6 +52,7 @@ export function DepositTicketPrint({
   onTokenRegenerated,
 }: DepositTicketPrintProps) {
   const [open, setOpen] = useState(false);
+  const sheetRef = useRef<HTMLDivElement>(null);
   const [token, setToken] = useState(trackingToken);
   const regenerate = useServerFn(regenerateTrackingToken);
   const [regenerating, setRegenerating] = useState(false);
@@ -83,7 +86,7 @@ export function DepositTicketPrint({
           Imprimer le ticket de dépôt
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Ticket de dépôt client (80 mm)</DialogTitle>
           <DialogDescription>
@@ -100,6 +103,7 @@ export function DepositTicketPrint({
 
         <div className="overflow-auto rounded-xl border border-border bg-white p-4">
           <div
+            ref={sheetRef}
             className="print-sheet mx-auto bg-white text-black"
             style={{ width: "72mm", padding: "2mm", fontFamily: "Arial, sans-serif" }}
           >
@@ -146,7 +150,7 @@ export function DepositTicketPrint({
         </div>
 
         <div className="flex flex-wrap gap-2">
-          <Button onClick={() => window.print()}>
+          <Button onClick={() => printSheet(sheetRef.current, "80mm auto")}>
             <Printer className="size-4" />
             Imprimer
           </Button>
