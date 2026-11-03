@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/inscription")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Créer un espace boutique — Trade-In Pro" },

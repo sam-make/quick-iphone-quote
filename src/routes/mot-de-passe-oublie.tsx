@@ -9,8 +9,10 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/mot-de-passe-oublie")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
+      { name: "robots", content: "noindex, follow" },
       { title: "Mot de passe oublié — Trade-In Pro" },
       { name: "description", content: "Recevez un lien sécurisé pour réinitialiser votre mot de passe Trade-In Pro." },
       { property: "og:title", content: "Mot de passe oublié — Trade-In Pro" },

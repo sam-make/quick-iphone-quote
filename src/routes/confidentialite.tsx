@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { LegalLayout, LegalSection, Missing } from "@/components/legal/LegalLayout";
 
 export const Route = createFileRoute("/confidentialite")({
+  staticData: { sitemap: true },
   head: () => ({
     meta: [
       { title: "Politique de confidentialité — Trade-In Pro" },

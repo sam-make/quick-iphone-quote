@@ -11,6 +11,7 @@ import { customerName, formatDateTime, type RepairStatus } from "@/lib/repairs";
 import { formatEuro } from "@/lib/pricing";
 
 export const Route = createFileRoute("/_authenticated/clients/$id")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Fiche client — Trade-In Pro" },

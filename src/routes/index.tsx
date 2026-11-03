@@ -15,6 +15,7 @@ import dashboardShot from "@/assets/screen-dashboard.jpg";
 import estimationShot from "@/assets/screen-estimation.jpg";
 
 export const Route = createFileRoute("/")({
+  staticData: { sitemap: true },
   head: () => ({
     meta: [
       { title: "Trade-In Pro — Logiciel d'estimation de reprise iPhone" },

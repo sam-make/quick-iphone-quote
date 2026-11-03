@@ -18,6 +18,7 @@ import { Route as InscriptionRouteImport } from './routes/inscription'
 import { Route as MentionsLegalesRouteImport } from './routes/mentions-legales'
 import { Route as MotDePasseOublieRouteImport } from './routes/mot-de-passe-oublie'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as AuthenticatedAdministrationRouteImport } from './routes/_authenticated/administration'
 import { Route as AuthenticatedEstimationRouteImport } from './routes/_authenticated/estimation'
 import { Route as AuthenticatedHistoriqueRouteImport } from './routes/_authenticated/historique'
@@ -72,6 +73,11 @@ const MotDePasseOublieRoute = MotDePasseOublieRouteImport.update({
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedAdministrationRoute =
@@ -145,6 +151,7 @@ export interface FileRoutesByFullPath {
   '/mentions-legales': typeof MentionsLegalesRoute
   '/mot-de-passe-oublie': typeof MotDePasseOublieRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/administration': typeof AuthenticatedAdministrationRoute
   '/estimation': typeof AuthenticatedEstimationRoute
   '/historique': typeof AuthenticatedHistoriqueRoute
@@ -166,6 +173,7 @@ export interface FileRoutesByTo {
   '/mentions-legales': typeof MentionsLegalesRoute
   '/mot-de-passe-oublie': typeof MotDePasseOublieRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/administration': typeof AuthenticatedAdministrationRoute
   '/estimation': typeof AuthenticatedEstimationRoute
   '/historique': typeof AuthenticatedHistoriqueRoute
@@ -189,6 +197,7 @@ export interface FileRoutesById {
   '/mentions-legales': typeof MentionsLegalesRoute
   '/mot-de-passe-oublie': typeof MotDePasseOublieRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/administration': typeof AuthenticatedAdministrationRoute
   '/_authenticated/estimation': typeof AuthenticatedEstimationRoute
   '/_authenticated/historique': typeof AuthenticatedHistoriqueRoute
@@ -212,6 +221,7 @@ export interface FileRouteTypes {
     | '/mentions-legales'
     | '/mot-de-passe-oublie'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/administration'
     | '/estimation'
     | '/historique'
@@ -233,6 +243,7 @@ export interface FileRouteTypes {
     | '/mentions-legales'
     | '/mot-de-passe-oublie'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/administration'
     | '/estimation'
     | '/historique'
@@ -255,6 +266,7 @@ export interface FileRouteTypes {
     | '/mentions-legales'
     | '/mot-de-passe-oublie'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/_authenticated/administration'
     | '/_authenticated/estimation'
     | '/_authenticated/historique'
@@ -278,6 +290,7 @@ export interface RootRouteChildren {
   MentionsLegalesRoute: typeof MentionsLegalesRoute
   MotDePasseOublieRoute: typeof MotDePasseOublieRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   SuiviTokenRoute: typeof SuiviTokenRoute
 }
 
@@ -344,6 +357,13 @@ declare module '@tanstack/react-router' {
       path: '/reset-password'
       fullPath: '/reset-password'
       preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated/administration': {
@@ -465,6 +485,7 @@ const rootRouteChildren: RootRouteChildren = {
   MentionsLegalesRoute: MentionsLegalesRoute,
   MotDePasseOublieRoute: MotDePasseOublieRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   SuiviTokenRoute: SuiviTokenRoute,
 }
 export const routeTree = rootRouteImport

@@ -7,6 +7,7 @@ import { formatDateTime } from "@/lib/repairs";
 import { formatEuro } from "@/lib/pricing";
 
 export const Route = createFileRoute("/_authenticated/factures/$id")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Facture — Trade-In Pro" },

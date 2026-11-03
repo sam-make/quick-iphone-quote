@@ -31,6 +31,7 @@ import { cn } from "@/lib/utils";
 const searchSchema = z.object({ customerId: z.string().uuid().optional() });
 
 export const Route = createFileRoute("/_authenticated/reparations/nouvelle")({
+  staticData: { sitemap: false },
   validateSearch: searchSchema,
   head: () => ({
     meta: [

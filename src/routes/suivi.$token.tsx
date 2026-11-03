@@ -8,11 +8,14 @@ import { formatDateTime } from "@/lib/repairs";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/suivi/$token")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Suivi de votre réparation — Trade-In Pro" },
       { name: "description", content: "Suivez l'avancement de votre réparation en temps réel." },
       { name: "robots", content: "noindex, nofollow" },
+      { property: "og:title", content: "Suivi de votre réparation — Trade-In Pro" },
+      { property: "og:description", content: "Consultez l’avancement de votre réparation et les coordonnées de votre boutique." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],

@@ -8,6 +8,7 @@ import { formatEuro, formatStorage } from "@/lib/pricing";
 import { MarketAnalysisPanel } from "@/components/estimation/MarketAnalysisPanel";
 
 export const Route = createFileRoute("/_authenticated/historique")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Historique des estimations — Trade-In Pro" },

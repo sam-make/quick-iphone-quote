@@ -27,6 +27,7 @@ import { customerName, type RepairStatus } from "@/lib/repairs";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/tableau-de-bord")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Tableau de bord — Trade-In Pro" },

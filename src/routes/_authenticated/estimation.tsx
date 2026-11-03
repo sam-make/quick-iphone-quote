@@ -26,6 +26,7 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/estimation")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Nouvelle estimation — Trade-In Pro" },

@@ -8,8 +8,10 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/reset-password")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
+      { name: "robots", content: "noindex, follow" },
       { title: "Nouveau mot de passe — Trade-In Pro" },
       { name: "description", content: "Définissez un nouveau mot de passe pour votre compte Trade-In Pro." },
       { property: "og:title", content: "Nouveau mot de passe — Trade-In Pro" },

@@ -12,3 +12,5 @@ Allow: /
 
 User-agent: *
 Allow: /
+
+Sitemap: https://trade-in-pro-iphone.lovable.app/sitemap.xml

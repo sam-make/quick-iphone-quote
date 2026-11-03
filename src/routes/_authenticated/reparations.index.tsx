@@ -13,6 +13,7 @@ import { formatEuro } from "@/lib/pricing";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/reparations/")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Réparations — Trade-In Pro" },

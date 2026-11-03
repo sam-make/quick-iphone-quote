@@ -10,6 +10,7 @@ import { CustomerFormDialog } from "@/components/repairs/CustomerFormDialog";
 import { customerName } from "@/lib/repairs";
 
 export const Route = createFileRoute("/_authenticated/clients/")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Clients — Trade-In Pro" },

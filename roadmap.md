@@ -1,4 +1,7 @@
 # Roadmap — Phase 1 sécurité & fiabilité
+## Corrections SEO
+- [x] Ajouter et vérifier le sitemap des pages publiques et sa référence dans robots.txt, sans publier (4 pages publiques ; 47 tests réussis)
+- [ ] Compléter les mentions légales et CGV — bloqué : identité juridique et clauses confirmées à fournir par l’éditeur
 ## Impression et scan des réparations
 - [x] Afficher les boutons étiquette et ticket sur la fiche réparation
 - [x] Afficher le scan sur le tableau de bord et la liste des réparations

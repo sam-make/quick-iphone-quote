@@ -20,3 +20,4 @@
 
 - Business access requires authentication, shop membership and existing role checks only; no payment dependency remains. Historical payment tables and applied migrations are retired but retained to preserve data and migration history.
 - Repair detail uses the shared RepairLabelPrint and DepositTicketPrint dialogs; dashboard and repair list reuse ScanSearch, keeping printing and tenant-scoped reference lookup consistent.
+- Sitemap URLs are derived from the router with a required staticData.sitemap decision on every route; exclude the authenticated subtree, account-recovery pages and secret tracking links to avoid exposing private destinations, and omit lastmod without authoritative page-specific timestamps.

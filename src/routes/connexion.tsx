@@ -10,6 +10,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/connexion")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Connexion — Trade-In Pro" },

@@ -31,6 +31,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect } from "react";
 
 export const Route = createFileRoute("/_authenticated/administration")({
+  staticData: { sitemap: false },
   head: () => ({
     meta: [
       { title: "Administration — Trade-In Pro" },
