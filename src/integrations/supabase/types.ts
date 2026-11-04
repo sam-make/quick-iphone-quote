@@ -14,6 +14,36 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_audit_events: {
+        Row: {
+          action: string
+          actor_id: string
+          after_data: Json
+          before_data: Json
+          created_at: string
+          id: string
+          target_id: string
+        }
+        Insert: {
+          action: string
+          actor_id: string
+          after_data: Json
+          before_data: Json
+          created_at?: string
+          id?: string
+          target_id: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string
+          after_data?: Json
+          before_data?: Json
+          created_at?: string
+          id?: string
+          target_id?: string
+        }
+        Relationships: []
+      }
       customer_devices: {
         Row: {
           brand: string
@@ -396,6 +426,24 @@ export type Database = {
           },
         ]
       }
+      global_user_roles: {
+        Row: {
+          created_at: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          role?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       invoices: {
         Row: {
           created_at: string
@@ -491,6 +539,7 @@ export type Database = {
           full_name: string
           id: string
           shop_id: string
+          suspended_at: string | null
         }
         Insert: {
           created_at?: string
@@ -498,6 +547,7 @@ export type Database = {
           full_name?: string
           id: string
           shop_id: string
+          suspended_at?: string | null
         }
         Update: {
           created_at?: string
@@ -505,6 +555,7 @@ export type Database = {
           full_name?: string
           id?: string
           shop_id?: string
+          suspended_at?: string | null
         }
         Relationships: [
           {
@@ -915,29 +966,35 @@ export type Database = {
       shops: {
         Row: {
           address: string | null
+          archived_at: string | null
           created_at: string
           email: string | null
           id: string
           name: string
           phone: string | null
+          suspended_at: string | null
           updated_at: string
         }
         Insert: {
           address?: string | null
+          archived_at?: string | null
           created_at?: string
           email?: string | null
           id?: string
           name: string
           phone?: string | null
+          suspended_at?: string | null
           updated_at?: string
         }
         Update: {
           address?: string | null
+          archived_at?: string | null
           created_at?: string
           email?: string | null
           id?: string
           name?: string
           phone?: string | null
+          suspended_at?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -979,6 +1036,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      business_access_allowed: { Args: never; Returns: boolean }
       current_shop_id: { Args: never; Returns: string }
       has_role: {
         Args: {
@@ -987,10 +1045,15 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_super_admin: { Args: never; Returns: boolean }
       next_shop_reference: { Args: { _kind: string }; Returns: string }
       seed_default_rules: { Args: { _shop_id: string }; Returns: undefined }
       seed_default_services: { Args: { _shop_id: string }; Returns: undefined }
       storage_step: { Args: { _gb: number }; Returns: number }
+      super_admin_mutate: {
+        Args: { _changes: Json; _kind: string; _target: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "employee"

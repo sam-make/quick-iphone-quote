@@ -1,0 +1,50 @@
+CREATE TABLE public.global_user_roles (user_id uuid PRIMARY KEY, role text NOT NULL DEFAULT 'super_admin' CHECK (role = 'super_admin'), created_at timestamptz NOT NULL DEFAULT now());
+GRANT SELECT ON public.global_user_roles TO authenticated;
+GRANT ALL ON public.global_user_roles TO service_role;
+ALTER TABLE public.global_user_roles ENABLE ROW LEVEL SECURITY;
+CREATE POLICY global_role_self ON public.global_user_roles FOR SELECT TO authenticated USING (user_id = auth.uid());
+INSERT INTO public.global_user_roles(user_id) SELECT id FROM auth.users WHERE email = 'haddaouisamy86@gmail.com' AND email_confirmed_at IS NOT NULL;
+ALTER TABLE public.shops ADD COLUMN suspended_at timestamptz, ADD COLUMN archived_at timestamptz;
+ALTER TABLE public.profiles ADD COLUMN suspended_at timestamptz;
+CREATE TABLE public.admin_audit_events (id uuid PRIMARY KEY DEFAULT gen_random_uuid(), actor_id uuid NOT NULL, action text NOT NULL, target_id uuid NOT NULL, before_data jsonb NOT NULL, after_data jsonb NOT NULL, created_at timestamptz NOT NULL DEFAULT now());
+GRANT ALL ON public.admin_audit_events TO service_role;
+ALTER TABLE public.admin_audit_events ENABLE ROW LEVEL SECURITY;
+CREATE FUNCTION public.is_super_admin() RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$ SELECT EXISTS (SELECT 1 FROM public.global_user_roles r JOIN auth.users u ON u.id=r.user_id WHERE r.user_id=auth.uid() AND r.role='super_admin' AND u.email='haddaouisamy86@gmail.com' AND u.email_confirmed_at IS NOT NULL); $$;
+REVOKE ALL ON FUNCTION public.is_super_admin() FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.is_super_admin() TO authenticated, service_role;
+CREATE FUNCTION public.business_access_allowed() RETURNS boolean LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$ SELECT auth.uid() IS NOT NULL AND NOT EXISTS (SELECT 1 FROM public.profiles p JOIN public.shops s ON s.id=p.shop_id WHERE p.id=auth.uid() AND (p.suspended_at IS NOT NULL OR s.suspended_at IS NOT NULL OR s.archived_at IS NOT NULL)); $$;
+REVOKE ALL ON FUNCTION public.business_access_allowed() FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.business_access_allowed() TO authenticated, service_role;
+CREATE FUNCTION public.protect_access_state() RETURNS trigger LANGUAGE plpgsql SET search_path = public AS $$ BEGIN IF auth.role() IS DISTINCT FROM 'service_role' AND (NEW.suspended_at IS DISTINCT FROM OLD.suspended_at OR (TG_TABLE_NAME='shops' AND to_jsonb(NEW)->'archived_at' IS DISTINCT FROM to_jsonb(OLD)->'archived_at')) THEN RAISE EXCEPTION 'Access state is server managed' USING ERRCODE='42501'; END IF; RETURN NEW; END; $$;
+CREATE TRIGGER protect_shop_access BEFORE UPDATE ON public.shops FOR EACH ROW EXECUTE FUNCTION public.protect_access_state();
+CREATE TRIGGER protect_profile_access BEFORE UPDATE ON public.profiles FOR EACH ROW EXECUTE FUNCTION public.protect_access_state();
+DO $$ DECLARE t text; BEGIN FOREACH t IN ARRAY ARRAY['shops','profiles','user_roles','shop_prices','deduction_rules','device_models','estimations','estimation_defects','customers','customer_devices','repair_services','repairs','repair_items','repair_status_history','repair_photos','invoices','estimation_market_analyses'] LOOP EXECUTE format('CREATE POLICY business_access_gate ON public.%I AS RESTRICTIVE FOR ALL TO authenticated USING (public.business_access_allowed()) WITH CHECK (public.business_access_allowed())',t); END LOOP; END $$;
+CREATE POLICY repair_storage_access_gate ON storage.objects AS RESTRICTIVE FOR ALL TO authenticated USING (bucket_id <> 'repair-photos' OR public.business_access_allowed()) WITH CHECK (bucket_id <> 'repair-photos' OR public.business_access_allowed());
+CREATE FUNCTION public.super_admin_mutate(_kind text, _target uuid, _changes jsonb) RETURNS void LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE old_row jsonb; new_row jsonb; target_shop uuid; owner_id uuid; BEGIN
+IF NOT public.is_super_admin() THEN RAISE EXCEPTION 'Forbidden' USING ERRCODE='42501'; END IF;
+SELECT user_id INTO owner_id FROM public.global_user_roles LIMIT 1;
+IF _kind='shop' THEN
+SELECT to_jsonb(s) INTO old_row FROM public.shops s WHERE id=_target FOR UPDATE;
+IF old_row IS NULL THEN RAISE EXCEPTION 'Shop not found'; END IF;
+IF EXISTS (SELECT 1 FROM public.profiles WHERE id=owner_id AND shop_id=_target) AND ((_changes->>'suspended')::boolean IS TRUE OR (_changes->>'archived')::boolean IS TRUE) THEN RAISE EXCEPTION 'Owner shop cannot be disabled'; END IF;
+UPDATE public.shops SET name=CASE WHEN _changes ? 'name' THEN _changes->>'name' ELSE name END, address=CASE WHEN _changes ? 'address' THEN _changes->>'address' ELSE address END, phone=CASE WHEN _changes ? 'phone' THEN _changes->>'phone' ELSE phone END, email=CASE WHEN _changes ? 'email' THEN _changes->>'email' ELSE email END, suspended_at=CASE WHEN _changes ? 'suspended' THEN CASE WHEN (_changes->>'suspended')::boolean THEN now() END ELSE suspended_at END, archived_at=CASE WHEN _changes ? 'archived' THEN CASE WHEN (_changes->>'archived')::boolean THEN now() END ELSE archived_at END WHERE id=_target;
+SELECT to_jsonb(s) INTO new_row FROM public.shops s WHERE id=_target;
+ELSIF _kind='member' THEN
+SELECT shop_id INTO target_shop FROM public.profiles WHERE id=_target;
+IF target_shop IS NULL THEN RAISE EXCEPTION 'Member not found'; END IF;
+PERFORM 1 FROM public.shops WHERE id=target_shop FOR UPDATE;
+SELECT jsonb_build_object('suspended_at',p.suspended_at,'role',r.role,'shop_id',p.shop_id) INTO old_row FROM public.profiles p JOIN public.user_roles r ON r.user_id=p.id AND r.shop_id=p.shop_id WHERE p.id=_target;
+IF old_row IS NULL THEN RAISE EXCEPTION 'Member role not found'; END IF;
+IF _target=owner_id THEN RAISE EXCEPTION 'Owner cannot be changed'; END IF;
+IF _changes ? 'role' AND _changes->>'role' NOT IN ('admin','employee') THEN RAISE EXCEPTION 'Invalid role'; END IF;
+IF old_row->>'role'='admin' AND ((_changes->>'role')='employee' OR (_changes->>'suspended')::boolean IS TRUE) AND NOT EXISTS (SELECT 1 FROM public.profiles p JOIN public.user_roles r ON r.user_id=p.id AND r.shop_id=p.shop_id WHERE p.shop_id=target_shop AND p.id<>_target AND p.suspended_at IS NULL AND r.role='admin') THEN RAISE EXCEPTION 'Last active administrator cannot be disabled'; END IF;
+IF _changes ? 'role' THEN UPDATE public.user_roles SET role=(_changes->>'role')::public.app_role WHERE user_id=_target AND shop_id=target_shop; END IF;
+IF _changes ? 'suspended' THEN UPDATE public.profiles SET suspended_at=CASE WHEN (_changes->>'suspended')::boolean THEN now() END WHERE id=_target; END IF;
+SELECT jsonb_build_object('suspended_at',p.suspended_at,'role',r.role,'shop_id',p.shop_id) INTO new_row FROM public.profiles p JOIN public.user_roles r ON r.user_id=p.id AND r.shop_id=p.shop_id WHERE p.id=_target;
+ELSE RAISE EXCEPTION 'Invalid action'; END IF;
+INSERT INTO public.admin_audit_events(actor_id,action,target_id,before_data,after_data) VALUES (auth.uid(),_kind,_target,old_row,new_row);
+END; $$;
+REVOKE ALL ON FUNCTION public.super_admin_mutate(text,uuid,jsonb) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.super_admin_mutate(text,uuid,jsonb) TO authenticated;
+COMMENT ON TABLE public.global_user_roles IS 'Global owner role, server managed and bound to verified Auth identity';
