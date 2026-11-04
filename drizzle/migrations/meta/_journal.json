@@ -64,6 +64,20 @@
       "when": 1793363435525,
       "tag": "0008_add_repair_tracking_token",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1793829719883,
+      "tag": "0009_super_admin_management",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1793829757141,
+      "tag": "0010_allow_audited_owner_mutations",
+      "breakpoints": true
     }
   ]
 }
