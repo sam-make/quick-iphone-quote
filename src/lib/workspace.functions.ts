@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireBusinessAccess } from "./access";
 import type { EstimationInput } from "./workspace.server";
 
 const estimationSchema = z.object({
@@ -14,7 +14,7 @@ const estimationSchema = z.object({
 
 /** Creates (or returns) the shop workspace attached to the signed-in user. */
 export const ensureWorkspace = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireBusinessAccess])
   .handler(async ({ context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { ensureWorkspaceFor } = await import("./workspace.server");
@@ -30,7 +30,7 @@ export const ensureWorkspace = createServerFn({ method: "POST" })
 
 /** Authoritative price computation + persistence of an estimation. */
 export const createEstimation = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireBusinessAccess])
   .inputValidator((data: EstimationInput) => estimationSchema.parse(data))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

@@ -1,5 +1,7 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useServerFn } from "@tanstack/react-start";
+import { ownerAccess } from "@/lib/super-admin.functions";
 import { useState, type ReactNode } from "react";
 import { AlertTriangle, Gauge, Loader2, History, LogOut, Menu, Settings, Sparkles, Users, Wrench, X } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
@@ -23,6 +25,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { data: workspace, isLoading: workspaceLoading, isError: workspaceError, refetch } = useWorkspace();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const [open, setOpen] = useState(false);
+  const ownerFn = useServerFn(ownerAccess);
+  const owner = useQuery({ queryKey: ["owner-access"], queryFn: () => ownerFn(), retry: false });
 
   async function handleSignOut() {
     await queryClient.cancelQueries();
@@ -60,6 +64,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </Link>
         );
       })}
+      {owner.data === true && <Link to="/admin" onClick={() => setOpen(false)} className={cn("flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium", pathname === "/admin" ? "bg-surface text-ink" : "text-muted-foreground")}><Settings className="size-4 text-primary" />Super Administration</Link>}
     </nav>
   );
 

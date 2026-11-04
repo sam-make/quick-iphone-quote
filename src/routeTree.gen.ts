@@ -19,6 +19,7 @@ import { Route as MentionsLegalesRouteImport } from './routes/mentions-legales'
 import { Route as MotDePasseOublieRouteImport } from './routes/mot-de-passe-oublie'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as AuthenticatedAdministrationRouteImport } from './routes/_authenticated/administration'
 import { Route as AuthenticatedEstimationRouteImport } from './routes/_authenticated/estimation'
 import { Route as AuthenticatedHistoriqueRouteImport } from './routes/_authenticated/historique'
@@ -79,6 +80,11 @@ const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedAdministrationRoute =
   AuthenticatedAdministrationRouteImport.update({
@@ -152,6 +158,7 @@ export interface FileRoutesByFullPath {
   '/mot-de-passe-oublie': typeof MotDePasseOublieRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/administration': typeof AuthenticatedAdministrationRoute
   '/estimation': typeof AuthenticatedEstimationRoute
   '/historique': typeof AuthenticatedHistoriqueRoute
@@ -174,6 +181,7 @@ export interface FileRoutesByTo {
   '/mot-de-passe-oublie': typeof MotDePasseOublieRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin': typeof AuthenticatedAdminRoute
   '/administration': typeof AuthenticatedAdministrationRoute
   '/estimation': typeof AuthenticatedEstimationRoute
   '/historique': typeof AuthenticatedHistoriqueRoute
@@ -198,6 +206,7 @@ export interface FileRoutesById {
   '/mot-de-passe-oublie': typeof MotDePasseOublieRoute
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/_authenticated/administration': typeof AuthenticatedAdministrationRoute
   '/_authenticated/estimation': typeof AuthenticatedEstimationRoute
   '/_authenticated/historique': typeof AuthenticatedHistoriqueRoute
@@ -222,6 +231,7 @@ export interface FileRouteTypes {
     | '/mot-de-passe-oublie'
     | '/reset-password'
     | '/sitemap.xml'
+    | '/admin'
     | '/administration'
     | '/estimation'
     | '/historique'
@@ -244,6 +254,7 @@ export interface FileRouteTypes {
     | '/mot-de-passe-oublie'
     | '/reset-password'
     | '/sitemap.xml'
+    | '/admin'
     | '/administration'
     | '/estimation'
     | '/historique'
@@ -267,6 +278,7 @@ export interface FileRouteTypes {
     | '/mot-de-passe-oublie'
     | '/reset-password'
     | '/sitemap.xml'
+    | '/_authenticated/admin'
     | '/_authenticated/administration'
     | '/_authenticated/estimation'
     | '/_authenticated/historique'
@@ -366,6 +378,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/administration': {
       id: '/_authenticated/administration'
       path: '/administration'
@@ -447,6 +466,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
   AuthenticatedAdministrationRoute: typeof AuthenticatedAdministrationRoute
   AuthenticatedEstimationRoute: typeof AuthenticatedEstimationRoute
   AuthenticatedHistoriqueRoute: typeof AuthenticatedHistoriqueRoute
@@ -460,6 +480,7 @@ interface AuthenticatedRouteRouteChildren {
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
   AuthenticatedAdministrationRoute: AuthenticatedAdministrationRoute,
   AuthenticatedEstimationRoute: AuthenticatedEstimationRoute,
   AuthenticatedHistoriqueRoute: AuthenticatedHistoriqueRoute,
