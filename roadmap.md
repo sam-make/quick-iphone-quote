@@ -1,6 +1,6 @@
 # Roadmap — Phase 1 sécurité & fiabilité
 ## Espace Super Administrateur
-- [ ] Inspecter architecture, rôles, RLS et identité vérifiée du propriétaire
+- [x] Inspecter architecture, rôles, RLS et identité vérifiée du propriétaire
 - [ ] Ajouter /admin, gestion globale et journal d’audit sans suppression de données
 - [ ] Vérifier accès propriétaire, refus boutique et appels directs, puis régressions
 ## Corrections SEO

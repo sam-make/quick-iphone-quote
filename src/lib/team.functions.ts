@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireBusinessAccess } from "./access";
 
 const shopSchema = z.object({
   name: z.string().min(2).max(120),
@@ -22,7 +22,7 @@ const roleSchema = z.object({
 });
 
 export const updateShopSettings = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireBusinessAccess])
   .inputValidator((data: unknown) => shopSchema.parse(data))
   .handler(async ({ data, context }) => {
     const { saveShopSettings } = await import("./team.server");
@@ -35,14 +35,14 @@ export const updateShopSettings = createServerFn({ method: "POST" })
   });
 
 export const fetchMembers = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireBusinessAccess])
   .handler(async ({ context }) => {
     const { listMembers } = await import("./team.server");
     return listMembers(context.supabase, context.userId);
   });
 
 export const inviteEmployee = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireBusinessAccess])
   .inputValidator((data: unknown) => inviteSchema.parse(data))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -51,7 +51,7 @@ export const inviteEmployee = createServerFn({ method: "POST" })
   });
 
 export const changeEmployeeRole = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireBusinessAccess])
   .inputValidator((data: unknown) => roleSchema.parse(data))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -60,7 +60,7 @@ export const changeEmployeeRole = createServerFn({ method: "POST" })
   });
 
 export const deleteEmployee = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireBusinessAccess])
   .inputValidator((data: unknown) => z.object({ memberId: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");

@@ -1,6 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { requireBusinessAccess } from "./access";
 import { REPAIR_STATUSES } from "./repairs";
 
 const customerSchema = z.object({
@@ -46,7 +46,7 @@ const statusSchema = z.object({
 });
 
 export const saveCustomer = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireBusinessAccess])
   .inputValidator((data: unknown) => customerSchema.parse(data))
   .handler(async ({ data, context }) => {
     const { upsertCustomerFor } = await import("./repairs.server");
@@ -54,7 +54,7 @@ export const saveCustomer = createServerFn({ method: "POST" })
   });
 
 export const createRepair = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireBusinessAccess])
   .inputValidator((data: unknown) => repairSchema.parse(data))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -63,7 +63,7 @@ export const createRepair = createServerFn({ method: "POST" })
   });
 
 export const changeRepairStatus = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireBusinessAccess])
   .inputValidator((data: unknown) => statusSchema.parse(data))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -72,7 +72,7 @@ export const changeRepairStatus = createServerFn({ method: "POST" })
   });
 
 export const generateInvoice = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireBusinessAccess])
   .inputValidator((data: unknown) => z.object({ repairId: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
@@ -95,7 +95,7 @@ export const getPublicTracking = createServerFn({ method: "POST" })
 
 /** Counter scan: reference → repair of the caller's shop (RLS-scoped). */
 export const findRepairByReference = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireBusinessAccess])
   .inputValidator((data: unknown) => z.object({ reference: z.string().max(40) }).parse(data))
   .handler(async ({ data, context }) => {
     const { findRepairByReferenceFor } = await import("./repairs.server");
@@ -104,7 +104,7 @@ export const findRepairByReference = createServerFn({ method: "POST" })
 
 /** Revokes the public tracking link and issues a fresh token. */
 export const regenerateTrackingToken = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([requireBusinessAccess])
   .inputValidator((data: unknown) => z.object({ repairId: z.string().uuid() }).parse(data))
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
