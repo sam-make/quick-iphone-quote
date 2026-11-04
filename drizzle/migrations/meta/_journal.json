@@ -71,6 +71,13 @@
       "when": 1793829719883,
       "tag": "0009_super_admin_management",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1793829757141,
+      "tag": "0010_allow_audited_owner_mutations",
+      "breakpoints": true
     }
   ]
 }
