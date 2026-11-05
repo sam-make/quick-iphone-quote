@@ -5,7 +5,22 @@ import { requireOwner } from "./super-admin.server";
 
 function client(email: string | undefined, confirmed: string | undefined, role: boolean) {
   const rpc = vi.fn(async () => ({ data: role, error: null }));
-  const value = { auth: { getUser: async () => ({ data: { user: { id: "owner-id", email, email_confirmed_at: confirmed, user_metadata: { role: "super_admin" } } }, error: null }) }, rpc };
+  const value = {
+    auth: {
+      getUser: async () => ({
+        data: {
+          user: {
+            id: "owner-id",
+            email,
+            email_confirmed_at: confirmed,
+            user_metadata: { role: "super_admin" },
+          },
+        },
+        error: null,
+      }),
+    },
+    rpc,
+  };
   return { value: value as unknown as SupabaseClient<Database>, rpc };
 }
 describe("global owner authorization", () => {
@@ -20,13 +35,19 @@ describe("global owner authorization", () => {
     expect(c.rpc).not.toHaveBeenCalled();
   });
   it("rejects the authorized email when not confirmed", async () => {
-    await expect(requireOwner(client("haddaouisamy86@gmail.com", undefined, true).value)).rejects.toThrow("réservé");
+    await expect(
+      requireOwner(client("haddaouisamy86@gmail.com", undefined, true).value),
+    ).rejects.toThrow("réservé");
   });
   it("rejects a verified owner without protected global role", async () => {
-    await expect(requireOwner(client("haddaouisamy86@gmail.com", "2026-08-16", false).value)).rejects.toThrow("réservé");
+    await expect(
+      requireOwner(client("haddaouisamy86@gmail.com", "2026-08-16", false).value),
+    ).rejects.toThrow("réservé");
   });
   it("rejects an absent authenticated user", async () => {
-    const value = { auth: { getUser: async () => ({ data: { user: null }, error: null }) } } as unknown as SupabaseClient<Database>;
+    const value = {
+      auth: { getUser: async () => ({ data: { user: null }, error: null }) },
+    } as unknown as SupabaseClient<Database>;
     await expect(requireOwner(value)).rejects.toThrow("réservé");
   });
 });
