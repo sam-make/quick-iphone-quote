@@ -1,6 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Json } from "@/integrations/supabase/types";
 
 export const ownerAccess = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
@@ -26,7 +28,7 @@ export const listGlobalData = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const projections = {
       shops: "id,name,address,phone,email,suspended_at,archived_at,created_at",
-      profiles: "id,full_name,email,shop_id,suspended_at,created_at,user_roles(role)",
+      profiles: "id,full_name,email,shop_id,suspended_at,created_at",
       repairs: "id,reference,shop_id,model,status,total_price,created_at",
       estimations: "id,shop_id,model_name,final_price,is_blocked,created_at",
       admin_audit_events: "id,actor_id,action,target_id,before_data,after_data,created_at",
@@ -34,7 +36,9 @@ export const listGlobalData = createServerFn({ method: "POST" })
       deduction_rules: "id,shop_id,name,category,deduction,is_blocking,active,created_at",
       shop_prices: "id,shop_id,model_id,color,storage_gb,base_price,updated_at",
     };
-    let query = supabaseAdmin.from(data.section).select(projections[data.section], { count: "exact" });
+    // Dynamic read-only table selection stays limited to the validated enum and explicit projections.
+    const reader = supabaseAdmin as SupabaseClient;
+    let query = reader.from(data.section).select(projections[data.section], { count: "exact" });
     const searchColumn = data.section === "profiles" ? "full_name" : data.section === "repairs" ? "reference" : data.section === "estimations" ? "model_name" : "name";
     if (data.search && !["shop_prices", "admin_audit_events"].includes(data.section)) query = query.ilike(searchColumn, `%${data.search.replace(/[%_]/g, "")}%`);
     if (data.shopId && ["profiles", "repairs", "estimations", "deduction_rules", "shop_prices"].includes(data.section)) query = query.eq("shop_id", data.shopId);
@@ -47,7 +51,13 @@ export const listGlobalData = createServerFn({ method: "POST" })
     const result = await query.order(data.section === "shop_prices" ? "updated_at" : "created_at", { ascending: false }).range(data.page * 20, data.page * 20 + 19);
     if (result.error) throw new Error("Chargement impossible.");
     // Dynamic table selection is intentionally projected above; return plain DTOs only.
-    return { rows: result.data as unknown as Record<string, unknown>[], count: result.count ?? 0 };
+    const rows = result.data as unknown as Record<string, Json>[];
+    if (data.section === "profiles" && rows.length) {
+      const roles = await supabaseAdmin.from("user_roles").select("user_id,shop_id,role").in("user_id", rows.map((row) => String(row.id)));
+      if (roles.error) throw new Error("Chargement impossible.");
+      for (const row of rows) row.user_roles = (roles.data ?? []).filter((role) => role.user_id === row.id && role.shop_id === row.shop_id).map((role) => ({ role: role.role }));
+    }
+    return { rows, count: result.count ?? 0 };
   });
 
 export const globalOverview = createServerFn({ method: "POST" })
