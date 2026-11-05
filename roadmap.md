@@ -1,8 +1,8 @@
 # Roadmap — Phase 1 sécurité & fiabilité
 ## Espace Super Administrateur
 - [x] Inspecter architecture, rôles, RLS et identité vérifiée du propriétaire
-- [ ] Ajouter /admin, gestion globale et journal d’audit sans suppression de données
-- [ ] Vérifier accès propriétaire, refus boutique et appels directs, puis régressions
+- [x] Ajouter /admin, gestion globale et journal d’audit sans suppression de données
+- [x] Vérifier accès propriétaire, refus boutique et appels directs, puis régressions (52 tests ; session suspendue bloquée, modification réversible restaurée ; sans publication)
 ## Corrections SEO
 - [x] Ajouter et vérifier le sitemap des pages publiques et sa référence dans robots.txt, sans publier (4 pages publiques ; 47 tests réussis)
 - [ ] Compléter les mentions légales et CGV — bloqué : identité juridique et clauses confirmées à fournir par l’éditeur
