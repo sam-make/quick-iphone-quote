@@ -50,7 +50,7 @@ function OwnerPage() {
   const access = useQuery({ queryKey: ["owner-access"], queryFn: () => accessFn(), retry: false });
   const overview = useQuery({ queryKey: ["global-overview"], queryFn: () => overviewFn(), enabled: access.data === true });
   const list = useQuery({ queryKey: ["global-data", section, search, shopId, state, page], queryFn: () => listFn({ data: { section, search, shopId: shopId || undefined, state, page } }), enabled: access.data === true });
-  const mutate = useMutation({ mutationFn: (data: Parameters<typeof updateFn>[0]["data"]) => updateFn({ data }), onSuccess: () => { toast.success("Modification enregistrée."); setEditing(null); setPending(null); setConfirmation(""); cache.invalidateQueries({ queryKey: ["global-data"] }); cache.invalidateQueries({ queryKey: ["workspace"] }); }, onError: (error) => toast.error(error.message) });
+  const mutate = useMutation({ mutationFn: (data: { kind: "shop" | "member"; targetId: string; changes: { name?: string; address?: string | null; phone?: string | null; email?: string | null; suspended?: boolean; archived?: boolean; role?: "admin" | "employee" } }) => updateFn({ data }), onSuccess: () => { toast.success("Modification enregistrée."); setEditing(null); setPending(null); setConfirmation(""); cache.invalidateQueries({ queryKey: ["global-data"] }); cache.invalidateQueries({ queryKey: ["workspace"] }); }, onError: (error) => toast.error(error.message) });
   if (access.isPending) return <p role="status">Vérification de l’accès…</p>;
   if (!access.data) return <div role="alert"><h1 className="text-2xl font-semibold">Accès refusé</h1><p className="mt-3 text-muted-foreground">Cet espace est réservé au propriétaire autorisé.</p></div>;
   const rows = list.data?.rows ?? [];
