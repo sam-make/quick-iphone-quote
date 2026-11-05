@@ -85,6 +85,13 @@
       "when": 1793829968590,
       "tag": "0011_protect_global_owner_and_last_admin",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1793843733011,
+      "tag": "0012_harden_member_access_trigger",
+      "breakpoints": true
     }
   ]
 }
