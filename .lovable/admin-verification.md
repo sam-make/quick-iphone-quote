@@ -11,7 +11,7 @@
 - `src/lib/super-admin.functions.ts`, `super-admin.server.ts`, `super-admin.server.test.ts`.
 - `src/lib/access.ts` ; fonctions workspace, team et repairs utilisent ce contrôle de suspension.
 - `vitest.config.ts` inclut tous les tests du projet.
-- Migrations additives `0009` à `0012` : rôle global, suspensions/archivage, journal et mutation atomique, politiques restrictives, protection du propriétaire et du dernier administrateur.
+- Migrations additives `0009` à `0013` : rôle global, suspensions/archivage, journal et mutation atomique, politiques restrictives, protection du propriétaire et du dernier administrateur, retrait de l’exécution publique des déclencheurs et références bloquées pour les accès suspendus.
 
 ## Tests réalisés
 - 52 tests automatiques réussis, lint des nouveaux modules réussi, compilation automatique réussie.
