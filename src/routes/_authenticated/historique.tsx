@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import type { CSSProperties } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Ban } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -76,8 +77,12 @@ function HistoryPage() {
         </div>
       ) : (
         <div className="space-y-3">
-          {rows.map((row) => (
-            <article key={row.id} className="surface-card p-5">
+          {rows.map((row, i) => (
+            <article
+              key={row.id}
+              className="surface-card animate-fade-up p-5"
+              style={{ "--motion-delay": `${Math.min(i, 10) * 60}ms` } as CSSProperties}
+            >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <p className="text-sm font-semibold text-ink">

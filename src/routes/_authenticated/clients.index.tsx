@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type CSSProperties } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Plus, Search, UserRound } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -103,8 +103,12 @@ function ClientsPage() {
           </p>
         ) : (
           <ul className="divide-y divide-border">
-            {filtered.map((customer) => (
-              <li key={customer.id}>
+            {filtered.map((customer, i) => (
+              <li
+                key={customer.id}
+                className="animate-fade-up"
+                style={{ "--motion-delay": `${Math.min(i, 10) * 50}ms` } as CSSProperties}
+              >
                 <Link
                   to="/clients/$id"
                   params={{ id: customer.id }}
