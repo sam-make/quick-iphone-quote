@@ -411,12 +411,14 @@ function RepairsView({ shopId }: { shopId?: string }) {
       ) : loading || !data ? (
         <StatsSkeleton />
       ) : (
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <StatCard label="Réparations" value={data.total} icon={Wrench} to="/reparations" />
-          <StatCard label="En cours" value={data.open} icon={Loader2} to="/reparations" />
-          <StatCard label="Montant en cours" value={formatEuro(data.openAmount)} icon={Euro} hint="Dossiers non terminés" />
-          <StatCard label="Clients" value={data.clients} icon={Users} to="/clients" />
-        </div>
+        <StatsGrid
+          stats={[
+            { label: "Réparations", value: data.total, icon: Wrench, to: "/reparations" },
+            { label: "En cours", value: data.open, icon: Loader2, to: "/reparations" },
+            { label: "Montant en cours", value: data.openAmount, format: formatEuro, icon: Euro, hint: "Dossiers non terminés" },
+            { label: "Clients", value: data.clients, icon: Users, to: "/clients" },
+          ]}
+        />
       )}
 
       {!query.isError && (
@@ -432,8 +434,12 @@ function RepairsView({ shopId }: { shopId?: string }) {
           }
         >
           <ul className="divide-y divide-border">
-            {data?.recent.map((row) => (
-              <li key={row.id}>
+            {data?.recent.map((row, i) => (
+              <li
+                key={row.id}
+                className="animate-fade-up"
+                style={{ "--motion-delay": `${i * 60}ms` } as React.CSSProperties}
+              >
                 <Link
                   to="/reparations/$id"
                   params={{ id: row.id }}
@@ -532,12 +538,14 @@ function EstimationsView({ shopId }: { shopId?: string }) {
       ) : loading || !data ? (
         <StatsSkeleton />
       ) : (
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <StatCard label="Estimations" value={data.total} icon={Sparkles} to="/historique" />
-          <StatCard label="Ce mois" value={data.month} icon={CalendarDays} to="/historique" />
-          <StatCard label="Valeur totale" value={formatEuro(data.value)} icon={Euro} hint="Hors reprises bloquées" />
-          <StatCard label="Reprises bloquées" value={data.blocked} icon={Ban} />
-        </div>
+        <StatsGrid
+          stats={[
+            { label: "Estimations", value: data.total, icon: Sparkles, to: "/historique" },
+            { label: "Ce mois", value: data.month, icon: CalendarDays, to: "/historique" },
+            { label: "Valeur totale", value: data.value, format: formatEuro, icon: Euro, hint: "Hors reprises bloquées" },
+            { label: "Reprises bloquées", value: data.blocked, icon: Ban },
+          ]}
+        />
       )}
 
       {!query.isError && (
@@ -553,8 +561,12 @@ function EstimationsView({ shopId }: { shopId?: string }) {
           }
         >
           <ul className="divide-y divide-border">
-            {data?.recent.map((row) => (
-              <li key={row.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
+            {data?.recent.map((row, i) => (
+              <li
+                key={row.id}
+                className="animate-fade-up flex flex-wrap items-center justify-between gap-3 px-5 py-4"
+                style={{ "--motion-delay": `${i * 60}ms` } as React.CSSProperties}
+              >
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium text-ink">
                     {row.model_name} · {formatStorage(row.storage_gb)} · {row.color}
