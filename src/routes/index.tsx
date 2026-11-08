@@ -232,6 +232,7 @@ function Landing() {
               </Link>
             </Button>
           </div>
+          </Reveal>
         </section>
       </main>
 
