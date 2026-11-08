@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 import { Button } from "@/components/ui/button";
+import { Reveal } from "@/components/motion";
 import dashboardShot from "@/assets/screen-dashboard.jpg";
 import estimationShot from "@/assets/screen-estimation.jpg";
 
@@ -102,16 +103,25 @@ function Landing() {
               <ShieldCheck className="size-3.5 text-primary" />
               Pensé par un réparateur, pour des réparateurs
             </span>
-            <h1 className="animate-rise mx-auto mt-7 max-w-3xl text-4xl font-semibold leading-[1.05] text-ink md:text-6xl">
+            <h1
+              className="animate-rise mx-auto mt-7 max-w-3xl text-4xl font-semibold leading-[1.05] text-ink md:text-6xl"
+              style={{ animationDelay: "90ms" }}
+            >
               L'estimation de reprise iPhone,
               <span className="text-gradient"> enfin sans appeler le responsable.</span>
             </h1>
-            <p className="animate-rise mx-auto mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
+            <p
+              className="animate-rise mx-auto mt-6 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg"
+              style={{ animationDelay: "180ms" }}
+            >
               Trade-In Pro donne à vos vendeurs un prix de reprise fiable en moins de deux minutes,
               calculé automatiquement à partir des règles de déduction que vous définissez
               vous-même.
             </p>
-            <div className="animate-rise mt-9 flex flex-wrap items-center justify-center gap-3">
+            <div
+              className="animate-rise mt-9 flex flex-wrap items-center justify-center gap-3"
+              style={{ animationDelay: "270ms" }}
+            >
               <Button asChild size="lg">
                 <Link to="/inscription">
                   Créer l'espace de ma boutique
@@ -123,7 +133,7 @@ function Landing() {
               </Button>
             </div>
 
-            <div className="animate-rise mx-auto mt-16 max-w-5xl">
+            <div className="animate-rise mx-auto mt-16 max-w-5xl" style={{ animationDelay: "380ms" }}>
               <div className="surface-card overflow-hidden p-2 shadow-[var(--shadow-float)]">
                 <img
                   src={dashboardShot}
@@ -147,19 +157,18 @@ function Landing() {
               d'administration complet pour piloter votre grille de reprise.
             </p>
             <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {features.map((feature) => (
-                <article
-                  key={feature.title}
-                  className="surface-card group p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--shadow-float)]"
-                >
-                  <span className="grid size-10 place-items-center rounded-xl bg-accent text-accent-foreground transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
-                    <feature.icon className="size-5" />
-                  </span>
-                  <h3 className="mt-5 text-base font-semibold text-ink">{feature.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                    {feature.text}
-                  </p>
-                </article>
+              {features.map((feature, i) => (
+                <Reveal key={feature.title} delay={(i % 3) * 90}>
+                  <article className="surface-card group h-full p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--shadow-float)]">
+                    <span className="grid size-10 place-items-center rounded-xl bg-accent text-accent-foreground transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                      <feature.icon className="size-5" />
+                    </span>
+                    <h3 className="mt-5 text-base font-semibold text-ink">{feature.title}</h3>
+                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+                      {feature.text}
+                    </p>
+                  </article>
+                </Reveal>
               ))}
             </div>
           </div>
@@ -167,6 +176,7 @@ function Landing() {
 
         <section id="apercu" className="py-20">
           <div className="mx-auto grid max-w-6xl items-center gap-12 px-5 lg:grid-cols-2">
+            <Reveal>
             <div>
               <h2 className="text-3xl font-semibold text-ink md:text-4xl">
                 Un diagnostic guidé, pas un formulaire.
@@ -189,6 +199,8 @@ function Landing() {
                 ))}
               </ul>
             </div>
+            </Reveal>
+            <Reveal delay={120}>
             <div className="surface-card overflow-hidden p-2">
               <img
                 src={estimationShot}
