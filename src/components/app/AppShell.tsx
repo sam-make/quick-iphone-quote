@@ -8,6 +8,7 @@ import { Logo } from "@/components/brand/Logo";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useWorkspace } from "@/hooks/useWorkspace";
+import { PageTransition } from "@/components/motion";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -110,7 +111,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </header>
 
         {open && (
-          <div className="border-b border-border/70 bg-surface-2 px-4 py-4 lg:hidden">
+          <div className="animate-fade-up border-b border-border/70 bg-surface-2 px-4 py-4 lg:hidden">
             {nav}
             <Button variant="ghost" size="sm" className="mt-2 w-full justify-start" onClick={handleSignOut}>
               <LogOut className="size-4" />
@@ -129,7 +130,9 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         )}
 
-        <main className="flex-1 px-5 py-8 lg:px-8">{children}</main>
+        <main className="flex-1 px-5 py-8 lg:px-8">
+          <PageTransition>{children}</PageTransition>
+        </main>
       </div>
     </div>
   );
