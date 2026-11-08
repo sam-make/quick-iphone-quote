@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode, type PointerEvent as ReactPointerEvent } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode, type PointerEvent as ReactPointerEvent } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -24,6 +24,7 @@ import { StatusBadge } from "@/components/repairs/StatusBadge";
 import { ScanSearch } from "@/components/repairs/ScanSearch";
 import { formatEuro, formatStorage } from "@/lib/pricing";
 import { customerName, type RepairStatus } from "@/lib/repairs";
+import { CountUp, FadeUp } from "@/components/motion";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/tableau-de-bord")({
@@ -232,12 +233,14 @@ function DashboardPage() {
 function StatCard({
   label,
   value,
+  format,
   icon: Icon,
   to,
   hint,
 }: {
   label: string;
-  value: ReactNode;
+  value: number;
+  format?: (n: number) => string;
   icon: typeof Wrench;
   to?: "/reparations" | "/clients" | "/historique";
   hint?: string;
@@ -251,14 +254,14 @@ function StatCard({
         </span>
       </div>
       <p className="mt-4 font-[family-name:var(--font-display)] text-2xl font-semibold text-ink md:text-3xl">
-        {value}
+        <CountUp value={value} format={format} />
       </p>
       {hint && <p className="mt-1 text-xs text-muted-foreground">{hint}</p>}
     </>
   );
-  const cls = "surface-card block p-5 transition-shadow";
+  const cls = "surface-card block p-5";
   return to ? (
-    <Link to={to} className={cn(cls, "hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring")}>
+    <Link to={to} className={cn(cls, "card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring")}>
       {body}
     </Link>
   ) : (
@@ -266,11 +269,34 @@ function StatCard({
   );
 }
 
+function StatsGrid({
+  stats,
+}: {
+  stats: {
+    label: string;
+    value: number;
+    format?: (n: number) => string;
+    icon: typeof Wrench;
+    to?: "/reparations" | "/clients" | "/historique";
+    hint?: string;
+  }[];
+}) {
+  return (
+    <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      {stats.map((stat, i) => (
+        <FadeUp key={stat.label} delay={i * 80}>
+          <StatCard {...stat} />
+        </FadeUp>
+      ))}
+    </div>
+  );
+}
+
 function StatsSkeleton() {
   return (
     <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
       {Array.from({ length: 4 }).map((_, i) => (
-        <div key={i} className="surface-card h-[118px] animate-pulse bg-muted/50" />
+        <div key={i} className="surface-card shimmer h-[118px] bg-muted/50" />
       ))}
     </div>
   );
@@ -385,12 +411,14 @@ function RepairsView({ shopId }: { shopId?: string }) {
       ) : loading || !data ? (
         <StatsSkeleton />
       ) : (
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <StatCard label="Réparations" value={data.total} icon={Wrench} to="/reparations" />
-          <StatCard label="En cours" value={data.open} icon={Loader2} to="/reparations" />
-          <StatCard label="Montant en cours" value={formatEuro(data.openAmount)} icon={Euro} hint="Dossiers non terminés" />
-          <StatCard label="Clients" value={data.clients} icon={Users} to="/clients" />
-        </div>
+        <StatsGrid
+          stats={[
+            { label: "Réparations", value: data.total, icon: Wrench, to: "/reparations" },
+            { label: "En cours", value: data.open, icon: Loader2, to: "/reparations" },
+            { label: "Montant en cours", value: data.openAmount, format: formatEuro, icon: Euro, hint: "Dossiers non terminés" },
+            { label: "Clients", value: data.clients, icon: Users, to: "/clients" },
+          ]}
+        />
       )}
 
       {!query.isError && (
@@ -406,8 +434,12 @@ function RepairsView({ shopId }: { shopId?: string }) {
           }
         >
           <ul className="divide-y divide-border">
-            {data?.recent.map((row) => (
-              <li key={row.id}>
+            {data?.recent.map((row, i) => (
+              <li
+                key={row.id}
+                className="animate-fade-up"
+                style={{ "--motion-delay": `${i * 60}ms` } as React.CSSProperties}
+              >
                 <Link
                   to="/reparations/$id"
                   params={{ id: row.id }}
@@ -506,12 +538,14 @@ function EstimationsView({ shopId }: { shopId?: string }) {
       ) : loading || !data ? (
         <StatsSkeleton />
       ) : (
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-          <StatCard label="Estimations" value={data.total} icon={Sparkles} to="/historique" />
-          <StatCard label="Ce mois" value={data.month} icon={CalendarDays} to="/historique" />
-          <StatCard label="Valeur totale" value={formatEuro(data.value)} icon={Euro} hint="Hors reprises bloquées" />
-          <StatCard label="Reprises bloquées" value={data.blocked} icon={Ban} />
-        </div>
+        <StatsGrid
+          stats={[
+            { label: "Estimations", value: data.total, icon: Sparkles, to: "/historique" },
+            { label: "Ce mois", value: data.month, icon: CalendarDays, to: "/historique" },
+            { label: "Valeur totale", value: data.value, format: formatEuro, icon: Euro, hint: "Hors reprises bloquées" },
+            { label: "Reprises bloquées", value: data.blocked, icon: Ban },
+          ]}
+        />
       )}
 
       {!query.isError && (
@@ -527,8 +561,12 @@ function EstimationsView({ shopId }: { shopId?: string }) {
           }
         >
           <ul className="divide-y divide-border">
-            {data?.recent.map((row) => (
-              <li key={row.id} className="flex flex-wrap items-center justify-between gap-3 px-5 py-4">
+            {data?.recent.map((row, i) => (
+              <li
+                key={row.id}
+                className="animate-fade-up flex flex-wrap items-center justify-between gap-3 px-5 py-4"
+                style={{ "--motion-delay": `${i * 60}ms` } as React.CSSProperties}
+              >
                 <div className="min-w-0">
                   <p className="truncate text-sm font-medium text-ink">
                     {row.model_name} · {formatStorage(row.storage_gb)} · {row.color}

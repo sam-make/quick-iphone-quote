@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type CSSProperties } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Plus, Search } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -120,8 +120,12 @@ function RepairsPage() {
           <p className="px-6 py-10 text-center text-sm text-muted-foreground">Aucun dossier ne correspond.</p>
         ) : (
           <ul className="divide-y divide-border">
-            {filtered.map((repair) => (
-              <li key={repair.id}>
+            {filtered.map((repair, i) => (
+              <li
+                key={repair.id}
+                className="animate-fade-up"
+                style={{ "--motion-delay": `${Math.min(i, 10) * 50}ms` } as CSSProperties}
+              >
                 <Link
                   to="/reparations/$id"
                   params={{ id: repair.id }}
