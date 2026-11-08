@@ -208,13 +208,15 @@ function Landing() {
                 loading="lazy"
                 width={1600}
                 height={1008}
-                className="w-full rounded-[calc(var(--radius-xl)-4px)]"
+                  className="w-full rounded-[calc(var(--radius-xl)-4px)]"
               />
             </div>
+            </Reveal>
           </div>
         </section>
 
         <section className="px-5 pb-24">
+          <Reveal>
           <div className="mx-auto max-w-5xl rounded-3xl bg-[image:var(--gradient-primary)] px-8 py-14 text-center text-primary-foreground shadow-[var(--shadow-float)]">
             <h2 className="text-3xl font-semibold md:text-4xl">
               Prêt à fiabiliser vos reprises&nbsp;?
