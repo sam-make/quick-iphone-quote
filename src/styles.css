@@ -225,6 +225,145 @@
   animation: rise-in 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+/* ---------- Motion design system ---------- */
+/*
+ * Centralized animations. Durations follow the product spec:
+ * micro-interactions 150–250ms, transitions 250–450ms, entrances 400–700ms.
+ * Only transform and opacity are animated. Everything is disabled under
+ * prefers-reduced-motion (see the media query at the end of this section).
+ */
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+  60% {
+    transform: scale(1.02);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer-slide {
+  from {
+    background-position: -200% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes check-pop {
+  0% {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Entrance: fade + rise. Delay via --motion-delay (set by <Stagger>). */
+@utility animate-fade-up {
+  animation: fade-up 480ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--motion-delay, 0ms);
+}
+
+/* Entrance with a light bounce, for dialogs, toasts confirmations, badges. */
+@utility animate-pop {
+  animation: pop-in 320ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--motion-delay, 0ms);
+}
+
+/* Small validation bounce for icons (e.g. success check). */
+@utility animate-check {
+  animation: check-pop 260ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* Skeleton shimmer: sliding highlight instead of a plain pulse. */
+@utility shimmer {
+  background-image: linear-gradient(
+    100deg,
+    transparent 20%,
+    color-mix(in oklab, var(--foreground) 7%, transparent) 50%,
+    transparent 80%
+  );
+  background-size: 200% 100%;
+  animation: shimmer-slide 1.4s linear infinite;
+}
+
+/* Press feedback for buttons and tappable rows (150ms micro-interaction). */
+@utility pressable {
+  transition:
+    transform 150ms cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 150ms ease,
+    color 150ms ease,
+    box-shadow 150ms ease;
+  &:active {
+    transform: scale(0.97);
+  }
+}
+
+/* Card depth: gentle lift + floating shadow on hover/focus. */
+@utility card-hover {
+  transition:
+    transform 250ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 250ms cubic-bezier(0.22, 1, 0.36, 1);
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-float);
+  }
+}
+
+/* Scroll-triggered reveal: hidden until .motion-visible is added by <Reveal>. */
+@utility motion-reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 560ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 560ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--motion-delay, 0ms);
+  &.motion-visible {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Accessibility: honor reduced motion everywhere, including tw-animate-css. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+  .motion-reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* ---------- Thermal printing (labels & deposit tickets) ---------- */
 @media print {
   body * {
