@@ -24,6 +24,7 @@ import { StatusBadge } from "@/components/repairs/StatusBadge";
 import { ScanSearch } from "@/components/repairs/ScanSearch";
 import { formatEuro, formatStorage } from "@/lib/pricing";
 import { customerName, type RepairStatus } from "@/lib/repairs";
+import { CountUp, FadeUp } from "@/components/motion";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/_authenticated/tableau-de-bord")({
@@ -232,12 +233,14 @@ function DashboardPage() {
 function StatCard({
   label,
   value,
+  format,
   icon: Icon,
   to,
   hint,
 }: {
   label: string;
-  value: ReactNode;
+  value: number;
+  format?: (n: number) => string;
   icon: typeof Wrench;
   to?: "/reparations" | "/clients" | "/historique";
   hint?: string;
@@ -251,14 +254,14 @@ function StatCard({
         </span>
       </div>
       <p className="mt-4 font-[family-name:var(--font-display)] text-2xl font-semibold text-ink md:text-3xl">
-        {value}
+        <CountUp value={value} format={format} />
       </p>
       {hint && <p className="mt-1 text-xs text-muted-foreground">{hint}</p>}
     </>
   );
-  const cls = "surface-card block p-5 transition-shadow";
+  const cls = "surface-card block p-5";
   return to ? (
-    <Link to={to} className={cn(cls, "hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring")}>
+    <Link to={to} className={cn(cls, "card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring")}>
       {body}
     </Link>
   ) : (
@@ -266,11 +269,34 @@ function StatCard({
   );
 }
 
+function StatsGrid({
+  stats,
+}: {
+  stats: {
+    label: string;
+    value: number;
+    format?: (n: number) => string;
+    icon: typeof Wrench;
+    to?: "/reparations" | "/clients" | "/historique";
+    hint?: string;
+  }[];
+}) {
+  return (
+    <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      {stats.map((stat, i) => (
+        <FadeUp key={stat.label} delay={i * 80}>
+          <StatCard {...stat} />
+        </FadeUp>
+      ))}
+    </div>
+  );
+}
+
 function StatsSkeleton() {
   return (
     <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
       {Array.from({ length: 4 }).map((_, i) => (
-        <div key={i} className="surface-card h-[118px] animate-pulse bg-muted/50" />
+        <div key={i} className="surface-card shimmer h-[118px] bg-muted/50" />
       ))}
     </div>
   );
