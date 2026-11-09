@@ -1,0 +1,7 @@
+# Analytics — diagnostic
+
+Les boutiques, estimations, réparations, clients et changements de statut possèdent des dates réelles. Ils permettent de reconstruire une activité métier à partir des enregistrements conservés, mais pas les consultations passées ni les enregistrements supprimés. La dernière connexion Auth est disponible par utilisateur : le maximum des membres actuels sera présenté pour la boutique, sans exposer les données Auth.
+
+Aucune présence quotidienne ni journal global d’activité boutique n’existe. Ajouter un suivi serveur minimal des jours de présence et un journal des futures créations/changements de statut. Les données reconstruites restent distinguées des présences mesurées depuis l’installation. Une boutique active signifie une activité observée dans les 7 derniers jours ; suspension et archivage restent des états d’accès distincts. Les seuils 7/14/30 jours sont cumulatifs, et les boutiques sans activité connue sont distinguées.
+
+Le nouvel onglet réutilise /admin, requireOwner, les contrôles Auth et le rôle protégé. Aucun élargissement des politiques métier ; RPC Analytics exclusivement propriétaire. Aucun nom client, IMEI, code de déverrouillage ou mot de passe dans les événements.

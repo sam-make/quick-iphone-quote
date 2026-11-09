@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
@@ -31,9 +31,24 @@ import {
   listGlobalData,
   updateGlobalEntity,
 } from "@/lib/super-admin.functions";
+import { OwnerAnalytics, ownerAnalyticsOptions, type AnalyticsFilters } from "@/components/admin/OwnerAnalytics";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   staticData: { sitemap: false },
+  validateSearch: (search: Record<string, unknown>): { section?: "analytics"; days?: 7|30|90; shop?: string; rank?: "estimates"|"frequency"; inactive?: "all"|"never"|"7"|"14"|"30"; q?: string } => ({
+    section: search.section === "analytics" ? "analytics" : undefined,
+    days: search.days === 7 || search.days === 90 || search.days === "7" || search.days === "90" ? Number(search.days) as 7|90 : 30,
+    shop: typeof search.shop === "string" && /^[0-9a-f-]{36}$/i.test(search.shop) ? search.shop : undefined,
+    rank: search.rank === "frequency" ? "frequency" : "estimates",
+    inactive: search.inactive === "never" || search.inactive === "7" || search.inactive === "14" || search.inactive === "30" ? search.inactive : "all",
+    q: typeof search.q === "string" ? search.q.slice(0,100) : "",
+  }),
+  loaderDeps: ({search}) => ({section: search.section, days: search.days ?? 30, shop: search.shop ?? ""}),
+  loader: async ({context,deps}) => {
+    if (deps.section === "analytics" && await ownerAccess()) await context.queryClient.ensureQueryData(ownerAnalyticsOptions(deps.days,deps.shop));
+  },
+  errorComponent: () => <div role="alert">Impossible de charger les statistiques. <Button onClick={()=>window.location.reload()}>Réessayer</Button></div>,
+  notFoundComponent: () => <p>Page introuvable.</p>,
   head: () => ({
     meta: [
       { title: "Super Administration — Trade-In Pro" },
@@ -66,6 +81,10 @@ type Row = Record<string, unknown>;
 const text = (value: unknown) => (value == null ? "—" : String(value));
 
 function OwnerPage() {
+  const routeSearch = Route.useSearch();
+  const navigate = useNavigate({from: Route.fullPath});
+  const analytics = routeSearch.section === "analytics";
+  const analyticsFilters: AnalyticsFilters = {days:routeSearch.days ?? 30,shop:routeSearch.shop ?? "",rank:routeSearch.rank ?? "estimates",inactive:routeSearch.inactive ?? "all",q:routeSearch.q ?? ""};
   const accessFn = useServerFn(ownerAccess);
   const overviewFn = useServerFn(globalOverview);
   const listFn = useServerFn(listGlobalData);
@@ -90,12 +109,12 @@ function OwnerPage() {
   const overview = useQuery({
     queryKey: ["global-overview"],
     queryFn: () => overviewFn(),
-    enabled: access.data === true,
+    enabled: access.data === true && !analytics,
   });
   const list = useQuery({
     queryKey: ["global-data", section, search, shopId, state, page],
     queryFn: () => listFn({ data: { section, search, shopId: shopId || undefined, state, page } }),
-    enabled: access.data === true,
+    enabled: access.data === true && !analytics,
   });
   const mutate = useMutation({
     mutationFn: (data: {
@@ -189,13 +208,15 @@ function OwnerPage() {
         ))}
       </div>
       <div className="flex flex-wrap gap-2" role="tablist" aria-label="Administration globale">
+        <Button role="tab" aria-selected={analytics} variant={analytics ? "default" : "outline"} onClick={()=>navigate({search:prev=>({...prev,section:"analytics"})})}>Analytics</Button>
         {sections.map(([id, label]) => (
           <Button
             key={id}
             role="tab"
-            aria-selected={section === id}
-            variant={section === id ? "default" : "outline"}
+            aria-selected={!analytics && section === id}
+            variant={!analytics && section === id ? "default" : "outline"}
             onClick={() => {
+              void navigate({search:prev=>({...prev,section:undefined})});
               setSection(id);
               setPage(0);
               setSearch("");
@@ -206,6 +227,7 @@ function OwnerPage() {
           </Button>
         ))}
       </div>
+      {analytics ? <OwnerAnalytics filters={analyticsFilters} onChange={change=>{void navigate({search:prev=>({...prev,...change,section:"analytics"}),replace:true});}}/> : <>
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative min-w-0 flex-1">
           <Search className="absolute left-3 top-3 size-4 text-muted-foreground" />
@@ -525,6 +547,7 @@ function OwnerPage() {
           </Button>
         </DialogContent>
       </Dialog>
+      </>}
     </div>
   );
 }

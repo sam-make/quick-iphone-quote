@@ -1,5 +1,14 @@
 # Roadmap — Motion Design global Trade-In Pro
 
+## Analytics Super Administrateur (demande actuelle)
+- [x] Examiner données disponibles, protections propriétaire et outils graphiques.
+- [ ] Ajouter un suivi minimal des présences et événements futurs, sans inventer d’historique.
+- [ ] Intégrer statistiques, périodes, classement, inactivité et fiches boutique dans /admin.
+- [ ] Tester calculs, autorisations et affichage connecté sur ordinateur et téléphone.
+- [ ] Fournir les limites historiques et le résultat, sans publication.
+
+## Chantier animations antérieur (hors périmètre Analytics)
+
 - [x] Analyser architecture et dépendances (Framer Motion absent → CSS + React, aucune nouvelle dépendance)
 - [ ] Système centralisé : keyframes + utilitaires dans styles.css, composants réutilisables (Reveal, Stagger, CountUp, PageTransition), prefers-reduced-motion
 - [ ] Dashboard : cartes en cascade, stats animées, profondeur au survol
