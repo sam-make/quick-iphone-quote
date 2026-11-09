@@ -829,6 +829,38 @@ export type Database = {
           },
         ]
       }
+      shop_activity_events: {
+        Row: {
+          id: string
+          kind: string
+          occurred_at: string
+          shop_id: string
+          source_id: string
+        }
+        Insert: {
+          id?: string
+          kind: string
+          occurred_at?: string
+          shop_id: string
+          source_id: string
+        }
+        Update: {
+          id?: string
+          kind?: string
+          occurred_at?: string
+          shop_id?: string
+          source_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_activity_events_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shop_prices: {
         Row: {
           base_price: number
@@ -963,6 +995,35 @@ export type Database = {
           },
         ]
       }
+      shop_usage_days: {
+        Row: {
+          day: string
+          first_seen_at: string
+          last_seen_at: string
+          shop_id: string
+        }
+        Insert: {
+          day?: string
+          first_seen_at?: string
+          last_seen_at?: string
+          shop_id: string
+        }
+        Update: {
+          day?: string
+          first_seen_at?: string
+          last_seen_at?: string
+          shop_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shop_usage_days_shop_id_fkey"
+            columns: ["shop_id"]
+            isOneToOne: false
+            referencedRelation: "shops"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       shops: {
         Row: {
           address: string | null
@@ -1047,6 +1108,11 @@ export type Database = {
       }
       is_super_admin: { Args: never; Returns: boolean }
       next_shop_reference: { Args: { _kind: string }; Returns: string }
+      owner_analytics: {
+        Args: { _days?: number; _shop?: string }
+        Returns: Json
+      }
+      record_shop_presence: { Args: never; Returns: undefined }
       seed_default_rules: { Args: { _shop_id: string }; Returns: undefined }
       seed_default_services: { Args: { _shop_id: string }; Returns: undefined }
       storage_step: { Args: { _gb: number }; Returns: number }
