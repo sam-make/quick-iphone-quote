@@ -2,7 +2,8 @@ import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { ownerAccess } from "@/lib/super-admin.functions";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { recordShopPresence } from "@/lib/owner-analytics.functions";
 import { AlertTriangle, Gauge, Loader2, History, LogOut, Menu, Settings, Sparkles, Users, Wrench, X } from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 import { Button } from "@/components/ui/button";
@@ -28,6 +29,18 @@ export function AppShell({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const ownerFn = useServerFn(ownerAccess);
   const owner = useQuery({ queryKey: ["owner-access"], queryFn: () => ownerFn(), retry: false });
+  const presenceFn = useServerFn(recordShopPresence);
+  const presenceShopId = workspace?.shop.id;
+  useEffect(() => {
+    if (!presenceShopId) return;
+    const record = () => {
+      if (document.visibilityState === "visible") void presenceFn().catch(() => undefined);
+    };
+    record();
+    const interval = window.setInterval(record, 300_000);
+    document.addEventListener("visibilitychange", record);
+    return () => { window.clearInterval(interval); document.removeEventListener("visibilitychange", record); };
+  }, [presenceFn, presenceShopId]);
 
   async function handleSignOut() {
     await queryClient.cancelQueries();
