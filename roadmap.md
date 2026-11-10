@@ -2,10 +2,10 @@
 
 ## Analytics Super Administrateur (demande actuelle)
 - [x] Examiner données disponibles, protections propriétaire et outils graphiques.
-- [ ] Ajouter un suivi minimal des présences et événements futurs, sans inventer d’historique.
-- [ ] Intégrer statistiques, périodes, classement, inactivité et fiches boutique dans /admin.
-- [ ] Tester calculs, autorisations et affichage connecté sur ordinateur et téléphone.
-- [ ] Fournir les limites historiques et le résultat, sans publication.
+- [x] Ajouter un suivi minimal des présences et événements futurs, sans inventer d’historique.
+- [x] Intégrer statistiques, périodes, classement, inactivité et fiches boutique dans /admin.
+- [x] Tester calculs, autorisations et affichage connecté sur ordinateur et téléphone.
+- [x] Fournir les limites historiques dans l’écran et le résultat, sans publication.
 
 ## Chantier animations antérieur (hors périmètre Analytics)
 
