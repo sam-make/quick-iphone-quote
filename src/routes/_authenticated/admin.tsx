@@ -199,14 +199,14 @@ function OwnerPage() {
           <p className="text-sm text-muted-foreground">Trade-In Pro</p>
         </div>
       </header>
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+      {!analytics && <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         {["Boutiques", "Utilisateurs", "Réparations", "Estimations"].map((label, i) => (
           <div key={label} className="border-b-2 border-primary/30 py-4">
             <p className="text-sm text-muted-foreground">{label}</p>
             <p className="mt-1 text-3xl font-semibold">{overview.data?.[i] ?? "…"}</p>
           </div>
         ))}
-      </div>
+      </div>}
       <div className="flex flex-wrap gap-2" role="tablist" aria-label="Administration globale">
         <Button role="tab" aria-selected={analytics} variant={analytics ? "default" : "outline"} onClick={()=>navigate({search:prev=>({...prev,section:"analytics"})})}>Analytics</Button>
         {sections.map(([id, label]) => (
