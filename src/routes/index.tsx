@@ -1,4 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useRef } from "react";
+import { tiktokVideo } from "@/lib/tiktok-attribution";
 import {
   ArrowRight,
   Building2,
@@ -72,6 +74,27 @@ const features = [
 ];
 
 function Landing() {
+  const attributed = useRef(false);
+  useEffect(() => {
+    const video = tiktokVideo(window.location.search);
+    if (!video || attributed.current) return;
+    // The injected runtime can arrive after hydration. It handles consent itself.
+    const attribute = () => {
+      if (!window.__lovableEvents?.track || attributed.current) return false;
+      window.__lovableEvents?.track?.("project.tiktok_attribution", { video });
+      attributed.current = true;
+      return true;
+    };
+    if (attribute()) return;
+    const timer = window.setInterval(() => {
+      if (attribute()) window.clearInterval(timer);
+    }, 500);
+    const timeout = window.setTimeout(() => window.clearInterval(timer), 30000);
+    return () => {
+      window.clearInterval(timer);
+      window.clearTimeout(timeout);
+    };
+  }, []);
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-40 border-b border-border/70 bg-background/80 backdrop-blur-xl">

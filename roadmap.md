@@ -1,5 +1,11 @@
 # Roadmap — Motion Design global Trade-In Pro
 
+## TikTok (demandes actuelles)
+- [x] Ajouter l’attribution des arrivées TikTok par vidéo sans doubler les visites déjà comptées.
+- [x] Vérifier les liens : six tests et navigateur réussis ; les clics internes à TikTok restent mesurables seulement par TikTok.
+- [ ] Animer la couverture nouvelle réparation et enregistrer le MP4 à côté de l’image — bloqué : génération refusée, environ 3,65 crédits nécessaires.
+- [ ] Contrôler la vidéo — bloqué tant que la génération ne peut pas démarrer.
+
 ## Analytics Super Administrateur (demande actuelle)
 - [x] Examiner données disponibles, protections propriétaire et outils graphiques.
 - [x] Ajouter un suivi minimal des présences et événements futurs, sans inventer d’historique.
