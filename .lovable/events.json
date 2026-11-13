@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "events": {
+    "project.tiktok_attribution": {
+      "event_schema_version": 1,
+      "description": "An existing landing page is reached with utm_source=tiktok; captures only allowlisted video attribution, not another page view or session.",
+      "privacy": {
+        "contains_pii": false,
+        "purpose": "product_analytics"
+      },
+      "properties_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "video"
+        ],
+        "properties": {
+          "video": {
+            "type": "string",
+            "enum": [
+              "bio",
+              "estimation",
+              "scan",
+              "reparation",
+              "unknown"
+            ]
+          }
+        }
+      }
+    }
+  }
+}
