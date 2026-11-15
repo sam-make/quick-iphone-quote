@@ -3,8 +3,8 @@
 ## TikTok (demandes actuelles)
 - [x] Ajouter l’attribution des arrivées TikTok par vidéo sans doubler les visites déjà comptées.
 - [x] Vérifier les liens : six tests et navigateur réussis ; les clics internes à TikTok restent mesurables seulement par TikTok.
-- [ ] Animer la couverture nouvelle réparation et enregistrer le MP4 à côté de l’image — bloqué : nouvelle tentative refusée le 13 novembre, environ 3,05 crédits nécessaires pour 5 secondes.
-- [ ] Contrôler la vidéo — bloqué tant que la génération ne peut pas démarrer.
+- [x] Animer la couverture nouvelle réparation et enregistrer le MP4 à côté de l’image.
+- [x] Contrôler la vidéo — 5,03 secondes, 720 × 1280 ; cadrage et titres conservés sur les images de contrôle.
 
 ## Analytics Super Administrateur (demande actuelle)
 - [x] Examiner données disponibles, protections propriétaire et outils graphiques.
