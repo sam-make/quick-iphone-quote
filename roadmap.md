@@ -1,6 +1,7 @@
 # Roadmap — Motion Design global Trade-In Pro
 
 ## TikTok (demandes actuelles)
+- [ ] Animer les couvertures estimation iPhone et scan réparation en MP4 courts, puis vérifier cadrage et titres et les regrouper avec les couvertures.
 - [x] Ajouter l’attribution des arrivées TikTok par vidéo sans doubler les visites déjà comptées.
 - [x] Vérifier les liens : six tests et navigateur réussis ; les clics internes à TikTok restent mesurables seulement par TikTok.
 - [x] Animer la couverture nouvelle réparation et enregistrer le MP4 à côté de l’image.
