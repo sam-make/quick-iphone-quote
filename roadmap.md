@@ -1,5 +1,11 @@
 # Roadmap — Motion Design global Trade-In Pro
 
+## Assistance IA aux estimations
+- [x] Examiner le diagnostic existant et les modèles OpenAI disponibles.
+- [ ] Confirmer le modèle autorisé avec le propriétaire (GPT-6 Astra bloqué par la politique de conservation ; GPT-6.1 Terra autorisé).
+- [ ] Ajouter une analyse de description libre proposant uniquement des règles actives de la boutique, à confirmer sans modification des prix par l’IA.
+- [ ] Tester les réponses, les accès et le parcours connecté ; ne pas publier.
+
 ## TikTok (demandes actuelles)
 - [ ] Animer les couvertures estimation iPhone et scan réparation en MP4 courts, puis vérifier cadrage et titres et les regrouper avec les couvertures.
 - [x] Ajouter l’attribution des arrivées TikTok par vidéo sans doubler les visites déjà comptées.
