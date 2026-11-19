@@ -1,5 +1,10 @@
 # Roadmap — Motion Design global Trade-In Pro
 
+## Google sign-in
+- [x] Reuse existing profiles, roles and Google provider configuration.
+- [x] Add a branded Google button to the login screen and session-aware home navigation.
+- [ ] Verify desktop/mobile and light/dark rendering, Google handoff and session redirect.
+
 ## Assistance IA aux estimations
 - [x] Examiner le diagnostic existant et les modèles OpenAI disponibles.
 - [ ] Confirmer le modèle autorisé avec le propriétaire (GPT-6 Astra bloqué par la politique de conservation ; GPT-6.1 Terra autorisé).

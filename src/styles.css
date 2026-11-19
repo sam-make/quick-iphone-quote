@@ -74,9 +74,15 @@
   --color-ink: var(--ink);
   --color-surface: var(--surface);
   --color-surface-2: var(--surface-2);
+  --color-google-background: var(--google-background);
+  --color-google-foreground: var(--google-foreground);
+  --color-google-border: var(--google-border);
 }
 
 :root {
+  --google-background: #FFFFFF;
+  --google-foreground: #1F1F1F;
+  --google-border: #747775;
   --radius: 0.75rem;
   --background: oklch(0.995 0.002 250);
   --foreground: oklch(0.19 0.015 260);
@@ -136,6 +142,9 @@
 }
 
 .dark {
+  --google-background: #131314;
+  --google-foreground: #E3E3E3;
+  --google-border: #8E918F;
   --background: oklch(0.129 0.042 264.695);
   --foreground: oklch(0.984 0.003 247.858);
   --card: oklch(0.208 0.042 265.755);

@@ -1,4 +1,7 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 import { useEffect, useRef } from "react";
 import { tiktokVideo } from "@/lib/tiktok-attribution";
 import {
@@ -74,6 +77,15 @@ const features = [
 ];
 
 function Landing() {
+  const { session } = useAuth();
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  async function signOut() {
+    await queryClient.cancelQueries();
+    queryClient.clear();
+    await supabase.auth.signOut();
+    await navigate({ to: "/connexion", replace: true });
+  }
   const attributed = useRef(false);
   useEffect(() => {
     const video = tiktokVideo(window.location.search);
@@ -109,12 +121,21 @@ function Landing() {
             </a>
           </nav>
           <div className="flex items-center gap-2">
+            {session ? (
+              <>
+                <Button asChild size="sm"><Link to="/tableau-de-bord">Ma boutique</Link></Button>
+                <Button variant="ghost" size="sm" onClick={signOut}>Déconnexion</Button>
+              </>
+            ) : (
+              <>
             <Button asChild variant="ghost" size="sm">
               <Link to="/connexion">Se connecter</Link>
             </Button>
             <Button asChild size="sm">
               <Link to="/inscription">Créer un compte</Link>
             </Button>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -152,7 +173,7 @@ function Landing() {
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline">
-                <Link to="/connexion">Se connecter</Link>
+                {session ? <Link to="/tableau-de-bord">Ma boutique</Link> : <Link to="/connexion">Se connecter</Link>}
               </Button>
             </div>
 
