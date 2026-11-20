@@ -69,4 +69,18 @@ if [[ "$login_status" != "200" ]] || ! grep -q 'Trade-In Pro' "$login"; then
   exit 1
 fi
 
-echo "Rendu serveur OK sur / et /connexion ; configuration publique transmise au navigateur."
+# Tester aussi le rendu SSR des écrans critiques de récupération de compte.
+# Aucune API Auth réelle ni aucun e-mail ne sont sollicités ici.
+for path in /mot-de-passe-oublie /reset-password; do
+  page_status="$(curl --silent --max-time 5 --output "$login" --write-out "%{http_code}" "http://127.0.0.1:4173$path" || true)"
+  if [[ "$page_status" != "200" ]] || ! grep -q 'Trade-In Pro' "$login"; then
+    echo "Échec du rendu serveur sur $path (HTTP $page_status)."
+    exit 1
+  fi
+  if grep -q 'test_only_dummy_do_not_use' "$login"; then
+    echo "Secret fictif détecté dans le HTML du Worker : $path."
+    exit 1
+  fi
+done
+
+echo "Rendu serveur OK sur /, /connexion, /mot-de-passe-oublie et /reset-password ; aucune fuite de secret détectée."
