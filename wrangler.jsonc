@@ -12,5 +12,6 @@
       "SUPABASE_PUBLISHABLE_KEY",
       "SUPABASE_SERVICE_ROLE_KEY"
     ]
-  }
+  },
+  "previews": {}
 }
