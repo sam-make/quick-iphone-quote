@@ -31,10 +31,7 @@ import {
   listGlobalData,
   updateGlobalEntity,
 } from "@/lib/super-admin.functions";
-import {
-  OwnerAnalytics,
-  type AnalyticsFilters,
-} from "@/components/admin/OwnerAnalytics";
+import { OwnerAnalytics, type AnalyticsFilters } from "@/components/admin/OwnerAnalytics";
 import { ownerAnalyticsOptions } from "@/lib/owner-analytics.options";
 
 export const Route = createFileRoute("/_authenticated/admin")({
