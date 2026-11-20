@@ -15,7 +15,7 @@ jobs:
         uses: oven-sh/setup-bun@v2
       - name: Installer les paquets sans scripts tiers
         id: install
-        run: bun install --ignore-scripts
+        run: bun install --frozen-lockfile --ignore-scripts
       - name: Vérifier les types TypeScript
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: bunx tsc --noEmit
@@ -52,30 +52,3 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 
-  regenerer_verrou:
-    name: Régénération ponctuelle du verrou Bun
-    if: ${{ github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'migration-cloudflare' }}
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Récupérer la branche sans toucher à main
-        uses: actions/checkout@v4
-        with:
-          ref: migration-cloudflare
-          persist-credentials: true
-      - name: Installer Bun
-        uses: oven-sh/setup-bun@v2
-      - name: Reconstruire le verrou depuis le registre public
-        run: bun install --ignore-scripts
-      - name: Enregistrer uniquement le verrou
-        run: |
-          git add bun.lock
-          if git diff --cached --quiet; then
-            echo "Le verrou est déjà à jour."
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "build: régénérer bun.lock de façon canonique"
-          git push origin HEAD:refs/heads/migration-cloudflare
