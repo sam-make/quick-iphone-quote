@@ -33,9 +33,9 @@ import {
 } from "@/lib/super-admin.functions";
 import {
   OwnerAnalytics,
-  ownerAnalyticsOptions,
   type AnalyticsFilters,
 } from "@/components/admin/OwnerAnalytics";
+import { ownerAnalyticsOptions } from "@/lib/owner-analytics.options";
 
 export const Route = createFileRoute("/_authenticated/admin")({
   staticData: { sitemap: false },
