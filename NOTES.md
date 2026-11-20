@@ -126,3 +126,11 @@ Aucune variable `SUPABASE_SERVICE_ROLE_KEY` relevée dans les trois fichiers d'e
 - Révocation des droits `anon`/`authenticated` sur `seed_default_rules(uuid)` et `seed_default_services(uuid)` ; serveur `service_role` toujours autorisé.
 - Auth source : 11 e-mails confirmés, 6 non confirmés ; 9 comptes avec jetons temporaires dans la source (non migrés), nouvelles confirmations nécessaires selon parcours.
 - Workflow manuel de déploiement production préparé sur PR brouillon ; **aucun Worker production déployé, aucune configuration de clé serveur effectuée**, aucun DNS modifié.
+
+
+## Agents Codex et orchestration — 20 novembre 2026
+- Six sous-agents Codex projet créés avec rôles distincts : sécurité, données, authentification, qualité, expérience réparateur et déploiement.
+- Configuration dans `.codex/config.toml` ; les modèles héritent du parent pour éviter d'imposer un modèle indisponible ; permissions et accès MCP hérités du parent.
+- Nouveau contrôle GitHub Actions non déployant : `.github/workflows/agents-preflight.yml` et `scripts/check-agent-contract.py`.
+- Tableau de dépendances et GO/NO-GO : `docs/AGENTS_PRODUCTION.md`. Les agents définis ne sont pas des processus déjà démarrés : ils s'activent en session Codex.
+- État : PR n°1 en brouillon. Les 24 tables et 17 utilisateurs sont restaurés, mais connexion réelle, données finales et Worker Cloudflare public **non validés**.

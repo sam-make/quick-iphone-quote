@@ -1,0 +1,6 @@
+# Sous-agents Codex du projet Trade-In Pro.
+# Ils héritent des connexions MCP, de l'approbation et des permissions du parent.
+# Ne pas configurer de secret ou de permission plus large dans ce fichier.
+[agents]
+enabled = true
+max_concurrent_threads_per_session = 6

@@ -48,3 +48,16 @@ Une tâche ne peut être déclarée « terminée » qu'après les cinq vérifica
 
 ## Rapport avant validation
 Résumer les fichiers changés, les cinq relectures, les tests réellement exécutés et leurs erreurs. Ne jamais déclarer « zéro bug » sans preuves.
+
+## Coordination réelle avec les sous-agents Codex
+
+Les cinq relectures ci-dessus restent obligatoires. Les rôles spécialisés exécutables sont définis dans `.codex/agents/` :
+`security_auditor`, `data_migration`, `auth_specialist`, `qa_engineer`, `repairer_ux`, `release_engineer`.
+
+- Pour une préparation de version, le coordinateur Codex doit déléguer en parallèle **les audits en lecture seule** à ces six rôles, attendre les rapports et consigner les décisions dans `docs/AGENTS_PRODUCTION.md` et `NOTES.md`.
+- Une revue ne constitue pas un déploiement. Les sous-agents ne tournent pas en arrière-plan sans session Codex active, contrairement aux vérifications GitHub Actions.
+- Ne lancer ni déploiement public, ni fusion de la PR, ni modification de la base actuellement utilisée sur Lovable sans validations prévues au tableau GO/NO-GO et autorisation spécifique.
+- Aucune donnée de client, sauvegarde, hash de mot de passe ou secret n'est admis dans les commits, issues et résultats d'automatisation.
+- Si un agent propose un correctif, le coordinateur contrôle le diff, exécute les tests CI et vérifie l'absence de conflit avec les autres agents.
+
+Le plan de fonctionnement et les critères de validation se trouvent dans `docs/AGENTS_PRODUCTION.md`.
