@@ -76,3 +76,28 @@ Aucune variable `SUPABASE_SERVICE_ROLE_KEY` relevée dans les trois fichiers d'e
 - **Total corrigé : 1 839 / 1 839 ; restant : 0 erreur et 0 avertissement.** Aucune règle désactivée et aucun commentaire d'ignorance ajouté.
 - **Vérification GitHub Actions 44715156157 sur commit 117ae1d : SUCCESS** : installation, TypeScript, lint (aucune erreur ni avertissement), 10 fichiers de tests, build Vite/Cloudflare, scan de secrets.
 - Aucune action sur `main`, la production, les paiements ou Supabase. Pull request 1 toujours non fusionnée. Le succès du build ne remplace pas un test fonctionnel en ligne.
+
+## Reprise technique — 20 novembre 2026 (après correction du lint)
+
+### Vérifications et correctifs effectués
+- PR n°1 toujours en brouillon ; toutes les modifications sont sur `migration-cloudflare`. Production, paiement et SQL propriétaire non modifiés.
+- Inspection **en lecture seule** du Worker `trade-in-pro-staging` : `SUPABASE_URL` correspond au projet Supabase de test ; les liaisons `SUPABASE_PUBLISHABLE_KEY` (publique) et `SUPABASE_SERVICE_ROLE_KEY` (serveur uniquement) existent. Aucune valeur de clé affichée ni modifiée. Aucune variable `VITE_*` enregistrée dans les liaisons du Worker.
+- **Bug prioritaire évité** : le navigateur ne recevait pas automatiquement les variables publiques `SUPABASE_*` présentes sur le Worker. Ajout de `src/integrations/supabase/public-config.ts`, qui transmet uniquement URL + clé publique par les balises HTML `meta` générées au rendu serveur. Cela évite de dépendre d'une valeur `VITE_*` à la compilation. Test de priorité configuration serveur vs ancienne configuration compilée ; aucune clé `service_role` transmise.
+- Nettoyage de messages Lovable restants dans le client serveur et le contrôle d'authentification. `.env.example` utilise `DATABASE_URL` (Drizzle).
+- **Nouveau contrôle GitHub Actions sans déploiement** : `vite preview` lance le vrai Worker localement. Deux pages publiques répondent HTTP 200 et l'URL fictive de Supabase apparaît bien dans l'HTML. Le fichier `.dev.vars` fictif doit être créé **avant `vite build`**, car Cloudflare le copie au résultat utilisé par `vite preview`. Aucun compte réel ni base réelle n'est contacté.
+- **Défaut critique du verrou découvert** dans les journaux : `InvalidLockfile: failed to parse lockfile`. L'installation l'ignorait et le recréait. Un job unique a généré un verrou canonique et l'a commité, puis a été retiré. Désormais l'installation utilise `bun install --frozen-lockfile --ignore-scripts` pour empêcher tout changement silencieux de versions.
+- **Résultat vérifié** du workflow `44731426820` : installation figée, TypeScript, lint, 11 fichiers de tests, build, rendu Worker local et scan de secrets **tous réussis**. Aucun déploiement sur Cloudflare.
+- `.gitignore` inclut désormais `.dev.vars*` pour exclure aussi les variantes nommées ; `README.md` ne dirige plus vers Lovable ; vérification de l'absence de variable serveur `SUPABASE_SERVICE_ROLE_KEY` dans les bundles navigateur ajoutée au workflow.
+
+### Cinq relectures avant validation
+- Sécurité : **partiel** — scan de secrets et isolation du code client contrôlés ; isolation RLS entre deux boutiques et clé serveur réelle non testées.
+- Qualité : **validé en CI** — installation figée, types, lint, compilation.
+- Tests : **validé en CI sur tests existants** — 11 fichiers de tests et rendu serveur local ; tests de bout en bout avec vrais comptes non réalisés.
+- Base de données : **aucune migration appliquée** ; export et restauration restent à organiser sur la base de test.
+- Réparateur : **non vérifié en conditions réelles** — appareil mobile, parcours devis/client/réparation/facture à tester avec réparateurs.
+
+### Priorités recommandées
+1. Tester une connexion e-mail/mot de passe et les parcours boutique sur un déploiement de **staging** explicitement isolé, jamais en production. Confirmer avant de déployer.
+2. Vérifier l'isolation multi-boutiques/RLS et les références de factures et réparations en situation réelle.
+3. Préparer un export manuel contrôlé de la base de test avant d'ajouter des données de réparateurs.
+4. Ne pas créer d'agents IA autonomes pour l'instant : les cinq rôles d'`AGENTS.md` sont des contrôles de relecture, pas des services payants.

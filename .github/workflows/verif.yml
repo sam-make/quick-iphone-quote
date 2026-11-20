@@ -35,6 +35,14 @@ jobs:
       - name: Compiler l'application
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: bun run build
+      - name: Bloquer toute référence à la clé serveur dans le bundle navigateur
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: |
+          test -d dist/client
+          if grep -R --include='*.js' -F -q 'SUPABASE_SERVICE_ROLE_KEY' dist/client; then
+            echo "Une référence à la clé serveur a été détectée côté navigateur."
+            exit 1
+          fi
       - name: Vérifier le rendu réel du Worker sans déploiement
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: bash scripts/smoke-worker-preview.sh
