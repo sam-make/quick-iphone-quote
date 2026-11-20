@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { queryOptions, useSuspenseQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { Area, AreaChart, CartesianGrid, XAxis, YAxis, Bar, BarChart } from "recharts";
 import { Activity, Building2, Users, Wrench, Smartphone, Search } from "lucide-react";
-import { getOwnerAnalytics } from "@/lib/owner-analytics.functions";
+import { ownerAnalyticsOptions } from "@/lib/owner-analytics.options";
 import {
   inactivityDays,
   isInactive,
@@ -36,12 +36,6 @@ export type AnalyticsFilters = {
   inactive: "all" | "never" | "7" | "14" | "30";
   q: string;
 };
-export const ownerAnalyticsOptions = (days: 7 | 30 | 90, shop: string) =>
-  queryOptions({
-    queryKey: ["owner-analytics", days, shop],
-    queryFn: () => getOwnerAnalytics({ data: { days, shopId: shop || undefined } }),
-    staleTime: 30_000,
-  });
 const formatDate = (value: string | null) =>
   value
     ? new Date(value).toLocaleString("fr-FR", {
