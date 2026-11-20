@@ -55,6 +55,10 @@ function AdminPage() {
   const workspaceQuery = useWorkspace();
   const workspace = workspaceQuery.data;
   const shopId = workspace?.shop.id;
+  const shopName = workspace?.shop.name;
+  const shopAddress = workspace?.shop.address;
+  const shopPhone = workspace?.shop.phone;
+  const shopEmail = workspace?.shop.email;
   const queryClient = useQueryClient();
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ["rules"] });
@@ -75,20 +79,14 @@ function AdminPage() {
   });
 
   useEffect(() => {
-    if (!workspace) return;
+    if (!shopId) return;
     setShopForm({
-      name: workspace.shop.name ?? "",
-      address: workspace.shop.address ?? "",
-      phone: workspace.shop.phone ?? "",
-      email: workspace.shop.email ?? "",
+      name: shopName ?? "",
+      address: shopAddress ?? "",
+      phone: shopPhone ?? "",
+      email: shopEmail ?? "",
     });
-  }, [
-    workspace?.shop.id,
-    workspace?.shop.name,
-    workspace?.shop.address,
-    workspace?.shop.phone,
-    workspace?.shop.email,
-  ]);
+  }, [shopId, shopName, shopAddress, shopPhone, shopEmail]);
 
   const saveShopFn = useServerFn(updateShopSettings);
   const membersFn = useServerFn(fetchMembers);
