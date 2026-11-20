@@ -119,3 +119,10 @@ Aucune variable `SUPABASE_SERVICE_ROLE_KEY` relevée dans les trois fichiers d'e
 - Configuration Wrangler du Worker modifiée **sur la branche PR uniquement** de `trade-in-pro-staging` à `trade-in-pro`. Aucune publication du Worker de production ni connexion Cloudflare à la nouvelle base à ce stade.
 - Blocage de lancement : **vérification réelle de connexion depuis le navigateur, configuration des secrets Worker, et synchronisation finale après gel des écritures Lovable**.
 - Aucun SQL métier privé ni données Auth publiés dans le dépôt. La PR reste en brouillon.
+
+### Sécurisation préalable au lancement (20/11/2026)
+- Source/destination : 24/24 empreintes de lignes métier identiques, 538 enregistrements ; 17 comptes Auth hachés identiques ; identités Auth complètes identiques ; 0 profil/role orphelin.
+- RLS : utilisateur anonyme 0 ligne, compte boutique limité à sa boutique, statut propriétaire attendu. 4 politiques Storage et bucket privé `repair-photos` reproduits ; 17 fonctions et 18 triggers identiques.
+- Révocation des droits `anon`/`authenticated` sur `seed_default_rules(uuid)` et `seed_default_services(uuid)` ; serveur `service_role` toujours autorisé.
+- Auth source : 11 e-mails confirmés, 6 non confirmés ; 9 comptes avec jetons temporaires dans la source (non migrés), nouvelles confirmations nécessaires selon parcours.
+- Workflow manuel de déploiement production préparé sur PR brouillon ; **aucun Worker production déployé, aucune configuration de clé serveur effectuée**, aucun DNS modifié.

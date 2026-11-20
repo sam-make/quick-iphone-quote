@@ -75,3 +75,15 @@ Utiliser `scripts/verify-production-migration.sql`, qui vérifie les totaux, les
 Références techniques :
 - [Migration des comptes Auth Supabase](https://supabase.com/kb/troubleshooting/migrating-auth-users-between-projects)
 - [Sauvegarde/restauration Supabase](https://supabase.com/docs/guides/platform/migrating-within-supabase/backup-restore)
+
+## 6. Exécution de la bascule Cloudflare (pas encore lancée)
+
+- Fichier `.github/workflows/deployer-production.yml` ajouté sur la branche de migration ; **déclenchement manuel uniquement** sur `main` après fusion validée. Confirmation textuelle `BASCULE_VALIDEE` obligatoire.
+- Enregistrer dans les secrets GitHub Actions de l'environnement `production` : `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SERVICE_ROLE_KEY`. **Ne pas écrire les valeurs dans GitHub, le chat, ni les fichiers du dépôt.**
+- Le workflow bloque si l'URL Supabase n'est pas `https://xuvaihwygkcwriqfnkbg.supabase.co`.
+- Après déploiement, vérifier en navigateur le domaine workers.dev réel du Worker `trade-in-pro`, puis configurer Supabase Auth (`Site URL`, redirections, e-mails) et contrôler les clients.
+- Déploiement non lancé : aucun secret du nouveau Supabase n'a encore été configuré dans Cloudflare.
+- Les comptes restaurés comprennent **11 adresses confirmées, 6 non confirmées**. **9 comptes** avaient un jeton Auth en attente dans la base source ; ces jetons temporaires n'ont volontairement pas été transférés. Prévoir de nouveaux liens de confirmation/récupération si nécessaire ; ne pas réutiliser les anciennes URL de vérification.
+- Les deux fonctions de peuplement `seed_default_rules(uuid)` et `seed_default_services(uuid)` sont désormais **interdites aux rôles anonymes et authentifiés** ; `service_role` reste autorisé. Cette restriction est cohérente avec le code serveur et les migrations SQL.
+- Derniers tests de cloisonnement : visiteur `anon` sans données ; membre d'une boutique limité à sa boutique ; rôle propriétaire vérifié. Aucun test réel de connexion utilisateur avec mot de passe n'a encore été exécuté depuis un navigateur.
+- **Avant exécution du workflow**, geler brièvement les écritures de Lovable et refaire la comparaison complète, rattraper les nouvelles données et seulement ensuite ouvrir le domaine Cloudflare. Il est dangereux d'écrire simultanément dans les deux bases, car il n'y a pas de synchronisation en continu.
