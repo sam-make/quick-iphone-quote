@@ -13,6 +13,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { AuthProvider } from "@/hooks/useAuth";
 import { Toaster } from "@/components/ui/sonner";
+import { getPublicSupabaseConfig } from "@/integrations/supabase/public-config";
 
 function NotFoundComponent() {
   return (
@@ -78,6 +79,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
+      { name: "trade-in-supabase-url", content: getPublicSupabaseConfig().url },
+      {
+        name: "trade-in-supabase-publishable-key",
+        content: getPublicSupabaseConfig().publishableKey,
+      },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "Trade-In Pro — Logiciel d'estimation de reprise iPhone" },
       {
