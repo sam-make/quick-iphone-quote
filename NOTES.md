@@ -101,3 +101,11 @@ Aucune variable `SUPABASE_SERVICE_ROLE_KEY` relevée dans les trois fichiers d'e
 2. Vérifier l'isolation multi-boutiques/RLS et les références de factures et réparations en situation réelle.
 3. Préparer un export manuel contrôlé de la base de test avant d'ajouter des données de réparateurs.
 4. Ne pas créer d'agents IA autonomes pour l'instant : les cinq rôles d'`AGENTS.md` sont des contrôles de relecture, pas des services payants.
+
+## Audit des sauvegardes et de l'authentification — 20/11/2026
+- Source : **le vrai Trade-In Pro** publié via Lovable, backend Supabase géré par Lovable Cloud, référence retrouvée dans les variables du projet `omjonrbowazuicnbpuux` ; l'accès direct via le compte Supabase connecté est refusé.
+- L'export métier remis par le propriétaire (`trade-in-pro-public-export.sql`, 200580 octets, SHA-256 `6cf56b97f71620050cc76a94adc6fb454c42496839387f00c674783933d1d4be`) possède 24 sections de données et **24/24 comptes de lignes identiques** à la source Lovable lors du contrôle. Aucun fichier privé commité.
+- `auth.users` : 17 comptes dont 17 avec hachage ; `auth.identities` : 17 identités toutes `email`. Les 11 profils correspondent aux utilisateurs Auth. **L'authentification n'a pas été exportée ni transférée**.
+- `repair-photos` : 0 fichier ; `repair_photos` : 0 ligne au contrôle. Inventaire à revalider à la bascule.
+- Aucun changement Supabase, Cloudflare ou production. Aucune fusion. Le projet Supabase de production destinataire reste à choisir/créer avec accord sur l'organisation et le coût éventuel.
+- [Plan et audit en lecture seule](docs/MIGRATION_PRODUCTION.md). Ne pas utiliser la base staging ni écraser le projet Supabase préexistant. La PR 1 reste en brouillon.

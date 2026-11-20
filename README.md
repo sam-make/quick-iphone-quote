@@ -442,19 +442,19 @@ L'application doit être intuitive, rapide, premium et suffisamment robuste pour
 
 ## Architecture actuelle
 
-- **GitHub** : dépôt source `sam-make/quick-iphone-quote`.
+- **GitHub** : dépôt source `sam-make/trade-in-pro`.
 - **Cloudflare Workers** : application TanStack Start exécutée côté serveur.
 - **Supabase** : comptes avec e-mail et mot de passe, base de données et droits par boutique.
 - Le développement n'utilise plus Lovable. Aucun déploiement sur la production n'est autorisé sans accord.
 
-Les modifications de la branche `migration-cloudflare` restent dans la [pull request n° 1](https://github.com/sam-make/quick-iphone-quote/pull/1) tant qu'elles ne sont pas validées.
+Les modifications de la branche `migration-cloudflare` restent dans la [pull request n° 1](https://github.com/sam-make/trade-in-pro/pull/1) tant qu'elles ne sont pas validées.
 
 ## Développement local
 
 Installer [Bun](https://bun.sh/) (gestionnaire des paquets), puis :
 
 ```sh
-git clone https://github.com/sam-make/quick-iphone-quote.git
+git clone https://github.com/sam-make/trade-in-pro.git
 cd quick-iphone-quote
 git switch migration-cloudflare
 bun install --frozen-lockfile

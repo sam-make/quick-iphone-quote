@@ -34,3 +34,11 @@ dist-ssr
 # Ne jamais suivre les environnements privés
 .env*
 !.env.example
+
+# Confidential: private database exports and authentication records
+trade-in-pro-public-export.sql
+trade-in-pro-export-lisez-moi.txt
+*auth-users*.csv
+*auth-identities*.csv
+*.backup
+*.dump
