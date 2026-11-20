@@ -28,6 +28,9 @@ jobs:
       - name: Compiler l'application
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: bun run build
+      - name: Vérifier le rendu réel du Worker sans déploiement
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: bash scripts/smoke-worker-preview.sh
   secrets:
     name: Vérifier les secrets des fichiers de la PR
     runs-on: ubuntu-latest
