@@ -63,3 +63,16 @@ Aucune variable `SUPABASE_SERVICE_ROLE_KEY` relevée dans les trois fichiers d'e
 - Lint : **ÉCHEC** (1 839 problèmes relevés dans un run antérieur ; le nombre exact du run 44705696149 doit être confirmé à ses journaux). La PR n'est **PAS verte**.
 - Décision : ne pas désactiver les contrôles ni reformater massivement des fichiers hors du périmètre sans autorisation.
 - `main` protégée d'après le propriétaire ; PR n°1 toujours en brouillon, non fusionnée.
+
+## Session lint du 20 novembre 2026 — résultats vérifiés
+- État initial (run 44705891478) : **1 839 problèmes**, dont 1 830 erreurs `prettier/prettier`, 8 avertissements `react-refresh/only-export-components`, 1 avertissement `react-hooks/exhaustive-deps`.
+- Groupe 1 : `bunx eslint . --fix` a automatiquement corrigé **1 830 problèmes de formatage**. Modifications enregistrées sur `migration-cloudflare` par GitHub Actions (commit 183c2e5). Le job automatique temporaire a été supprimé du workflow ensuite.
+- Groupe 2 : dépendances primitives du `useEffect` dans l'administration. Avertissement React Hooks corrigé sans ignorer la règle.
+- Groupe 3 : suppression de quatre exports internes inutilisés par d'autres modules : `badgeVariants`, `useFormField`, `navigationMenuTriggerStyle`, `useSidebar`.
+- Groupe 4 : extraction de `buttonVariants` et `toggleVariants` dans des fichiers autonomes, avec mise à jour des imports consommateurs.
+- Groupe 5 : extraction de `ownerAnalyticsOptions` dans `src/lib/owner-analytics.options.ts` pour préserver la mise en cache des statistiques sans export non-composant.
+- Groupe 6 : séparation de `AuthProvider`, `AuthContext` et du hook `useAuth` pour conserver le comportement de connexion et supprimer le dernier avertissement.
+- Corrections secondaires de formatage des imports et de la fin des fichiers après extraction.
+- **Total corrigé : 1 839 / 1 839 ; restant : 0 erreur et 0 avertissement.** Aucune règle désactivée et aucun commentaire d'ignorance ajouté.
+- **Vérification GitHub Actions 44715156157 sur commit 117ae1d : SUCCESS** : installation, TypeScript, lint (aucune erreur ni avertissement), 10 fichiers de tests, build Vite/Cloudflare, scan de secrets.
+- Aucune action sur `main`, la production, les paiements ou Supabase. Pull request 1 toujours non fusionnée. Le succès du build ne remplace pas un test fonctionnel en ligne.
