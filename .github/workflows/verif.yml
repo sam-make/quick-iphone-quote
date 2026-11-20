@@ -1,0 +1,37 @@
+name: Vérifications de la pull request
+on:
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  verifier:
+    name: Installation, types, lint, tests et build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+      - name: Installer Bun
+        uses: oven-sh/setup-bun@v2
+      - name: Installer les paquets sans scripts tiers
+        run: bun install --ignore-scripts
+      - name: Vérifier les types TypeScript
+        run: bunx tsc --noEmit
+      - name: Vérifier le lint
+        run: bun run lint
+      - name: Exécuter les tests
+        run: bun run test
+      - name: Compiler l'application
+        run: bun run build
+  secrets:
+    name: Vérifier les secrets des fichiers de la PR
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le code complet
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Rechercher des secrets
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
