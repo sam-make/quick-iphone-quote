@@ -1,0 +1,16 @@
+name: Vérifier l'aperçu Cloudflare connecté à Supabase
+on:
+  push:
+    branches: [migration-cloudflare]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  smoke-preview:
+    name: HTTP SSR, nouvelle base et Auth
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Attendre la propagation de la préproduction, puis tester les URLs sans identifiants
+        run: bash scripts/smoke-cloudflare-preview.sh
