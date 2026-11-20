@@ -53,3 +53,13 @@ Aucune variable `SUPABASE_SERVICE_ROLE_KEY` relevée dans les trois fichiers d'e
 - Lint : 1 839 problèmes (1 830 erreurs, 9 avertissements) sur un commit après suppression de `__lovableEvents`, très majoritairement erreurs de formatage `prettier/prettier` dans des fichiers existants. Le CI reste rouge. Ne pas masquer le problème en désactivant les règles.
 - Workflow ajusté pour lancer les tests et le build même après un échec de lint, afin de découvrir d'autres blocages. Vérifier les résultats de la dernière exécution.
 - Le conteneur local n'a ni Bun ni accès GitHub ; seuls les jobs GitHub Actions constituent une exécution technique à distance.
+
+### Résultat vérifié après correction (run GitHub Actions 44705696149, commit 4280402)
+- Installation Bun : **SUCCÈS**.
+- Vérification TypeScript : **SUCCÈS**.
+- Tests automatisés : **SUCCÈS** (étape GitHub Actions ; nombre de tests à confirmer si nécessaire).
+- Build Vite / Cloudflare : **SUCCÈS** (compilation seulement, aucun déploiement ni test runtime de Worker).
+- Scan de secrets : **SUCCÈS**.
+- Lint : **ÉCHEC** (1 839 problèmes relevés dans un run antérieur ; le nombre exact du run 44705696149 doit être confirmé à ses journaux). La PR n'est **PAS verte**.
+- Décision : ne pas désactiver les contrôles ni reformater massivement des fichiers hors du périmètre sans autorisation.
+- `main` protégée d'après le propriétaire ; PR n°1 toujours en brouillon, non fusionnée.
