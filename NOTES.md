@@ -1,0 +1,29 @@
+# NOTES — Trade-In Pro
+Date : 2026-11-20
+Branche de travail : `migration-cloudflare`; ne jamais écrire directement sur `main`.
+
+## Architecture
+GitHub pour le code, Cloudflare Workers pour TanStack Start SSR, Supabase pour les données et comptes. Lovable exclu de la cible. Production interdite sans accord.
+
+## Réalisé pour la PR fondations
+- Vérification d'accès GitHub : branche créée, fichier `TEST_ACCES.md` créé puis supprimé.
+- `AGENTS.md` remplacé par cinq agents et des règles strictes.
+- `.env`, `.env.development`, `.env.production` retirés du suivi de la branche ; `.gitignore` renforcé, `.env.example` sans valeurs ajouté.
+- Connexion Google / bibliothèque `@lovable.dev/cloud-auth-js` supprimées ; connexion e-mail/mot de passe conservée.
+- Vérifications GitHub Actions sur PR : installation, types, lint, tests, build, secrets.
+- Architecture cible documentée.
+
+## Sécurité des anciennes variables
+Aucune variable `SUPABASE_SERVICE_ROLE_KEY` relevée dans les trois fichiers d'environnement examinés. Une variable de jeton client de paiement `VITE_PAYMENTS_CLIENT_TOKEN` y était renseignée ; ne pas afficher sa valeur. Des clés Supabase publiques y étaient renseignées. Ces fichiers existent dans l'historique Git antérieur : les retirer de la dernière version ne purge pas l'historique. Vérifier le caractère secret des valeurs et décider d'une rotation si nécessaire, sans action irréversible automatique.
+
+## Blocages et vérifications
+- Les dépendances restantes `@lovable.dev/vite-tanstack-config` et `@lovable.dev/ai-gateway`, et le verrou `bun.lock`, ne sont pas modifiés dans cette mission ; la suppression complète de Lovable reste à faire.
+- Le code de paiement et les fonctions SQL du propriétaire restent intacts.
+- Les tests et la compilation locale doivent être exécutés et leurs résultats indiqués ici ; ne rien présumer.
+- Vérifier que le flux GitHub Actions s'exécute avec succès avant fusion.
+- Aucun accès ni modification à la production ou à Supabase.
+
+## Suites proposées (nécessitent accord pour nouvelles modifications)
+1. Réparer la compilation Cloudflare Workers autonome sans bibliothèque Lovable.
+2. Réviser le verrou Bun pour retirer les entrées devenues inutiles.
+3. Valider sécurité RLS, estimations, numérotation REP/FA et mobile avec des tests automatisés.
