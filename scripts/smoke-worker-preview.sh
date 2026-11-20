@@ -44,6 +44,26 @@ fi
 
 if ! grep -q 'name="trade-in-supabase-url"' "$home" || ! grep -q "https://staging.example.invalid" "$home"; then
   echo "La réponse HTML n'inclut pas la configuration publique Supabase du Worker."
+  python3 - "$home" <<'PY'
+from html.parser import HTMLParser
+import sys
+
+class MetaReader(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.names = []
+    def handle_starttag(self, tag, attrs):
+        if tag == "meta":
+            self.names.append(dict(attrs).get("name", ""))
+
+body = open(sys.argv[1], encoding="utf-8").read()
+parser = MetaReader()
+parser.feed(body)
+print("Diagnostic sans valeurs : HTML:", len(body), "caractères")
+print("Balise Supabase URL présente:", "trade-in-supabase-url" in parser.names)
+print("URL fictive de test présente:", "staging.example.invalid" in body)
+print("Titre Trade-In Pro présent:", "Trade-In Pro" in body)
+PY
   exit 1
 fi
 
