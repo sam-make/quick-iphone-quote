@@ -30,3 +30,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Ne jamais suivre les environnements privés
+.env*
+!.env.example
