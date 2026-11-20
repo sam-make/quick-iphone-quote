@@ -1,7 +1,6 @@
 /** Request a recovery link without exposing whether the account exists. */
 export type PasswordRecoveryResult =
-  | { ok: true }
-  | { ok: false; reason: "rate_limit" | "unavailable" };
+  { ok: true } | { ok: false; reason: "rate_limit" | "unavailable" };
 
 type ResetSender = (
   email: string,
