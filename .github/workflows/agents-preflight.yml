@@ -1,0 +1,19 @@
+name: Agents Codex - contrôle de préparation
+on:
+  push:
+    branches: [migration-cloudflare]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  contrat-agents:
+    name: Contrat des six agents et garde production
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Récupérer la branche
+        uses: actions/checkout@v4
+      - name: Vérifier la configuration de délégation et les gardes
+        run: python3 scripts/check-agent-contract.py

@@ -1,28 +1,63 @@
-<!-- LOVABLE:BEGIN -->
-> [!IMPORTANT]
-> This project is connected to [Lovable](https://lovable.dev). Avoid rewriting
-> published git history — force pushing, or rebasing/amending/squashing commits
-> that are already pushed — as it rewrites history on Lovable's side and the
-> user will likely lose their project history.
->
-> Commits you push to the connected branch sync back to Lovable and show up in
-> the editor, so keep the branch in a working state.
-<!-- LOVABLE:END -->
+# Trade-In Pro — instructions obligatoires des agents
 
-## Project rules
-- Google sign-in uses the generated Lovable helper and returns to the public login page; existing session handling opens the shop only after authentication.
-- AI defect assistance validates suggestions against the caller's active shop rules and rejects price fields; human confirmation preserves the authoritative pricing engine.
-- Estimations, estimation defects, invoices, repairs, repair items and repair status history are written only by server functions using the admin client after tenant checks; authenticated users have no INSERT grant, so prices and totals can never come from the browser.
-- REP/FA references come from the `next_shop_reference` database function (atomic per-shop yearly counter in `shop_sequences`); never compute them in app code.
-- Base-price priority lives in `resolveBasePrice` (src/lib/pricing.ts), shared by the estimate page and the server; covered by `src/lib/pricing.test.ts` (`bun run test`).
-- Market analysis uses the single pure `computeProfit` module; persist entered inputs rather than derived margins so calculations remain consistent across both resale scenarios.
-- user_metadata is never trusted for shop attachment or roles: `inviteMember` pre-writes `profiles`/`user_roles` server-side before first login, and `ensureWorkspaceFor` only reuses that server-written profile, otherwise it creates a new shop owned by the caller.
-- Profile identity and shop membership are immutable in the database; invitations insert new profiles/roles, never upsert existing membership, and role checks bind roles to the profile's shop to prevent tenant reassignment.
-- Repair status workflow and invoice eligibility live in `canChangeStatus` / `INVOICEABLE_STATUSES` (src/lib/repairs.ts), enforced by the server with a compare-and-set on the previous status; the UI only mirrors them.
+## Périmètre
+- Architecture cible : code GitHub, application TanStack Start exécutée dans Cloudflare Workers, données et comptes dans Supabase.
+- Lovable est exclu des développements futurs.
+- Priorité : sécurité des boutiques, rapidité, simplicité, coûts gratuits pendant les tests.
+- Avant toute tâche, consulter `NOTES.md` pour connaître les travaux et blocages en cours. Le mettre à jour à la fin.
 
-- Business access requires authentication, shop membership and existing role checks only; no payment dependency remains. Historical payment tables and applied migrations are retired but retained to preserve data and migration history.
-- Repair detail uses the shared RepairLabelPrint and DepositTicketPrint dialogs; dashboard and repair list reuse ScanSearch, keeping printing and tenant-scoped reference lookup consistent.
-- Sitemap URLs are derived from the router with a required staticData.sitemap decision on every route; exclude the authenticated subtree, account-recovery pages and secret tracking links to avoid exposing private destinations, and omit lastmod without authoritative page-specific timestamps.
-- Global administration uses a separate verified-owner role and dedicated server functions; mutations and audit events are atomic in a guarded RPC, while restrictive RLS and requireBusinessAccess enforce reversible suspensions without broadening tenant permissions.
-- Owner Analytics uses an owner-guarded RPC for aggregates, Paris-calendar periods, minimal database-triggered business events and server-scoped daily presence; this avoids exposing tenant data or fabricating historical visits, while URL filters keep comparisons reproducible.
-- TikTok attribution emits an allowlisted campaign event from the existing landing page into the injected analytics runtime; visits use distinct analytics session IDs, never another page-view event or a database counter.
+## Règles strictes
+1. Ne jamais toucher à la production (application, comptes, base, ressources Cloudflare) sans accord préalable explicite.
+2. Ne jamais écrire sur `main`. Utiliser `migration-cloudflare` et proposer les changements par pull request non fusionnée.
+3. Aucun service payant sans accord écrit.
+4. Aucun secret, mot de passe, token ou clé privée dans Git, les journaux, les captures ou les messages. Ne jamais exposer `SUPABASE_SERVICE_ROLE_KEY` au navigateur.
+5. Toujours demander confirmation avant toute action irréversible, notamment suppression de données et migrations destructrices.
+6. Ne pas modifier ni supprimer le code de paiement sans nouvelle instruction explicite ; le signaler seulement.
+7. Ne pas modifier l'identité du propriétaire codée dans `is_super_admin` et `guard_global_owner_role` sans accord explicite.
+
+## Cinq agents de relecture obligatoires
+Une tâche ne peut être déclarée « terminée » qu'après les cinq vérifications. Indiquer PASSÉ / ÉCHEC / NON VÉRIFIÉ avec preuves et blocages.
+
+### 1. Sécurité
+- Aucune clé secrète dans le code source ou dans les fichiers suivis par Git.
+- La clé `service_role` reste exclusivement sur le serveur, jamais dans un fichier `VITE_*` ou dans le navigateur.
+- Vérifier l'isolation entre boutiques pour chaque lecture, écriture et fonction à privilèges.
+- Préserver RLS (règles qui limitent les lignes accessibles) et les droits minimaux de chaque compte.
+
+### 2. Qualité
+- Installer les dépendances, vérifier la compilation et les types TypeScript.
+- Vérifier le lint (règles de style et de qualité) et ne casser aucun test existant.
+- Garder un style cohérent et expliquer clairement tout échec technique.
+
+### 3. Tests
+- Maintenir des tests automatiques sur les prix de reprise, déductions et cas bloquants.
+- Tester les totaux des réparations et factures.
+- Tester la numérotation unique et concurrente des références REP et FA, y compris ses garanties SQL.
+
+### 4. Base de données
+- Tout changement de structure ou de logique SQL passe par une migration datée et relue.
+- Ne jamais appliquer une migration à la production sans autorisation.
+- Prévoir un export régulier et vérifié des données Supabase, car le plan gratuit ne garantit pas de sauvegarde automatique.
+- Conserver l'isolation des boutiques, les règles RLS, les fonctions et les déclencheurs existants.
+
+### 5. Réparateur
+- Tester les pages sur téléphone.
+- Utiliser du français clair et des erreurs qui indiquent comment résoudre le problème.
+- Permettre une estimation en quelques secondes dans un parcours court.
+- Réduire les clics nécessaires pour créer un client, une réparation ou une facture.
+
+## Rapport avant validation
+Résumer les fichiers changés, les cinq relectures, les tests réellement exécutés et leurs erreurs. Ne jamais déclarer « zéro bug » sans preuves.
+
+## Coordination réelle avec les sous-agents Codex
+
+Les cinq relectures ci-dessus restent obligatoires. Les rôles spécialisés exécutables sont définis dans `.codex/agents/` :
+`security_auditor`, `data_migration`, `auth_specialist`, `qa_engineer`, `repairer_ux`, `release_engineer`.
+
+- Pour une préparation de version, le coordinateur Codex doit déléguer en parallèle **les audits en lecture seule** à ces six rôles, attendre les rapports et consigner les décisions dans `docs/AGENTS_PRODUCTION.md` et `NOTES.md`.
+- Une revue ne constitue pas un déploiement. Les sous-agents ne tournent pas en arrière-plan sans session Codex active, contrairement aux vérifications GitHub Actions.
+- Ne lancer ni déploiement public, ni fusion de la PR, ni modification de la base actuellement utilisée sur Lovable sans validations prévues au tableau GO/NO-GO et autorisation spécifique.
+- Aucune donnée de client, sauvegarde, hash de mot de passe ou secret n'est admis dans les commits, issues et résultats d'automatisation.
+- Si un agent propose un correctif, le coordinateur contrôle le diff, exécute les tests CI et vérifie l'absence de conflit avec les autres agents.
+
+Le plan de fonctionnement et les critères de validation se trouvent dans `docs/AGENTS_PRODUCTION.md`.

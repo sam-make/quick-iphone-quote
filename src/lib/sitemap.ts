@@ -37,12 +37,15 @@ export function sitemapPathForLocation(
   location: Pick<ParsedLocation, "pathname" | "publicHref">,
   routeId: string,
 ): string | undefined {
-  if (!isSafeSitemapPath(location.pathname) || !isSafeSitemapPath(location.publicHref)) return undefined;
+  if (!isSafeSitemapPath(location.pathname) || !isSafeSitemapPath(location.publicHref))
+    return undefined;
   const result = router.getMatchedRoutes(location.pathname) as RouteMatch;
   const [params, foundRoute] = Array.isArray(result)
     ? [result[1], result[2]]
     : [result.routeParams, result.parseError ? undefined : result.foundRoute];
-  return params["**"] === undefined && foundRoute?.id === routeId && isSitemapRouteIncluded(foundRoute)
+  return params["**"] === undefined &&
+    foundRoute?.id === routeId &&
+    isSitemapRouteIncluded(foundRoute)
     ? location.publicHref
     : undefined;
 }
@@ -53,7 +56,8 @@ export interface SitemapEntry {
 }
 
 function isSafeSitemapPath(pathname: string): boolean {
-  if (!pathname.startsWith("/") || pathname.startsWith("//") || /[?#\\]/.test(pathname)) return false;
+  if (!pathname.startsWith("/") || pathname.startsWith("//") || /[?#\\]/.test(pathname))
+    return false;
   try {
     return decodeURI(new URL(pathname, "https://sitemap.invalid").pathname) === decodeURI(pathname);
   } catch {
@@ -63,14 +67,25 @@ function isSafeSitemapPath(pathname: string): boolean {
 
 export function sitemapXML(baseURL: string, entries: SitemapEntry[]): string {
   const origin = new URL(baseURL);
-  if (!/^https?:$/.test(origin.protocol) || origin.username || origin.password ||
-      origin.pathname !== "/" || origin.search || origin.hash) {
+  if (
+    !/^https?:$/.test(origin.protocol) ||
+    origin.username ||
+    origin.password ||
+    origin.pathname !== "/" ||
+    origin.search ||
+    origin.hash
+  ) {
     throw new Error("The sitemap base URL must be the public site origin");
   }
   const entities: Record<string, string> = {
-    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&apos;",
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&apos;",
   };
-  const escape = (value: string) => value.replace(/[&<>"']/g, (character) => entities[character] ?? character);
+  const escape = (value: string) =>
+    value.replace(/[&<>"']/g, (character) => entities[character] ?? character);
   const seen = new Set<string>();
   const urls: string[] = [];
   for (const entry of entries) {
@@ -78,7 +93,9 @@ export function sitemapXML(baseURL: string, entries: SitemapEntry[]): string {
     const url = new URL(entry.path, origin);
     if (seen.has(url.href)) continue;
     seen.add(url.href);
-    urls.push(`<url><loc>${escape(url.href)}</loc>${entry.lastmod ? `<lastmod>${escape(entry.lastmod)}</lastmod>` : ""}</url>`);
+    urls.push(
+      `<url><loc>${escape(url.href)}</loc>${entry.lastmod ? `<lastmod>${escape(entry.lastmod)}</lastmod>` : ""}</url>`,
+    );
   }
   return `<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.join("")}</urlset>`;
 }

@@ -3,11 +3,10 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { z } from "zod";
 import { AuthLayout } from "@/components/auth/AuthLayout";
-import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks/useAuthHook";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/connexion")({
@@ -15,9 +14,15 @@ export const Route = createFileRoute("/connexion")({
   head: () => ({
     meta: [
       { title: "Connexion — Trade-In Pro" },
-      { name: "description", content: "Connectez-vous à l'espace sécurisé de votre boutique Trade-In Pro." },
+      {
+        name: "description",
+        content: "Connectez-vous à l'espace sécurisé de votre boutique Trade-In Pro.",
+      },
       { property: "og:title", content: "Connexion — Trade-In Pro" },
-      { property: "og:description", content: "Accédez à l'espace de votre boutique de reprise iPhone." },
+      {
+        property: "og:description",
+        content: "Accédez à l'espace de votre boutique de reprise iPhone.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -81,9 +86,7 @@ function LoginPage() {
       options: { emailRedirectTo: `${window.location.origin}/tableau-de-bord` },
     });
     setResending(false);
-    toast[error ? "error" : "success"](
-      error ? error.message : "E-mail de confirmation renvoyé.",
-    );
+    toast[error ? "error" : "success"](error ? error.message : "E-mail de confirmation renvoyé.");
   }
 
   return (
@@ -99,12 +102,6 @@ function LoginPage() {
         </>
       }
     >
-      <GoogleSignInButton />
-      <div className="my-5 flex items-center gap-3 text-xs text-muted-foreground">
-        <span className="h-px flex-1 bg-border" />
-        <span>ou par e-mail</span>
-        <span className="h-px flex-1 bg-border" />
-      </div>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
           <Label htmlFor="email">Adresse e-mail</Label>
@@ -138,7 +135,13 @@ function LoginPage() {
           {submitting ? "Connexion…" : "Se connecter"}
         </Button>
         {unconfirmed ? (
-          <Button type="button" variant="outline" className="w-full" onClick={handleResend} disabled={resending}>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            onClick={handleResend}
+            disabled={resending}
+          >
             {resending ? "Envoi…" : "Renvoyer l'e-mail de confirmation"}
           </Button>
         ) : null}

@@ -35,9 +35,15 @@ export const Route = createFileRoute("/_authenticated/administration")({
   head: () => ({
     meta: [
       { title: "Administration — Trade-In Pro" },
-      { name: "description", content: "Gérez vos règles de déduction, vos prix de base et les infos de la boutique." },
+      {
+        name: "description",
+        content: "Gérez vos règles de déduction, vos prix de base et les infos de la boutique.",
+      },
       { property: "og:title", content: "Administration — Trade-In Pro" },
-      { property: "og:description", content: "Règles de déduction 100 % personnalisables par boutique." },
+      {
+        property: "og:description",
+        content: "Règles de déduction 100 % personnalisables par boutique.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -49,25 +55,38 @@ function AdminPage() {
   const workspaceQuery = useWorkspace();
   const workspace = workspaceQuery.data;
   const shopId = workspace?.shop.id;
+  const shopName = workspace?.shop.name;
+  const shopAddress = workspace?.shop.address;
+  const shopPhone = workspace?.shop.phone;
+  const shopEmail = workspace?.shop.email;
   const queryClient = useQueryClient();
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ["rules"] });
     queryClient.invalidateQueries({ queryKey: ["shop-prices"] });
   };
 
-  const [draft, setDraft] = useState({ name: "", deduction: "", category: "technique" as RuleCategory, blocking: false });
+  const [draft, setDraft] = useState({
+    name: "",
+    deduction: "",
+    category: "technique" as RuleCategory,
+    blocking: false,
+  });
   const [shopForm, setShopForm] = useState({ name: "", address: "", phone: "", email: "" });
-  const [inviteForm, setInviteForm] = useState({ email: "", fullName: "", role: "employee" as "admin" | "employee" });
+  const [inviteForm, setInviteForm] = useState({
+    email: "",
+    fullName: "",
+    role: "employee" as "admin" | "employee",
+  });
 
   useEffect(() => {
-    if (!workspace) return;
+    if (!shopId) return;
     setShopForm({
-      name: workspace.shop.name ?? "",
-      address: workspace.shop.address ?? "",
-      phone: workspace.shop.phone ?? "",
-      email: workspace.shop.email ?? "",
+      name: shopName ?? "",
+      address: shopAddress ?? "",
+      phone: shopPhone ?? "",
+      email: shopEmail ?? "",
     });
-  }, [workspace?.shop.id, workspace?.shop.name, workspace?.shop.address, workspace?.shop.phone, workspace?.shop.email]);
+  }, [shopId, shopName, shopAddress, shopPhone, shopEmail]);
 
   const saveShopFn = useServerFn(updateShopSettings);
   const membersFn = useServerFn(fetchMembers);
@@ -171,8 +190,16 @@ function AdminPage() {
     queryKey: ["admin-prices", shopId],
     enabled: Boolean(shopId),
     queryFn: async () => {
-      const { data } = await supabase.from("shop_prices").select("id, model_id, storage_gb, base_price").eq("color", "*");
-      return (data ?? []) as { id: string; model_id: string; storage_gb: number; base_price: number }[];
+      const { data } = await supabase
+        .from("shop_prices")
+        .select("id, model_id, storage_gb, base_price")
+        .eq("color", "*");
+      return (data ?? []) as {
+        id: string;
+        model_id: string;
+        storage_gb: number;
+        base_price: number;
+      }[];
     },
   });
 
@@ -221,7 +248,12 @@ function AdminPage() {
       patch,
     }: {
       id: string;
-      patch: Partial<Pick<RepairService, "name" | "price" | "duration_minutes" | "category" | "description" | "active">>;
+      patch: Partial<
+        Pick<
+          RepairService,
+          "name" | "price" | "duration_minutes" | "category" | "description" | "active"
+        >
+      >;
     }) => {
       const { error } = await supabase.from("repair_services").update(patch).eq("id", id);
       if (error) throw error;
@@ -268,7 +300,13 @@ function AdminPage() {
   });
 
   const updateRule = useMutation({
-    mutationFn: async ({ id, patch }: { id: string; patch: { name?: string; deduction?: number; active?: boolean } }) => {
+    mutationFn: async ({
+      id,
+      patch,
+    }: {
+      id: string;
+      patch: { name?: string; deduction?: number; active?: boolean };
+    }) => {
       const { error } = await supabase.from("deduction_rules").update(patch).eq("id", id);
       if (error) throw error;
     },
@@ -288,9 +326,23 @@ function AdminPage() {
   });
 
   const savePrice = useMutation({
-    mutationFn: async ({ modelId, storage, value }: { modelId: string; storage: number; value: number }) => {
+    mutationFn: async ({
+      modelId,
+      storage,
+      value,
+    }: {
+      modelId: string;
+      storage: number;
+      value: number;
+    }) => {
       const { error } = await supabase.from("shop_prices").upsert(
-        { shop_id: shopId!, model_id: modelId, color: "*", storage_gb: storage, base_price: value },
+        {
+          shop_id: shopId!,
+          model_id: modelId,
+          color: "*",
+          storage_gb: storage,
+          base_price: value,
+        },
         { onConflict: "shop_id,model_id,color,storage_gb" },
       );
       if (error) throw error;
@@ -309,7 +361,9 @@ function AdminPage() {
   if (workspaceQuery.isError || !workspace) {
     return (
       <div role="alert" className="space-y-3 text-sm">
-        <p className="text-destructive">Impossible de vérifier vos droits d'accès pour le moment.</p>
+        <p className="text-destructive">
+          Impossible de vérifier vos droits d'accès pour le moment.
+        </p>
         <Button size="sm" variant="outline" onClick={() => workspaceQuery.refetch()}>
           Réessayer
         </Button>
@@ -317,7 +371,11 @@ function AdminPage() {
     );
   }
   if (workspace.role !== "admin") {
-    return <p className="text-sm text-muted-foreground">Accès réservé à l'administrateur de la boutique.</p>;
+    return (
+      <p className="text-sm text-muted-foreground">
+        Accès réservé à l'administrateur de la boutique.
+      </p>
+    );
   }
 
   return (
@@ -360,7 +418,9 @@ function AdminPage() {
                   min={0}
                   disabled={draft.blocking}
                   value={draft.deduction}
-                  onChange={(event) => setDraft((prev) => ({ ...prev, deduction: event.target.value }))}
+                  onChange={(event) =>
+                    setDraft((prev) => ({ ...prev, deduction: event.target.value }))
+                  }
                 />
               </div>
               <div className="space-y-2">
@@ -384,7 +444,10 @@ function AdminPage() {
                   ))}
                 </select>
               </div>
-              <Button onClick={() => addRule.mutate()} disabled={!draft.name.trim() || addRule.isPending}>
+              <Button
+                onClick={() => addRule.mutate()}
+                disabled={!draft.name.trim() || addRule.isPending}
+              >
                 <Plus className="size-4" />
                 Ajouter
               </Button>
@@ -429,10 +492,14 @@ function AdminPage() {
                         <span className="text-sm text-muted-foreground">€</span>
                       </div>
                       <div className="ml-auto flex items-center gap-3">
-                        <span className="text-xs text-muted-foreground">{rule.active ? "Active" : "Inactive"}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {rule.active ? "Active" : "Inactive"}
+                        </span>
                         <Switch
                           checked={rule.active}
-                          onCheckedChange={(value) => updateRule.mutate({ id: rule.id, patch: { active: value } })}
+                          onCheckedChange={(value) =>
+                            updateRule.mutate({ id: rule.id, patch: { active: value } })
+                          }
                         />
                         <Button
                           variant="ghost"
@@ -453,19 +520,23 @@ function AdminPage() {
 
         <TabsContent value="prices" className="space-y-4">
           <p className="text-sm text-muted-foreground">
-            Laissez vide pour utiliser le prix de référence du catalogue. Un prix défini ici remplace le prix de base
-            pour toutes les couleurs du modèle.
+            Laissez vide pour utiliser le prix de référence du catalogue. Un prix défini ici
+            remplace le prix de base pour toutes les couleurs du modèle.
           </p>
           {models.map((model) => (
             <section key={model.id} className="surface-card p-5">
               <h3 className="text-sm font-semibold text-ink">{model.name}</h3>
               <div className="mt-3 flex flex-wrap gap-4">
                 {model.storages.map((storage) => {
-                  const override = prices.find((row) => row.model_id === model.id && row.storage_gb === storage);
+                  const override = prices.find(
+                    (row) => row.model_id === model.id && row.storage_gb === storage,
+                  );
                   const fallback = Number(model.base_price) + storageStep(storage);
                   return (
                     <div key={storage} className="space-y-1">
-                      <Label className="text-xs text-muted-foreground">{formatStorage(storage)}</Label>
+                      <Label className="text-xs text-muted-foreground">
+                        {formatStorage(storage)}
+                      </Label>
                       <Input
                         className="h-9 w-28"
                         type="number"
@@ -479,7 +550,9 @@ function AdminPage() {
                           savePrice.mutate({ modelId: model.id, storage, value });
                         }}
                       />
-                      <p className="text-[11px] text-muted-foreground">Réf. {formatEuro(fallback)}</p>
+                      <p className="text-[11px] text-muted-foreground">
+                        Réf. {formatEuro(fallback)}
+                      </p>
                     </div>
                   );
                 })}
@@ -499,7 +572,9 @@ function AdminPage() {
                   value={serviceDraft.name}
                   maxLength={80}
                   placeholder="Remplacement écran"
-                  onChange={(event) => setServiceDraft((prev) => ({ ...prev, name: event.target.value }))}
+                  onChange={(event) =>
+                    setServiceDraft((prev) => ({ ...prev, name: event.target.value }))
+                  }
                 />
               </div>
               <div className="space-y-2">
@@ -509,7 +584,9 @@ function AdminPage() {
                   type="number"
                   min={0}
                   value={serviceDraft.price}
-                  onChange={(event) => setServiceDraft((prev) => ({ ...prev, price: event.target.value }))}
+                  onChange={(event) =>
+                    setServiceDraft((prev) => ({ ...prev, price: event.target.value }))
+                  }
                 />
               </div>
               <div className="space-y-2">
@@ -519,7 +596,9 @@ function AdminPage() {
                   type="number"
                   min={0}
                   value={serviceDraft.duration}
-                  onChange={(event) => setServiceDraft((prev) => ({ ...prev, duration: event.target.value }))}
+                  onChange={(event) =>
+                    setServiceDraft((prev) => ({ ...prev, duration: event.target.value }))
+                  }
                 />
               </div>
               <div className="space-y-2">
@@ -529,10 +608,15 @@ function AdminPage() {
                   value={serviceDraft.category}
                   maxLength={40}
                   placeholder="ecran"
-                  onChange={(event) => setServiceDraft((prev) => ({ ...prev, category: event.target.value }))}
+                  onChange={(event) =>
+                    setServiceDraft((prev) => ({ ...prev, category: event.target.value }))
+                  }
                 />
               </div>
-              <Button onClick={() => addService.mutate()} disabled={!serviceDraft.name.trim() || addService.isPending}>
+              <Button
+                onClick={() => addService.mutate()}
+                disabled={!serviceDraft.name.trim() || addService.isPending}
+              >
                 <Plus className="size-4" />
                 Ajouter
               </Button>
@@ -543,7 +627,9 @@ function AdminPage() {
                 id="service-description"
                 value={serviceDraft.description}
                 maxLength={200}
-                onChange={(event) => setServiceDraft((prev) => ({ ...prev, description: event.target.value }))}
+                onChange={(event) =>
+                  setServiceDraft((prev) => ({ ...prev, description: event.target.value }))
+                }
               />
             </div>
           </section>
@@ -554,13 +640,17 @@ function AdminPage() {
             </h3>
             <ul className="divide-y divide-border">
               {services.map((service) => (
-                <li key={service.id} className="grid gap-3 px-6 py-4 md:grid-cols-[1fr_110px_110px_130px_auto] md:items-center">
+                <li
+                  key={service.id}
+                  className="grid gap-3 px-6 py-4 md:grid-cols-[1fr_110px_110px_130px_auto] md:items-center"
+                >
                   <Input
                     className="h-9"
                     defaultValue={service.name}
                     onBlur={(event) => {
                       const value = event.target.value.trim();
-                      if (value && value !== service.name) updateService.mutate({ id: service.id, patch: { name: value } });
+                      if (value && value !== service.name)
+                        updateService.mutate({ id: service.id, patch: { name: value } });
                     }}
                   />
                   <div className="flex items-center gap-1">
@@ -587,7 +677,10 @@ function AdminPage() {
                       onBlur={(event) => {
                         const value = Number(event.target.value);
                         if (!Number.isNaN(value) && value !== service.duration_minutes) {
-                          updateService.mutate({ id: service.id, patch: { duration_minutes: value } });
+                          updateService.mutate({
+                            id: service.id,
+                            patch: { duration_minutes: value },
+                          });
                         }
                       }}
                     />
@@ -604,10 +697,14 @@ function AdminPage() {
                     }}
                   />
                   <div className="flex items-center gap-3 md:justify-end">
-                    <span className="text-xs text-muted-foreground">{service.active ? "Active" : "Inactive"}</span>
+                    <span className="text-xs text-muted-foreground">
+                      {service.active ? "Active" : "Inactive"}
+                    </span>
                     <Switch
                       checked={service.active}
-                      onCheckedChange={(value) => updateService.mutate({ id: service.id, patch: { active: value } })}
+                      onCheckedChange={(value) =>
+                        updateService.mutate({ id: service.id, patch: { active: value } })
+                      }
                     />
                     <Button
                       variant="ghost"
@@ -622,7 +719,9 @@ function AdminPage() {
               ))}
             </ul>
             {services.length === 0 && (
-              <p className="px-6 py-6 text-sm text-muted-foreground">Aucune prestation pour le moment.</p>
+              <p className="px-6 py-6 text-sm text-muted-foreground">
+                Aucune prestation pour le moment.
+              </p>
             )}
           </section>
         </TabsContent>
@@ -640,7 +739,9 @@ function AdminPage() {
                   id="shop-name"
                   value={shopForm.name}
                   maxLength={120}
-                  onChange={(event) => setShopForm((prev) => ({ ...prev, name: event.target.value }))}
+                  onChange={(event) =>
+                    setShopForm((prev) => ({ ...prev, name: event.target.value }))
+                  }
                 />
               </div>
               <div className="space-y-2">
@@ -649,7 +750,9 @@ function AdminPage() {
                   id="shop-phone"
                   value={shopForm.phone}
                   maxLength={40}
-                  onChange={(event) => setShopForm((prev) => ({ ...prev, phone: event.target.value }))}
+                  onChange={(event) =>
+                    setShopForm((prev) => ({ ...prev, phone: event.target.value }))
+                  }
                 />
               </div>
               <div className="space-y-2">
@@ -659,7 +762,9 @@ function AdminPage() {
                   type="email"
                   value={shopForm.email}
                   maxLength={160}
-                  onChange={(event) => setShopForm((prev) => ({ ...prev, email: event.target.value }))}
+                  onChange={(event) =>
+                    setShopForm((prev) => ({ ...prev, email: event.target.value }))
+                  }
                 />
               </div>
               <div className="space-y-2 sm:col-span-2">
@@ -668,7 +773,9 @@ function AdminPage() {
                   id="shop-address"
                   value={shopForm.address}
                   maxLength={300}
-                  onChange={(event) => setShopForm((prev) => ({ ...prev, address: event.target.value }))}
+                  onChange={(event) =>
+                    setShopForm((prev) => ({ ...prev, address: event.target.value }))
+                  }
                 />
               </div>
             </div>
@@ -686,8 +793,8 @@ function AdminPage() {
           <section className="surface-card p-6">
             <h2 className="text-base font-semibold text-ink">Inviter un employé</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              L'employé reçoit un e-mail d'invitation pour définir son mot de passe et rejoint automatiquement votre
-              boutique.
+              L'employé reçoit un e-mail d'invitation pour définir son mot de passe et rejoint
+              automatiquement votre boutique.
             </p>
             <div className="mt-4 grid gap-4 sm:grid-cols-[1fr_1fr_160px_auto] sm:items-end">
               <div className="space-y-2">
@@ -696,7 +803,9 @@ function AdminPage() {
                   id="invite-name"
                   value={inviteForm.fullName}
                   maxLength={120}
-                  onChange={(event) => setInviteForm((prev) => ({ ...prev, fullName: event.target.value }))}
+                  onChange={(event) =>
+                    setInviteForm((prev) => ({ ...prev, fullName: event.target.value }))
+                  }
                 />
               </div>
               <div className="space-y-2">
@@ -706,7 +815,9 @@ function AdminPage() {
                   type="email"
                   value={inviteForm.email}
                   maxLength={160}
-                  onChange={(event) => setInviteForm((prev) => ({ ...prev, email: event.target.value }))}
+                  onChange={(event) =>
+                    setInviteForm((prev) => ({ ...prev, email: event.target.value }))
+                  }
                 />
               </div>
               <div className="space-y-2">
@@ -716,7 +827,10 @@ function AdminPage() {
                   className="h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm"
                   value={inviteForm.role}
                   onChange={(event) =>
-                    setInviteForm((prev) => ({ ...prev, role: event.target.value as "admin" | "employee" }))
+                    setInviteForm((prev) => ({
+                      ...prev,
+                      role: event.target.value as "admin" | "employee",
+                    }))
                   }
                 >
                   <option value="employee">Employé</option>
@@ -725,7 +839,11 @@ function AdminPage() {
               </div>
               <Button
                 onClick={() => invite.mutate()}
-                disabled={!inviteForm.email.trim() || inviteForm.fullName.trim().length < 2 || invite.isPending}
+                disabled={
+                  !inviteForm.email.trim() ||
+                  inviteForm.fullName.trim().length < 2 ||
+                  invite.isPending
+                }
               >
                 <UserPlus className="size-4" />
                 Inviter
@@ -745,9 +863,13 @@ function AdminPage() {
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm font-medium text-ink">
                         {member.full_name}
-                        {isSelf && <span className="ml-2 text-xs text-muted-foreground">(vous)</span>}
+                        {isSelf && (
+                          <span className="ml-2 text-xs text-muted-foreground">(vous)</span>
+                        )}
                       </p>
-                      <p className="truncate text-xs text-muted-foreground">{member.email ?? "—"}</p>
+                      <p className="truncate text-xs text-muted-foreground">
+                        {member.email ?? "—"}
+                      </p>
                     </div>
                     <select
                       aria-label="Rôle"
@@ -755,7 +877,10 @@ function AdminPage() {
                       value={member.role}
                       disabled={isSelf || setRole.isPending}
                       onChange={(event) =>
-                        setRole.mutate({ memberId: member.id, role: event.target.value as "admin" | "employee" })
+                        setRole.mutate({
+                          memberId: member.id,
+                          role: event.target.value as "admin" | "employee",
+                        })
                       }
                     >
                       <option value="employee">Employé</option>
@@ -775,7 +900,9 @@ function AdminPage() {
               })}
             </ul>
             {members.length === 0 && (
-              <p className="px-6 py-6 text-sm text-muted-foreground">Aucun employé pour le moment.</p>
+              <p className="px-6 py-6 text-sm text-muted-foreground">
+                Aucun employé pour le moment.
+              </p>
             )}
           </section>
         </TabsContent>

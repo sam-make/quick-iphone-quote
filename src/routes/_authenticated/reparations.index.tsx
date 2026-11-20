@@ -8,7 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { StatusBadge } from "@/components/repairs/StatusBadge";
 import { ScanSearch } from "@/components/repairs/ScanSearch";
-import { customerName, formatDateTime, REPAIR_STATUSES, STATUS_LABELS, type RepairStatus } from "@/lib/repairs";
+import {
+  customerName,
+  formatDateTime,
+  REPAIR_STATUSES,
+  STATUS_LABELS,
+  type RepairStatus,
+} from "@/lib/repairs";
 import { formatEuro } from "@/lib/pricing";
 import { cn } from "@/lib/utils";
 
@@ -17,9 +23,15 @@ export const Route = createFileRoute("/_authenticated/reparations/")({
   head: () => ({
     meta: [
       { title: "Réparations — Trade-In Pro" },
-      { name: "description", content: "Suivez tous les dossiers de réparation de votre boutique en temps réel." },
+      {
+        name: "description",
+        content: "Suivez tous les dossiers de réparation de votre boutique en temps réel.",
+      },
       { property: "og:title", content: "Réparations — Trade-In Pro" },
-      { property: "og:description", content: "Statuts, clients, appareils et montants en un coup d'œil." },
+      {
+        property: "og:description",
+        content: "Statuts, clients, appareils et montants en un coup d'œil.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -50,7 +62,9 @@ function RepairsPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("repairs")
-        .select("id, reference, brand, model, status, total_price, created_at, employee_name, customers(first_name, last_name, phone)")
+        .select(
+          "id, reference, brand, model, status, total_price, created_at, employee_name, customers(first_name, last_name, phone)",
+        )
         .order("created_at", { ascending: false });
       if (error) throw error;
       return data as unknown as RepairRow[];
@@ -73,7 +87,9 @@ function RepairsPage() {
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold text-ink md:text-3xl">Réparations</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Tous les dossiers en cours et terminés de la boutique.</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Tous les dossiers en cours et terminés de la boutique.
+          </p>
         </div>
         <Button asChild>
           <Link to="/reparations/nouvelle">
@@ -117,7 +133,9 @@ function RepairsPage() {
         {isLoading ? (
           <p className="px-6 py-8 text-sm text-muted-foreground">Chargement…</p>
         ) : filtered.length === 0 ? (
-          <p className="px-6 py-10 text-center text-sm text-muted-foreground">Aucun dossier ne correspond.</p>
+          <p className="px-6 py-10 text-center text-sm text-muted-foreground">
+            Aucun dossier ne correspond.
+          </p>
         ) : (
           <ul className="divide-y divide-border">
             {filtered.map((repair, i) => (
@@ -136,7 +154,9 @@ function RepairsPage() {
                     {customerName(repair.customers)} · {repair.brand} {repair.model}
                   </span>
                   <StatusBadge status={repair.status} />
-                  <span className="ml-auto text-sm font-medium text-ink">{formatEuro(Number(repair.total_price))}</span>
+                  <span className="ml-auto text-sm font-medium text-ink">
+                    {formatEuro(Number(repair.total_price))}
+                  </span>
                   <span className="w-full text-xs text-muted-foreground">
                     {formatDateTime(repair.created_at)} · {repair.employee_name}
                   </span>

@@ -440,25 +440,29 @@ Je veux obtenir un logiciel professionnel destiné aux boutiques de réparation,
 
 L'application doit être intuitive, rapide, premium et suffisamment robuste pour être commercialisée sous forme d'abonnement SaaS auprès de plusieurs boutiques.
 
-This project was built with [Lovable](https://lovable.dev).
+## Architecture actuelle
 
-**Live app**: https://quick-iphone-quote.lovable.app
+- **GitHub** : dépôt source `sam-make/trade-in-pro`.
+- **Cloudflare Workers** : application TanStack Start exécutée côté serveur.
+- **Supabase** : comptes avec e-mail et mot de passe, base de données et droits par boutique.
+- Le développement n'utilise plus Lovable. Aucun déploiement sur la production n'est autorisé sans accord.
 
-## Build with Lovable
+Les modifications de la branche `migration-cloudflare` restent dans la [pull request n° 1](https://github.com/sam-make/trade-in-pro/pull/1) tant qu'elles ne sont pas validées.
 
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/381a2a77-9166-4c0a-9a21-37215e022f9d).
+## Développement local
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
-
-## Development
-
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+Installer [Bun](https://bun.sh/) (gestionnaire des paquets), puis :
 
 ```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
-npm run dev
+git clone https://github.com/sam-make/trade-in-pro.git
+cd quick-iphone-quote
+git switch migration-cloudflare
+bun install --frozen-lockfile
+bun run dev
 ```
+
+Créer localement un fichier `.dev.vars` avec les variables serveur nécessaires, **sans utiliser les clés de production et sans jamais envoyer ce fichier à GitHub**. Les noms de variables sont listés dans `.env.example`. La clé `SUPABASE_SERVICE_ROLE_KEY` ne doit jamais être visible par le navigateur.
+
+Pour contrôler le code : `bun run lint`, `bun run test`, `bun run build`. La vérification GitHub Actions exécute aussi un Worker localement avec une configuration fictive, sans contacter une vraie base de données.
+
+Lire `docs/ARCHITECTURE.md`, `AGENTS.md` et `NOTES.md` avant de modifier le projet.

@@ -66,7 +66,9 @@ export function resolveBasePrice(
 ): number {
   const exact = overrides.find((row) => row.color === color);
   const wildcard = overrides.find((row) => row.color === "*");
-  return Number(exact?.base_price ?? wildcard?.base_price ?? Number(catalogBasePrice) + storageStep(storageGb));
+  return Number(
+    exact?.base_price ?? wildcard?.base_price ?? Number(catalogBasePrice) + storageStep(storageGb),
+  );
 }
 
 export function computePrice(basePrice: number, rules: DeductionRule[]): PriceBreakdown {

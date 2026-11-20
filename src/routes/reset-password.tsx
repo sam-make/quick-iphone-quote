@@ -13,7 +13,10 @@ export const Route = createFileRoute("/reset-password")({
     meta: [
       { name: "robots", content: "noindex, follow" },
       { title: "Nouveau mot de passe — Trade-In Pro" },
-      { name: "description", content: "Définissez un nouveau mot de passe pour votre compte Trade-In Pro." },
+      {
+        name: "description",
+        content: "Définissez un nouveau mot de passe pour votre compte Trade-In Pro.",
+      },
       { property: "og:title", content: "Nouveau mot de passe — Trade-In Pro" },
       { property: "og:description", content: "Choisissez un nouveau mot de passe sécurisé." },
       { property: "og:type", content: "website" },
@@ -101,38 +104,42 @@ function ResetPasswordPage() {
           <p className="rounded-xl bg-secondary p-4 text-sm text-secondary-foreground">
             Ce lien de réinitialisation est expiré ou déjà utilisé. Demandez-en un nouveau.
           </p>
-          <Button className="w-full" size="lg" onClick={() => navigate({ to: "/mot-de-passe-oublie" })}>
+          <Button
+            className="w-full"
+            size="lg"
+            onClick={() => navigate({ to: "/mot-de-passe-oublie" })}
+          >
             Nouvelle demande
           </Button>
         </div>
       ) : (
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="password">Nouveau mot de passe</Label>
-          <Input
-            id="password"
-            type="password"
-            autoComplete="new-password"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            required
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="confirm">Confirmation</Label>
-          <Input
-            id="confirm"
-            type="password"
-            autoComplete="new-password"
-            value={confirm}
-            onChange={(event) => setConfirm(event.target.value)}
-            required
-          />
-        </div>
-        <Button type="submit" className="w-full" size="lg" disabled={submitting}>
-          {submitting ? "Enregistrement…" : "Mettre à jour"}
-        </Button>
-      </form>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="password">Nouveau mot de passe</Label>
+            <Input
+              id="password"
+              type="password"
+              autoComplete="new-password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              required
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="confirm">Confirmation</Label>
+            <Input
+              id="confirm"
+              type="password"
+              autoComplete="new-password"
+              value={confirm}
+              onChange={(event) => setConfirm(event.target.value)}
+              required
+            />
+          </div>
+          <Button type="submit" className="w-full" size="lg" disabled={submitting}>
+            {submitting ? "Enregistrement…" : "Mettre à jour"}
+          </Button>
+        </form>
       )}
     </AuthLayout>
   );

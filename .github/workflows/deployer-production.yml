@@ -1,0 +1,97 @@
+name: Déploiement manuel Trade-In Pro (production)
+on:
+  workflow_dispatch:
+    inputs:
+      validation:
+        description: "Tapez BASCULE_VALIDEE après vérification des comptes et synchronisation finale"
+        required: true
+        type: string
+permissions:
+  contents: read
+concurrency:
+  group: trade-in-pro-production
+  cancel-in-progress: false
+jobs:
+  deployer:
+    if: github.ref_name == 'main' && inputs.validation == 'BASCULE_VALIDEE'
+    environment: production
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+    steps:
+      - name: Récupérer le code validé
+        uses: actions/checkout@v4
+      - name: Installer Bun
+        uses: oven-sh/setup-bun@v2
+      - name: Vérifier la présence des clés de déploiement (sans les afficher)
+        shell: bash
+        run: |
+          set -euo pipefail
+          for var in CLOUDFLARE_API_TOKEN CLOUDFLARE_ACCOUNT_ID SUPABASE_URL SUPABASE_PUBLISHABLE_KEY SUPABASE_SERVICE_ROLE_KEY; do
+            if [ -z "${!var:-}" ]; then
+              echo "::error::Configuration manquante : $var"
+              exit 1
+            fi
+          done
+          case "$SUPABASE_URL" in
+            https://xuvaihwygkcwriqfnkbg.supabase.co) ;;
+            *) echo "::error::URL Supabase inattendue : production attendue"; exit 1;;
+          esac
+      - name: Installer les dépendances
+        run: bun install --frozen-lockfile --ignore-scripts
+      - name: Vérifier TypeScript, lint et tests
+        run: |
+          bunx tsc --noEmit
+          bun run lint
+          bun run test
+      - name: Compiler
+        run: bun run build
+      - name: Empêcher toute fuite de secret dans le navigateur
+        shell: bash
+        run: |
+          test -d dist/client
+          if grep -R --include='*.js' -F -q 'SUPABASE_SERVICE_ROLE_KEY' dist/client; then
+            echo "::error::Référence à la clé serveur détectée côté navigateur"
+            exit 1
+          fi
+          if grep -R --include='*.js' -F -q "$SUPABASE_SERVICE_ROLE_KEY" dist/client; then
+            echo "::error::Valeur de clé serveur détectée dans le bundle public"
+            exit 1
+          fi
+      - name: Tester le Worker sans déployer
+        run: bash scripts/smoke-worker-preview.sh
+      - name: Vérifier la prise en charge du déploiement atomique
+        shell: bash
+        run: |
+          set -euo pipefail
+          bunx wrangler deploy --help | grep -q -- '--secrets-file'
+      - name: Déployer le Worker et ses secrets ensemble
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Un seul déploiement inclut le code et les trois bindings.
+          # Aucun fichier contenant des secrets ne quitte le runner.
+          secrets_dir="$(mktemp -d "${RUNNER_TEMP}/tradein-secrets.XXXXXXXX")"
+          trap 'rm -f "$secrets_dir/secrets.json"; rmdir "$secrets_dir"' EXIT
+          python3 - "$secrets_dir/secrets.json" <<'PY'
+          import json
+          import os
+          import sys
+
+          keys = (
+              "SUPABASE_URL",
+              "SUPABASE_PUBLISHABLE_KEY",
+              "SUPABASE_SERVICE_ROLE_KEY",
+          )
+          os.umask(0o077)
+          with open(sys.argv[1], "w", encoding="utf-8") as output:
+              json.dump({key: os.environ[key] for key in keys}, output)
+          PY
+          bunx wrangler deploy --secrets-file "$secrets_dir/secrets.json"
+      - name: Déploiement terminé
+        run: |
+          echo "Worker trade-in-pro déployé. Vérifier la connexion et les parcours avant tout changement de domaine."

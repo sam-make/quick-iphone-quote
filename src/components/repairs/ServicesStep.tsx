@@ -3,7 +3,13 @@ import { Minus, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { formatDuration, lineTotal, totalsOf, type RepairLine, type RepairService } from "@/lib/repairs";
+import {
+  formatDuration,
+  lineTotal,
+  totalsOf,
+  type RepairLine,
+  type RepairService,
+} from "@/lib/repairs";
 import { formatEuro } from "@/lib/pricing";
 import { cn } from "@/lib/utils";
 
@@ -41,7 +47,9 @@ export function ServicesStep({
   const setQuantity = (index: number, delta: number) => {
     onChange(
       lines.map((line, i) =>
-        i === index ? { ...line, quantity: Math.min(50, Math.max(1, line.quantity + delta)) } : line,
+        i === index
+          ? { ...line, quantity: Math.min(50, Math.max(1, line.quantity + delta)) }
+          : line,
       ),
     );
   };
@@ -65,7 +73,8 @@ export function ServicesStep({
             >
               <span className="block text-sm font-medium text-ink">{service.name}</span>
               <span className="mt-1 block text-xs text-muted-foreground">
-                {formatEuro(Number(service.price))} · {formatDuration(Number(service.duration_minutes))}
+                {formatEuro(Number(service.price))} ·{" "}
+                {formatDuration(Number(service.duration_minutes))}
               </span>
             </button>
           );
@@ -126,18 +135,33 @@ export function ServicesStep({
         <div className="surface-card overflow-hidden">
           <ul className="divide-y divide-border">
             {lines.map((line, index) => (
-              <li key={`${line.serviceId ?? "custom"}-${index}`} className="flex flex-wrap items-center gap-3 px-5 py-3">
+              <li
+                key={`${line.serviceId ?? "custom"}-${index}`}
+                className="flex flex-wrap items-center gap-3 px-5 py-3"
+              >
                 <span className="text-sm font-medium text-ink">{line.name}</span>
                 <div className="ml-auto flex items-center gap-1">
-                  <Button variant="ghost" size="icon" aria-label="Retirer" onClick={() => setQuantity(index, -1)}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Retirer"
+                    onClick={() => setQuantity(index, -1)}
+                  >
                     <Minus className="size-4" />
                   </Button>
                   <span className="w-6 text-center text-sm">{line.quantity}</span>
-                  <Button variant="ghost" size="icon" aria-label="Ajouter" onClick={() => setQuantity(index, 1)}>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Ajouter"
+                    onClick={() => setQuantity(index, 1)}
+                  >
                     <Plus className="size-4" />
                   </Button>
                 </div>
-                <span className="w-20 text-right text-sm font-medium text-ink">{formatEuro(lineTotal(line))}</span>
+                <span className="w-20 text-right text-sm font-medium text-ink">
+                  {formatEuro(lineTotal(line))}
+                </span>
                 <Button
                   variant="ghost"
                   size="icon"
@@ -150,7 +174,9 @@ export function ServicesStep({
             ))}
           </ul>
           <div className="flex items-center justify-between border-t border-border bg-surface-2 px-5 py-3">
-            <span className="text-sm text-muted-foreground">Durée estimée : {formatDuration(totals.minutes)}</span>
+            <span className="text-sm text-muted-foreground">
+              Durée estimée : {formatDuration(totals.minutes)}
+            </span>
             <span className="text-lg font-semibold text-ink">{formatEuro(totals.price)}</span>
           </div>
         </div>

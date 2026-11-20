@@ -15,7 +15,10 @@ export const Route = createFileRoute("/_authenticated/clients/$id")({
   head: () => ({
     meta: [
       { title: "Fiche client — Trade-In Pro" },
-      { name: "description", content: "Coordonnées, appareils, réparations et factures d'un client." },
+      {
+        name: "description",
+        content: "Coordonnées, appareils, réparations et factures d'un client.",
+      },
       { property: "og:title", content: "Fiche client — Trade-In Pro" },
       { property: "og:description", content: "Tout l'historique du client en un seul écran." },
       { property: "og:type", content: "website" },
@@ -66,7 +69,14 @@ function CustomerPage() {
         .select("id, brand, model, color, storage, imei")
         .eq("customer_id", id)
         .order("created_at", { ascending: false });
-      return (data ?? []) as { id: string; brand: string; model: string; color: string | null; storage: string | null; imei: string | null }[];
+      return (data ?? []) as {
+        id: string;
+        brand: string;
+        model: string;
+        color: string | null;
+        storage: string | null;
+        imei: string | null;
+      }[];
     },
   });
 
@@ -100,7 +110,9 @@ function CustomerPage() {
           </p>
           {customer?.address && <p className="text-sm text-muted-foreground">{customer.address}</p>}
           {customer?.notes && (
-            <p className="mt-3 rounded-lg bg-surface-2 px-3 py-2 text-sm text-muted-foreground">{customer.notes}</p>
+            <p className="mt-3 rounded-lg bg-surface-2 px-3 py-2 text-sm text-muted-foreground">
+              {customer.notes}
+            </p>
           )}
         </div>
         <div className="flex gap-2">
@@ -127,7 +139,9 @@ function CustomerPage() {
         <TabsContent value="repairs">
           <section className="surface-card overflow-hidden">
             {repairs.length === 0 ? (
-              <p className="px-6 py-8 text-sm text-muted-foreground">Aucune réparation enregistrée.</p>
+              <p className="px-6 py-8 text-sm text-muted-foreground">
+                Aucune réparation enregistrée.
+              </p>
             ) : (
               <ul className="divide-y divide-border">
                 {repairs.map((repair) => (
@@ -142,8 +156,12 @@ function CustomerPage() {
                         {repair.brand} {repair.model}
                       </span>
                       <StatusBadge status={repair.status} />
-                      <span className="ml-auto text-sm font-medium text-ink">{formatEuro(Number(repair.total_price))}</span>
-                      <span className="w-full text-xs text-muted-foreground">{formatDateTime(repair.created_at)}</span>
+                      <span className="ml-auto text-sm font-medium text-ink">
+                        {formatEuro(Number(repair.total_price))}
+                      </span>
+                      <span className="w-full text-xs text-muted-foreground">
+                        {formatDateTime(repair.created_at)}
+                      </span>
                     </Link>
                   </li>
                 ))}
@@ -167,8 +185,12 @@ function CustomerPage() {
                     >
                       <FileText className="size-4 text-primary" />
                       <span className="text-sm font-medium text-ink">{invoice.number}</span>
-                      <span className="text-xs text-muted-foreground">{formatDateTime(invoice.issued_at)}</span>
-                      <span className="ml-auto text-sm font-medium text-ink">{formatEuro(Number(invoice.total))}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {formatDateTime(invoice.issued_at)}
+                      </span>
+                      <span className="ml-auto text-sm font-medium text-ink">
+                        {formatEuro(Number(invoice.total))}
+                      </span>
                     </Link>
                   </li>
                 ))}
@@ -192,7 +214,11 @@ function CustomerPage() {
                     <span className="text-xs text-muted-foreground">
                       {[device.color, device.storage].filter(Boolean).join(" · ")}
                     </span>
-                    {device.imei && <span className="ml-auto text-xs text-muted-foreground">IMEI {device.imei}</span>}
+                    {device.imei && (
+                      <span className="ml-auto text-xs text-muted-foreground">
+                        IMEI {device.imei}
+                      </span>
+                    )}
                   </li>
                 ))}
               </ul>

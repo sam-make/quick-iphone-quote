@@ -113,8 +113,17 @@ describe("public payload whitelist", () => {
     });
 
     expect(dto.reference).toBe("REP-2026-0001");
-    expect(dto.device).toEqual({ brand: "Apple", model: "iPhone 13", storage: "256 Go", color: "Noir" });
-    expect(dto.shop).toEqual({ name: "Boutique Test", address: "1 rue de la Paix", phone: "0102030405" });
+    expect(dto.device).toEqual({
+      brand: "Apple",
+      model: "iPhone 13",
+      storage: "256 Go",
+      color: "Noir",
+    });
+    expect(dto.shop).toEqual({
+      name: "Boutique Test",
+      address: "1 rue de la Paix",
+      phone: "0102030405",
+    });
 
     const serialized = JSON.stringify(dto);
     expect(serialized).not.toContain("356789104512345");
@@ -128,7 +137,14 @@ describe("public payload whitelist", () => {
 
   it("flags a cancelled repair without faking a timeline", () => {
     const dto = buildPublicTrackingDto({
-      repair: { reference: "REP-2026-0002", status: "annule", brand: "Apple", model: "iPhone 12", storage: null, color: null },
+      repair: {
+        reference: "REP-2026-0002",
+        status: "annule",
+        brand: "Apple",
+        model: "iPhone 12",
+        storage: null,
+        color: null,
+      },
       history: [
         { status: "recu", created_at: "2026-10-01T10:00:00Z" },
         { status: "annule", created_at: "2026-10-02T10:00:00Z" },

@@ -1,9 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/hooks/useAuthHook";
 import { supabase } from "@/integrations/supabase/client";
-import { useEffect, useRef } from "react";
-import { tiktokVideo } from "@/lib/tiktok-attribution";
 import {
   ArrowRight,
   Building2,
@@ -86,27 +84,6 @@ function Landing() {
     await supabase.auth.signOut();
     await navigate({ to: "/connexion", replace: true });
   }
-  const attributed = useRef(false);
-  useEffect(() => {
-    const video = tiktokVideo(window.location.search);
-    if (!video || attributed.current) return;
-    // The injected runtime can arrive after hydration. It handles consent itself.
-    const attribute = () => {
-      if (!window.__lovableEvents?.track || attributed.current) return false;
-      window.__lovableEvents?.track?.("project.tiktok_attribution", { video });
-      attributed.current = true;
-      return true;
-    };
-    if (attribute()) return;
-    const timer = window.setInterval(() => {
-      if (attribute()) window.clearInterval(timer);
-    }, 500);
-    const timeout = window.setTimeout(() => window.clearInterval(timer), 30000);
-    return () => {
-      window.clearInterval(timer);
-      window.clearTimeout(timeout);
-    };
-  }, []);
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-40 border-b border-border/70 bg-background/80 backdrop-blur-xl">
@@ -123,17 +100,21 @@ function Landing() {
           <div className="flex items-center gap-2">
             {session ? (
               <>
-                <Button asChild size="sm"><Link to="/tableau-de-bord">Ma boutique</Link></Button>
-                <Button variant="ghost" size="sm" onClick={signOut}>Déconnexion</Button>
+                <Button asChild size="sm">
+                  <Link to="/tableau-de-bord">Ma boutique</Link>
+                </Button>
+                <Button variant="ghost" size="sm" onClick={signOut}>
+                  Déconnexion
+                </Button>
               </>
             ) : (
               <>
-            <Button asChild variant="ghost" size="sm">
-              <Link to="/connexion">Se connecter</Link>
-            </Button>
-            <Button asChild size="sm">
-              <Link to="/inscription">Créer un compte</Link>
-            </Button>
+                <Button asChild variant="ghost" size="sm">
+                  <Link to="/connexion">Se connecter</Link>
+                </Button>
+                <Button asChild size="sm">
+                  <Link to="/inscription">Créer un compte</Link>
+                </Button>
               </>
             )}
           </div>
@@ -173,11 +154,18 @@ function Landing() {
                 </Link>
               </Button>
               <Button asChild size="lg" variant="outline">
-                {session ? <Link to="/tableau-de-bord">Ma boutique</Link> : <Link to="/connexion">Se connecter</Link>}
+                {session ? (
+                  <Link to="/tableau-de-bord">Ma boutique</Link>
+                ) : (
+                  <Link to="/connexion">Se connecter</Link>
+                )}
               </Button>
             </div>
 
-            <div className="animate-rise mx-auto mt-16 max-w-5xl" style={{ animationDelay: "380ms" }}>
+            <div
+              className="animate-rise mx-auto mt-16 max-w-5xl"
+              style={{ animationDelay: "380ms" }}
+            >
               <div className="surface-card overflow-hidden p-2 shadow-[var(--shadow-float)]">
                 <img
                   src={dashboardShot}
@@ -221,61 +209,61 @@ function Landing() {
         <section id="apercu" className="py-20">
           <div className="mx-auto grid max-w-6xl items-center gap-12 px-5 lg:grid-cols-2">
             <Reveal>
-            <div>
-              <h2 className="text-3xl font-semibold text-ink md:text-4xl">
-                Un diagnostic guidé, pas un formulaire.
-              </h2>
-              <p className="mt-4 text-muted-foreground">
-                Le vendeur parcourt l'état esthétique, les vérifications techniques puis les
-                blocages. Chaque critère coché applique immédiatement la déduction configurée par la
-                boutique.
-              </p>
-              <ul className="mt-8 space-y-4">
-                {[
-                  "Prix de base associé à la combinaison modèle + couleur + capacité",
-                  "Déductions appliquées en temps réel, sans rechargement",
-                  "Blocage automatique de la reprise en cas d'iCloud ou d'Activation Lock",
-                ].map((item) => (
-                  <li key={item} className="flex gap-3 text-sm text-foreground">
-                    <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
+              <div>
+                <h2 className="text-3xl font-semibold text-ink md:text-4xl">
+                  Un diagnostic guidé, pas un formulaire.
+                </h2>
+                <p className="mt-4 text-muted-foreground">
+                  Le vendeur parcourt l'état esthétique, les vérifications techniques puis les
+                  blocages. Chaque critère coché applique immédiatement la déduction configurée par
+                  la boutique.
+                </p>
+                <ul className="mt-8 space-y-4">
+                  {[
+                    "Prix de base associé à la combinaison modèle + couleur + capacité",
+                    "Déductions appliquées en temps réel, sans rechargement",
+                    "Blocage automatique de la reprise en cas d'iCloud ou d'Activation Lock",
+                  ].map((item) => (
+                    <li key={item} className="flex gap-3 text-sm text-foreground">
+                      <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             </Reveal>
             <Reveal delay={120}>
-            <div className="surface-card overflow-hidden p-2">
-              <img
-                src={estimationShot}
-                alt="Aperçu du module de diagnostic technique de Trade-In Pro"
-                loading="lazy"
-                width={1600}
-                height={1008}
+              <div className="surface-card overflow-hidden p-2">
+                <img
+                  src={estimationShot}
+                  alt="Aperçu du module de diagnostic technique de Trade-In Pro"
+                  loading="lazy"
+                  width={1600}
+                  height={1008}
                   className="w-full rounded-[calc(var(--radius-xl)-4px)]"
-              />
-            </div>
+                />
+              </div>
             </Reveal>
           </div>
         </section>
 
         <section className="px-5 pb-24">
           <Reveal>
-          <div className="mx-auto max-w-5xl rounded-3xl bg-[image:var(--gradient-primary)] px-8 py-14 text-center text-primary-foreground shadow-[var(--shadow-float)]">
-            <h2 className="text-3xl font-semibold md:text-4xl">
-              Prêt à fiabiliser vos reprises&nbsp;?
-            </h2>
-            <p className="mx-auto mt-4 max-w-xl text-primary-foreground/80">
-              Créez l'espace de votre boutique, importez vos règles de déduction et lancez votre
-              première estimation dans la foulée.
-            </p>
-            <Button asChild size="lg" variant="secondary" className="mt-8">
-              <Link to="/inscription">
-                Démarrer maintenant
-                <ArrowRight className="size-4" />
-              </Link>
-            </Button>
-          </div>
+            <div className="mx-auto max-w-5xl rounded-3xl bg-[image:var(--gradient-primary)] px-8 py-14 text-center text-primary-foreground shadow-[var(--shadow-float)]">
+              <h2 className="text-3xl font-semibold md:text-4xl">
+                Prêt à fiabiliser vos reprises&nbsp;?
+              </h2>
+              <p className="mx-auto mt-4 max-w-xl text-primary-foreground/80">
+                Créez l'espace de votre boutique, importez vos règles de déduction et lancez votre
+                première estimation dans la foulée.
+              </p>
+              <Button asChild size="lg" variant="secondary" className="mt-8">
+                <Link to="/inscription">
+                  Démarrer maintenant
+                  <ArrowRight className="size-4" />
+                </Link>
+              </Button>
+            </div>
           </Reveal>
         </section>
       </main>

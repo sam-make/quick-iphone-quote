@@ -1,0 +1,63 @@
+name: Vérifications de la pull request
+on:
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  verifier:
+    name: Installation, types, lint, tests et build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+      - name: Installer Bun
+        uses: oven-sh/setup-bun@v2
+      - name: Installer les paquets sans scripts tiers
+        id: install
+        run: bun install --frozen-lockfile --ignore-scripts
+      - name: Vérifier les types TypeScript
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: bunx tsc --noEmit
+      - name: Vérifier le lint
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: bun run lint
+      - name: Exécuter les tests
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: bun run test
+      - name: Préparer une configuration locale fictive pour le rendu serveur
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: |
+          cat > .dev.vars <<'EOF'
+          SUPABASE_URL="https://staging.example.invalid"
+          SUPABASE_PUBLISHABLE_KEY="sb_publishable_preview_dummy"
+          SUPABASE_SERVICE_ROLE_KEY="test_only_dummy_do_not_use"
+          EOF
+      - name: Compiler l'application
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: bun run build
+      - name: Bloquer toute référence à la clé serveur dans le bundle navigateur
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: |
+          test -d dist/client
+          if grep -R --include='*.js' -F -q 'SUPABASE_SERVICE_ROLE_KEY' dist/client; then
+            echo "Une référence à la clé serveur a été détectée côté navigateur."
+            exit 1
+          fi
+      - name: Vérifier le rendu réel du Worker sans déploiement
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: bash scripts/smoke-worker-preview.sh
+  secrets:
+    name: Vérifier les secrets des fichiers de la PR
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le code complet
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Rechercher des secrets
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+

@@ -32,7 +32,10 @@ export const Route = createFileRoute("/_authenticated/estimation")({
       { title: "Nouvelle estimation — Trade-In Pro" },
       { name: "description", content: "Estimez la reprise d'un iPhone en moins de deux minutes." },
       { property: "og:title", content: "Nouvelle estimation — Trade-In Pro" },
-      { property: "og:description", content: "Diagnostic guidé et prix de reprise calculé instantanément." },
+      {
+        property: "og:description",
+        content: "Diagnostic guidé et prix de reprise calculé instantanément.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -91,8 +94,15 @@ function EstimationPage() {
     queryKey: ["shop-prices", shopId],
     enabled: Boolean(shopId),
     queryFn: async () => {
-      const { data } = await supabase.from("shop_prices").select("model_id, color, storage_gb, base_price");
-      return (data ?? []) as { model_id: string; color: string; storage_gb: number; base_price: number }[];
+      const { data } = await supabase
+        .from("shop_prices")
+        .select("model_id, color, storage_gb, base_price");
+      return (data ?? []) as {
+        model_id: string;
+        color: string;
+        storage_gb: number;
+        base_price: number;
+      }[];
     },
   });
 
@@ -100,7 +110,9 @@ function EstimationPage() {
 
   const basePrice = useMemo(() => {
     if (!model || storage === null) return 0;
-    const overrides = prices.filter((row) => row.model_id === model.id && row.storage_gb === storage);
+    const overrides = prices.filter(
+      (row) => row.model_id === model.id && row.storage_gb === storage,
+    );
     return resolveBasePrice(model.base_price, storage, color, overrides);
   }, [model, storage, color, prices]);
 
@@ -144,7 +156,8 @@ function EstimationPage() {
         <div>
           <h1 className="text-2xl font-semibold text-ink md:text-3xl">Nouvelle estimation</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Sélectionnez l'appareil puis parcourez le diagnostic. Le prix se met à jour instantanément.
+            Sélectionnez l'appareil puis parcourez le diagnostic. Le prix se met à jour
+            instantanément.
           </p>
         </div>
 
@@ -233,7 +246,9 @@ function EstimationPage() {
         {grouped.map((group) => (
           <section key={group.category} className="surface-card p-6">
             <div className="flex items-center gap-2">
-              <h2 className="text-base font-semibold text-ink">{CATEGORY_LABELS[group.category as RuleCategory]}</h2>
+              <h2 className="text-base font-semibold text-ink">
+                {CATEGORY_LABELS[group.category as RuleCategory]}
+              </h2>
               {group.category === "blocage" && (
                 <Badge variant="destructive" className="gap-1">
                   <AlertTriangle className="size-3" /> Bloque la reprise

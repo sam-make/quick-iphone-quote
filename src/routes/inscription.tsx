@@ -15,10 +15,14 @@ export const Route = createFileRoute("/inscription")({
       { title: "Créer un espace boutique — Trade-In Pro" },
       {
         name: "description",
-        content: "Créez l'espace sécurisé de votre boutique de réparation et lancez vos estimations iPhone.",
+        content:
+          "Créez l'espace sécurisé de votre boutique de réparation et lancez vos estimations iPhone.",
       },
       { property: "og:title", content: "Créer un espace boutique — Trade-In Pro" },
-      { property: "og:description", content: "Ouvrez l'espace de votre boutique en moins d'une minute." },
+      {
+        property: "og:description",
+        content: "Ouvrez l'espace de votre boutique en moins d'une minute.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -147,7 +151,14 @@ function SignupPage() {
         </div>
         <div className="space-y-2">
           <Label htmlFor="email">Adresse e-mail</Label>
-          <Input id="email" type="email" autoComplete="email" value={form.email} onChange={update("email")} required />
+          <Input
+            id="email"
+            type="email"
+            autoComplete="email"
+            value={form.email}
+            onChange={update("email")}
+            required
+          />
         </div>
         <div className="space-y-2">
           <Label htmlFor="password">Mot de passe</Label>

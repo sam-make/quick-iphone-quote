@@ -11,7 +11,10 @@ export const Route = createFileRoute("/_authenticated/factures/$id")({
   head: () => ({
     meta: [
       { title: "Facture — Trade-In Pro" },
-      { name: "description", content: "Facture imprimable d'une réparation, avec détail des prestations." },
+      {
+        name: "description",
+        content: "Facture imprimable d'une réparation, avec détail des prestations.",
+      },
       { property: "og:title", content: "Facture — Trade-In Pro" },
       { property: "og:description", content: "Document de facturation généré par votre boutique." },
       { property: "og:type", content: "website" },
@@ -35,7 +38,9 @@ function InvoicePage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("invoices")
-        .select("id, number, total, issued_at, shop_snapshot, customer_snapshot, device_snapshot, lines, repair_id")
+        .select(
+          "id, number, total, issued_at, shop_snapshot, customer_snapshot, device_snapshot, lines, repair_id",
+        )
         .eq("id", id)
         .maybeSingle();
       if (error) throw error;
@@ -119,7 +124,9 @@ function InvoicePage() {
           </tbody>
         </table>
 
-        <p className="text-right text-lg font-semibold text-ink">Total {formatEuro(Number(invoice.total))}</p>
+        <p className="text-right text-lg font-semibold text-ink">
+          Total {formatEuro(Number(invoice.total))}
+        </p>
       </article>
     </div>
   );

@@ -91,7 +91,8 @@ export function totalsOf(lines: RepairLine[]) {
   return lines.reduce(
     (acc, line) => ({
       price: acc.price + lineTotal(line),
-      minutes: acc.minutes + Number(line.durationMinutes || 0) * Math.max(1, Number(line.quantity || 1)),
+      minutes:
+        acc.minutes + Number(line.durationMinutes || 0) * Math.max(1, Number(line.quantity || 1)),
     }),
     { price: 0, minutes: 0 },
   );
@@ -105,7 +106,9 @@ export function formatDuration(minutes: number): string {
   return m === 0 ? `${h} h` : `${h} h ${m}`;
 }
 
-export function customerName(customer: { first_name?: string | null; last_name?: string | null } | null | undefined) {
+export function customerName(
+  customer: { first_name?: string | null; last_name?: string | null } | null | undefined,
+) {
   if (!customer) return "—";
   return `${customer.first_name ?? ""} ${customer.last_name ?? ""}`.trim() || "Client";
 }
@@ -115,7 +118,9 @@ export function normalizePhone(phone: string): string {
 }
 
 export function formatDateTime(value: string): string {
-  return new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium", timeStyle: "short" }).format(new Date(value));
+  return new Intl.DateTimeFormat("fr-FR", { dateStyle: "medium", timeStyle: "short" }).format(
+    new Date(value),
+  );
 }
 
 /** Statuses after which a repair file is closed and can no longer change. */
@@ -135,9 +140,15 @@ export function canChangeStatus(
 ): { ok: true } | { ok: false; reason: string } {
   if (from === to) return { ok: false, reason: "Le dossier a déjà ce statut." };
   if (FINAL_STATUSES.includes(from))
-    return { ok: false, reason: `Dossier clôturé (${STATUS_LABELS[from]}) : statut non modifiable.` };
+    return {
+      ok: false,
+      reason: `Dossier clôturé (${STATUS_LABELS[from]}) : statut non modifiable.`,
+    };
   if (to === "restitue" && from !== "termine")
-    return { ok: false, reason: "Un appareil ne peut être restitué qu’après le statut « Terminé »." };
+    return {
+      ok: false,
+      reason: "Un appareil ne peut être restitué qu’après le statut « Terminé ».",
+    };
   if (to === "annule" && options.invoiced)
     return { ok: false, reason: "Impossible d’annuler une réparation déjà facturée." };
   return { ok: true };

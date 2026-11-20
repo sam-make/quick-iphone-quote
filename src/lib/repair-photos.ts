@@ -12,9 +12,16 @@ export async function uploadRepairPhotos(
 ): Promise<number> {
   let uploaded = 0;
   for (const file of files) {
-    const extension = file.name.split(".").pop()?.toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
+    const extension =
+      file.name
+        .split(".")
+        .pop()
+        ?.toLowerCase()
+        .replace(/[^a-z0-9]/g, "") || "jpg";
     const path = `${shopId}/${repairId}/${phase}-${crypto.randomUUID()}.${extension}`;
-    const { error } = await supabase.storage.from(PHOTO_BUCKET).upload(path, file, { upsert: false });
+    const { error } = await supabase.storage
+      .from(PHOTO_BUCKET)
+      .upload(path, file, { upsert: false });
     if (error) continue;
     const { error: rowError } = await supabase
       .from("repair_photos")

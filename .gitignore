@@ -18,7 +18,7 @@ dist-ssr
 
 # Wrangler / Cloudflare
 .wrangler/
-.dev.vars
+.dev.vars*
 
 # Editor directories and files
 .vscode/*
@@ -30,3 +30,15 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Ne jamais suivre les environnements privés
+.env*
+!.env.example
+
+# Confidential: private database exports and authentication records
+trade-in-pro-public-export.sql
+trade-in-pro-export-lisez-moi.txt
+*auth-users*.csv
+*auth-identities*.csv
+*.backup
+*.dump

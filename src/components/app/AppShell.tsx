@@ -4,7 +4,19 @@ import { useServerFn } from "@tanstack/react-start";
 import { ownerAccess } from "@/lib/super-admin.functions";
 import { useEffect, useState, type ReactNode } from "react";
 import { recordShopPresence } from "@/lib/owner-analytics.functions";
-import { AlertTriangle, Gauge, Loader2, History, LogOut, Menu, Settings, Sparkles, Users, Wrench, X } from "lucide-react";
+import {
+  AlertTriangle,
+  Gauge,
+  Loader2,
+  History,
+  LogOut,
+  Menu,
+  Settings,
+  Sparkles,
+  Users,
+  Wrench,
+  X,
+} from "lucide-react";
 import { Logo } from "@/components/brand/Logo";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,7 +36,12 @@ const NAV = [
 export function AppShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const { data: workspace, isLoading: workspaceLoading, isError: workspaceError, refetch } = useWorkspace();
+  const {
+    data: workspace,
+    isLoading: workspaceLoading,
+    isError: workspaceError,
+    refetch,
+  } = useWorkspace();
   const pathname = useRouterState({ select: (state) => state.location.pathname });
   const [open, setOpen] = useState(false);
   const ownerFn = useServerFn(ownerAccess);
@@ -39,7 +56,10 @@ export function AppShell({ children }: { children: ReactNode }) {
     record();
     const interval = window.setInterval(record, 300_000);
     document.addEventListener("visibilitychange", record);
-    return () => { window.clearInterval(interval); document.removeEventListener("visibilitychange", record); };
+    return () => {
+      window.clearInterval(interval);
+      document.removeEventListener("visibilitychange", record);
+    };
   }, [presenceFn, presenceShopId]);
 
   async function handleSignOut() {
@@ -52,7 +72,9 @@ export function AppShell({ children }: { children: ReactNode }) {
   // Admin link stays visible (as a loading placeholder) until the role is known,
   // so a slow or failed workspace load never silently hides it.
   const roleKnown = Boolean(workspace);
-  const items = NAV.filter((item) => !("adminOnly" in item && item.adminOnly) || !roleKnown || workspace?.role === "admin");
+  const items = NAV.filter(
+    (item) => !("adminOnly" in item && item.adminOnly) || !roleKnown || workspace?.role === "admin",
+  );
 
   const nav = (
     <nav className="flex flex-col gap-1">
@@ -73,12 +95,27 @@ export function AppShell({ children }: { children: ReactNode }) {
             <item.icon className={cn("size-4", active && "text-primary")} />
             {item.label}
             {"adminOnly" in item && item.adminOnly && workspaceLoading && (
-              <Loader2 className="ml-auto size-3.5 animate-spin text-muted-foreground" aria-label="Chargement du rôle" />
+              <Loader2
+                className="ml-auto size-3.5 animate-spin text-muted-foreground"
+                aria-label="Chargement du rôle"
+              />
             )}
           </Link>
         );
       })}
-      {owner.data === true && <Link to="/admin" onClick={() => setOpen(false)} className={cn("flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium", pathname === "/admin" ? "bg-surface text-ink" : "text-muted-foreground")}><Settings className="size-4 text-primary" />Super Administration</Link>}
+      {owner.data === true && (
+        <Link
+          to="/admin"
+          onClick={() => setOpen(false)}
+          className={cn(
+            "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium",
+            pathname === "/admin" ? "bg-surface text-ink" : "text-muted-foreground",
+          )}
+        >
+          <Settings className="size-4 text-primary" />
+          Super Administration
+        </Link>
+      )}
     </nav>
   );
 
@@ -92,7 +129,12 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="rounded-xl border border-border bg-surface p-3">
           <p className="truncate text-sm font-medium text-ink">{workspace?.shop.name ?? "…"}</p>
           <p className="truncate text-xs text-muted-foreground">{workspace?.profile.full_name}</p>
-          <Button variant="ghost" size="sm" className="mt-2 w-full justify-start" onClick={handleSignOut}>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="mt-2 w-full justify-start"
+            onClick={handleSignOut}
+          >
             <LogOut className="size-4" />
             Déconnexion
           </Button>
@@ -126,7 +168,12 @@ export function AppShell({ children }: { children: ReactNode }) {
         {open && (
           <div className="animate-fade-up border-b border-border/70 bg-surface-2 px-4 py-4 lg:hidden">
             {nav}
-            <Button variant="ghost" size="sm" className="mt-2 w-full justify-start" onClick={handleSignOut}>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="mt-2 w-full justify-start"
+              onClick={handleSignOut}
+            >
               <LogOut className="size-4" />
               Déconnexion
             </Button>
@@ -134,9 +181,14 @@ export function AppShell({ children }: { children: ReactNode }) {
         )}
 
         {workspaceError && (
-          <div role="alert" className="flex flex-wrap items-center gap-3 border-b border-destructive/30 bg-destructive/10 px-5 py-3 text-sm text-destructive lg:px-8">
+          <div
+            role="alert"
+            className="flex flex-wrap items-center gap-3 border-b border-destructive/30 bg-destructive/10 px-5 py-3 text-sm text-destructive lg:px-8"
+          >
             <AlertTriangle className="size-4" />
-            <span className="flex-1">Impossible de charger votre boutique. Certaines rubriques peuvent être indisponibles.</span>
+            <span className="flex-1">
+              Impossible de charger votre boutique. Certaines rubriques peuvent être indisponibles.
+            </span>
             <Button size="sm" variant="outline" onClick={() => refetch()}>
               Réessayer
             </Button>

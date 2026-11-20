@@ -14,9 +14,15 @@ export const Route = createFileRoute("/_authenticated/clients/")({
   head: () => ({
     meta: [
       { title: "Clients — Trade-In Pro" },
-      { name: "description", content: "Gérez vos clients, leurs appareils, leurs réparations et leurs factures." },
+      {
+        name: "description",
+        content: "Gérez vos clients, leurs appareils, leurs réparations et leurs factures.",
+      },
       { property: "og:title", content: "Clients — Trade-In Pro" },
-      { property: "og:description", content: "Fiches clients, historique de réparations et factures archivées." },
+      {
+        property: "og:description",
+        content: "Fiches clients, historique de réparations et factures archivées.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -38,7 +44,11 @@ function ClientsPage() {
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
 
-  const { data: customers = [], isLoading, refetch } = useQuery({
+  const {
+    data: customers = [],
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ["customers", workspace?.shop.id],
     enabled: Boolean(workspace?.shop.id),
     queryFn: async () => {
@@ -118,7 +128,9 @@ function ClientsPage() {
                     <UserRound className="size-4" />
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-medium text-ink">{customerName(customer)}</span>
+                    <span className="block truncate text-sm font-medium text-ink">
+                      {customerName(customer)}
+                    </span>
                     <span className="block truncate text-xs text-muted-foreground">
                       {customer.phone}
                       {customer.email ? ` · ${customer.email}` : ""}

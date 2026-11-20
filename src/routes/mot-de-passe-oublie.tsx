@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
+import { requestPasswordReset } from "@/lib/password-recovery";
 
 export const Route = createFileRoute("/mot-de-passe-oublie")({
   staticData: { sitemap: false },
@@ -14,7 +15,10 @@ export const Route = createFileRoute("/mot-de-passe-oublie")({
     meta: [
       { name: "robots", content: "noindex, follow" },
       { title: "Mot de passe oublié — Trade-In Pro" },
-      { name: "description", content: "Recevez un lien sécurisé pour réinitialiser votre mot de passe Trade-In Pro." },
+      {
+        name: "description",
+        content: "Recevez un lien sécurisé pour réinitialiser votre mot de passe Trade-In Pro.",
+      },
       { property: "og:title", content: "Mot de passe oublié — Trade-In Pro" },
       { property: "og:description", content: "Réinitialisez l'accès à votre espace boutique." },
       { property: "og:type", content: "website" },
@@ -37,10 +41,20 @@ function ForgotPasswordPage() {
       return;
     }
     setSubmitting(true);
-    await supabase.auth.resetPasswordForEmail(parsed.data, {
-      redirectTo: `${window.location.origin}/reset-password`,
-    });
+    const result = await requestPasswordReset(
+      (address, options) => supabase.auth.resetPasswordForEmail(address, options),
+      parsed.data,
+      `${window.location.origin}/reset-password`,
+    );
     setSubmitting(false);
+    if (!result.ok) {
+      toast.error(
+        result.reason === "rate_limit"
+          ? "Trop de demandes. Réessayez dans quelques minutes."
+          : "Impossible d'envoyer l'e-mail pour le moment. Réessayez plus tard.",
+      );
+      return;
+    }
     setSent(true);
   }
 

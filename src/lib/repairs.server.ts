@@ -389,7 +389,11 @@ export async function generateInvoiceFor(
   if (invoiceError) {
     // Unique repair_id: a concurrent request already created the invoice.
     if (invoiceError.code === "23505") {
-      const { data: again } = await supabase.from("invoices").select("id").eq("repair_id", repairId).maybeSingle();
+      const { data: again } = await supabase
+        .from("invoices")
+        .select("id")
+        .eq("repair_id", repairId)
+        .maybeSingle();
       if (again) return { id: again.id as string, existed: true };
     }
     throw new Error(invoiceError.message);
@@ -423,11 +427,7 @@ export async function getPublicTrackingFor(
       .select("status, created_at")
       .eq("repair_id", repair.id)
       .order("created_at", { ascending: true }),
-    admin
-      .from("shops")
-      .select("name, address, phone")
-      .eq("id", repair.shop_id)
-      .maybeSingle(),
+    admin.from("shops").select("name, address, phone").eq("id", repair.shop_id).maybeSingle(),
   ]);
 
   return buildPublicTrackingDto({
