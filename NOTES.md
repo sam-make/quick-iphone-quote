@@ -134,3 +134,11 @@ Aucune variable `SUPABASE_SERVICE_ROLE_KEY` relevée dans les trois fichiers d'e
 - Nouveau contrôle GitHub Actions non déployant : `.github/workflows/agents-preflight.yml` et `scripts/check-agent-contract.py`.
 - Tableau de dépendances et GO/NO-GO : `docs/AGENTS_PRODUCTION.md`. Les agents définis ne sont pas des processus déjà démarrés : ils s'activent en session Codex.
 - État : PR n°1 en brouillon. Les 24 tables et 17 utilisateurs sont restaurés, mais connexion réelle, données finales et Worker Cloudflare public **non validés**.
+
+## Lancement manuel du sprint agents — 20/11/2026
+- Le sprint de préparation `Automation_b5eb05ac5a8881918c0ecfaa10de05b9` a été déclenché manuellement par `run_now`; l'exécution a été effectuée **dans le chat courant** (retour `inline_run`), et non par six processus Codex permanents. Les séances horaires déjà planifiées restent séparées.
+- Configuration des six rôles Codex lue et validée dans `.codex/agents`. Aucun sous-agent Codex autonome n'a été lancé par cette interface : elle ne dispose pas du mécanisme de délégation Codex.
+- CI du commit `e0310d4aaf2ea2f866c58ac2400c8362cea64082` : `Agents Codex - contrôle de préparation` et `Vérifications de la pull request` **SUCCÈS** (runs 44752285588 et 44752285573).
+- Audit live **lecture seule** : 24/24 tables métier et 538/538 lignes, empreintes identiques ; `auth.identities` identique (17 comptes). `auth.users` même nombre 17 avec jetons temporaires différents ; ne pas réimporter.
+- Supabase sécurité : 1 INFO (`rls_enabled_no_policy`), 3 WARN (deux catégories `SECURITY DEFINER` exposées et protection contre les mots de passe compromis désactivée). Risques consignés dans issue #3 ; dérive données issue #4.
+- Cloudflare non déployé, PR #1 non fusionnée. P0 encore ouverts : vraie reconnexion des utilisateurs, test métier navigateur, examen des privilèges, delta Lovable final et GO/NO-GO.
