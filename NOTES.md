@@ -109,3 +109,13 @@ Aucune variable `SUPABASE_SERVICE_ROLE_KEY` relevée dans les trois fichiers d'e
 - `repair-photos` : 0 fichier ; `repair_photos` : 0 ligne au contrôle. Inventaire à revalider à la bascule.
 - Aucun changement Supabase, Cloudflare ou production. Aucune fusion. Le projet Supabase de production destinataire reste à choisir/créer avec accord sur l'organisation et le coût éventuel.
 - [Plan et audit en lecture seule](docs/MIGRATION_PRODUCTION.md). Ne pas utiliser la base staging ni écraser le projet Supabase préexistant. La PR 1 reste en brouillon.
+
+## Restauration Supabase production — 20/11/2026
+- Nouveau projet **`trade-in-pro-production`** : `xuvaihwygkcwriqfnkbg`, région Paris, `ACTIVE_HEALTHY`.
+- Source Lovable inchangée. Les **17** utilisateurs Auth et **17** identités email ont été transférés avec UUID et hachages identiques, sans exporter de secrets vers GitHub. Les **24** tables publiques / **538** lignes de l'instantané source ont été restaurées et comparées par empreinte des données : **24/24 identiques**.
+- **61 politiques RLS**, **24 tables RLS**, **18 déclencheurs** et **4 politiques Storage** pour le compartiment privé `repair-photos` recréés. Aucun fichier photo actif dans la source au contrôle.
+- Tests SQL de cloisonnement : rôle anonyme 0 ligne visible ; compte boutique isolé ; propriétaire super-admin reconnu, autre membre non propriétaire ; 0 référence orpheline Auth/profils/rôles.
+- Audit Supabase : fonctions `SECURITY DEFINER` exposées et protection anti-mot-de-passe-compromis à examiner avant publication.
+- Configuration Wrangler du Worker modifiée **sur la branche PR uniquement** de `trade-in-pro-staging` à `trade-in-pro`. Aucune publication du Worker de production ni connexion Cloudflare à la nouvelle base à ce stade.
+- Blocage de lancement : **vérification réelle de connexion depuis le navigateur, configuration des secrets Worker, et synchronisation finale après gel des écritures Lovable**.
+- Aucun SQL métier privé ni données Auth publiés dans le dépôt. La PR reste en brouillon.
