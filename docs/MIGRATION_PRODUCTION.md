@@ -109,3 +109,9 @@ Les contrôles ont été réalisés en lecture seule sur la **source Lovable** e
 4. Préparer les variables Worker de production (clé publiable côté client, secrets strictement serveur), vérifier les domaines et URLs de callback.
 5. Prévoir la synchronisation finale si des écritures surviennent sur Lovable après l'audit, puis préparer un plan de retour arrière testé.
 6. Faire approuver et exécuter le déploiement public seulement après le feu vert des tests.
+
+## Garde complémentaire de déploiement — 20/11/2026
+
+Un audit du workflow a identifié que l'ancien ordre `wrangler deploy` puis `wrangler secret put` déployait des versions intermédiaires avec des secrets absents ou périmés. Correction préparée sur la PR #1 : `wrangler deploy --secrets-file` regroupe les 3 bindings et le code en un seul déploiement. Wrangler vérifie `secrets.required` dans `wrangler.jsonc`. Le fichier temporaire est généré uniquement dans le runner GitHub et supprimé. **Aucune bascule ni configuration réelle effectuée.**
+
+Le parcours « mot de passe oublié » ne confirme plus l'envoi si l'API répond en erreur ; quatre tests unitaires couvrent réussite, erreur, limitation et panne réseau. Le vrai envoi Supabase Auth doit être validé séparément.

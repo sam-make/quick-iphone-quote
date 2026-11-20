@@ -31,6 +31,7 @@ jobs:
           cat > .dev.vars <<'EOF'
           SUPABASE_URL="https://staging.example.invalid"
           SUPABASE_PUBLISHABLE_KEY="sb_publishable_preview_dummy"
+          SUPABASE_SERVICE_ROLE_KEY="test_only_dummy_do_not_use"
           EOF
       - name: Compiler l'application
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}

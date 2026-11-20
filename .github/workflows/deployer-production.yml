@@ -64,15 +64,34 @@ jobs:
           fi
       - name: Tester le Worker sans déployer
         run: bash scripts/smoke-worker-preview.sh
-      - name: Déployer le Worker sur Cloudflare
-        run: bunx wrangler deploy
-      - name: Installer les variables protégées du Worker
+      - name: Vérifier la prise en charge du déploiement atomique
         shell: bash
         run: |
           set -euo pipefail
-          printf '%s' "$SUPABASE_URL" | bunx wrangler secret put SUPABASE_URL
-          printf '%s' "$SUPABASE_PUBLISHABLE_KEY" | bunx wrangler secret put SUPABASE_PUBLISHABLE_KEY
-          printf '%s' "$SUPABASE_SERVICE_ROLE_KEY" | bunx wrangler secret put SUPABASE_SERVICE_ROLE_KEY
+          bunx wrangler deploy --help | grep -q -- '--secrets-file'
+      - name: Déployer le Worker et ses secrets ensemble
+        shell: bash
+        run: |
+          set -euo pipefail
+          # Un seul déploiement inclut le code et les trois bindings.
+          # Aucun fichier contenant des secrets ne quitte le runner.
+          secrets_dir="$(mktemp -d "${RUNNER_TEMP}/tradein-secrets.XXXXXXXX")"
+          trap 'rm -f "$secrets_dir/secrets.json"; rmdir "$secrets_dir"' EXIT
+          python3 - "$secrets_dir/secrets.json" <<'PY'
+          import json
+          import os
+          import sys
+
+          keys = (
+              "SUPABASE_URL",
+              "SUPABASE_PUBLISHABLE_KEY",
+              "SUPABASE_SERVICE_ROLE_KEY",
+          )
+          os.umask(0o077)
+          with open(sys.argv[1], "w", encoding="utf-8") as output:
+              json.dump({key: os.environ[key] for key in keys}, output)
+          PY
+          bunx wrangler deploy --secrets-file "$secrets_dir/secrets.json"
       - name: Déploiement terminé
         run: |
           echo "Worker trade-in-pro déployé. Vérifier la connexion et les parcours avant tout changement de domaine."

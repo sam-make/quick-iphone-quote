@@ -43,6 +43,13 @@ for token in ("workflow_dispatch:", "BASCULE_VALIDEE", "github.ref_name == 'main
 
 wrangler = json.loads((ROOT / "wrangler.jsonc").read_text(encoding="utf-8"))
 require(wrangler.get("name") == "trade-in-pro", "Worker cible inattendu")
+require("secrets" in wrangler and set(wrangler["secrets"].get("required", [])) == {
+    "SUPABASE_URL", "SUPABASE_PUBLISHABLE_KEY", "SUPABASE_SERVICE_ROLE_KEY",
+}, "Secrets Worker obligatoires non déclarés")
+require("wrangler deploy --secrets-file" in workflow,
+        "Déploiement atomique code + secrets absent")
+require("wrangler secret put" not in workflow,
+        "Déploiement différé des secrets interdit")
 
 if problems:
     for message in problems:
