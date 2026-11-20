@@ -50,3 +50,17 @@ Le coordinateur principal est le Codex qui reçoit la tâche; il consolide les a
 > Travaille sur `migration-cloudflare`. Lance en parallèle les six sous-agents définis dans `.codex/agents/` et attends leurs rapports. Consolide les constats P0/P1, corrige uniquement les points pouvant être testés sans toucher au site Lovable ni aux comptes des boutiques. Exécute les tests, actualise NOTES.md et conserve la PR 1 en brouillon. Aucun déploiement public ni changement irréversible sans nouveau feu vert.
 
 Ne pas utiliser `--yolo` et ne pas croire qu'une instruction écrite dans le TOML crée à elle seule une restriction d'autorisation : les permissions réelles viennent de la session parent et des contrôles de CI.
+
+## Revue ciblée des privilèges Supabase — 20 novembre 2026, séance 16 h 30
+
+Contrôles **en lecture seule** sur la destination autonome `xuvaihwygkcwriqfnkbg` ; aucune migration SQL appliquée. L'alerte du Security Advisor est **confirmée** : 1 INFO (`rls_enabled_no_policy`) et 3 WARN (`anon_security_definer_function_executable`, `authenticated_security_definer_function_executable`, `auth_leaked_password_protection`). [Linter Supabase : fonctions accessibles aux anonymes](https://supabase.com/docs/guides/database/database-linter?lint=0028_anon_security_definer_function_executable).
+
+Inventaire via `pg_proc`, `pg_namespace` et `has_function_privilege` : **12 fonctions `public` SECURITY DEFINER**, dont 10 exécutables par `anon` et `authenticated` ; `seed_default_rules(uuid)` et `seed_default_services(uuid)` sont déjà interdites à ces deux rôles. Les 10 autres comprennent `business_access_allowed`, `capture_shop_activity`, `current_shop_id`, `guard_member_access`, `has_role`, `is_super_admin`, `next_shop_reference`, `owner_analytics`, `record_shop_presence`, `super_admin_mutate`.
+
+Analyse de code SQL vérifiée : `owner_analytics` et `super_admin_mutate` appellent `is_super_admin()` avant de lire/modifier des données. `next_shop_reference` dérive la boutique de `current_shop_id()` et refuse une boutique absente ; `record_shop_presence` exige un utilisateur, une boutique et un rôle. **Cela ne prouve pas** l'absence de contournement RLS : il faut des tests d'exécution avec JWT contrôlés et l'analyse des appels de chaque fonction.
+
+**Risque P1 à examiner :** `has_role(_user_id uuid, _role app_role)` vérifie le rôle de l'identifiant fourni, sans comparer explicitement `_user_id` à `auth.uid()`. La fonction renvoie un booléen et ne livre pas directement les lignes métier, mais son exposition `anon` mérite un test d'énumération et une revue de ses dépendances RLS avant tout REVOKE. Ne pas modifier sa sémantique à l'aveugle.
+
+**Actions sûres proposées :** inventorier les références de chaque fonction dans les politiques RLS, les triggers et le frontend ; identifier les RPC publiques nécessaires ; tester `anon`, deux boutiques et le super-admin avec des identités de test ; ensuite préparer une migration datée limitant uniquement les `EXECUTE` inutiles, revue par sécurité et QA. Ne pas appliquer de REVOKE à la base actuelle sans validation.
+
+**État GO/NO-GO : sécurité = PARTIEL / NO-GO.** Le succès des tests CI prouve la compilation et les contrôles statiques, pas la sécurité d'une connexion réelle. Le test Auth historique, le navigateur mobile, le delta Lovable final et la validation explicite restent obligatoires.
