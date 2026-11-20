@@ -3,7 +3,7 @@ on:
   pull_request:
     branches: [main]
 permissions:
-  contents: write
+  contents: read
 jobs:
   verifier:
     name: Installation, types, lint, tests et build
@@ -41,31 +41,3 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  corriger_format:
-    name: Correction automatique unique du formatage
-    if: ${{ github.event.pull_request.head.repo.full_name == github.repository && github.event.pull_request.head.ref == 'migration-cloudflare' }}
-    runs-on: ubuntu-latest
-    steps:
-      - name: Ouvrir explicitement la branche de travail
-        uses: actions/checkout@v4
-        with:
-          ref: migration-cloudflare
-          persist-credentials: true
-      - name: Installer Bun
-        uses: oven-sh/setup-bun@v2
-      - name: Installer les dépendances sans scripts tiers
-        run: bun install --ignore-scripts
-      - name: Corriger les erreurs réparables automatiquement
-        run: bunx eslint . --fix
-        continue-on-error: true
-      - name: Conserver seulement les changements de code source
-        run: |
-          git add -u -- '*.ts' '*.tsx' '*.js'
-          if git diff --cached --quiet; then
-            echo "Aucune correction automatique à enregistrer."
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "style: corrections automatiques ESLint et Prettier"
-          git push origin HEAD:refs/heads/migration-cloudflare
