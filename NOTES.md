@@ -149,3 +149,10 @@ Aucune variable `SUPABASE_SERVICE_ROLE_KEY` relevée dans les trois fichiers d'e
 - Supabase Security Advisor inchangé : 1 INFO et 3 WARN. Inventaire, remédiations prudentes et GO/NO-GO consignés dans `docs/AGENTS_PRODUCTION.md` et issue #4.
 - Les deux GitHub Actions du commit `972d11e3` ont réussi. Nouvelle CI attendue après ce commit de documentation.
 - Aucun changement SQL ni production, aucun compte client touché. Auth réelle, RLS multi-boutiques sous JWT et parcours navigateur restent NON VÉRIFIÉS. Sous-agents Codex non exécutables directement par cette session ; audits réalisés avec les connecteurs.
+
+## Relance à la demande — 20/11/2026, vers 17 h (Europe/Amsterdam)
+- Automatisation du sprint vérifiée **activée** : exécution de 16 h 30 terminée, prochaine séance prévue à 17 h 30 ; déclenchement immédiat `run_now` accepté avec retour `inline_run` (travail dans la conversation, pas six processus indépendants).
+- Lecture effective sur `migration-cloudflare` de `AGENTS.md`, `NOTES.md`, `docs/AGENTS_PRODUCTION.md`, `.codex/config.toml`, des six fichiers `.codex/agents/*.toml`, de la PR #1 et des tickets #2 à #7.
+- Vérification factuelle : `.codex/config.toml` autorise jusqu'à six threads **par session Codex** ; cette conversation n'a pas de mécanisme de lancement de sous-agents Codex. Aucun thread autonome n'est donc confirmé en cours.
+- Responsabilités conservées : `security_auditor` (#3), `data_migration` (#4), `auth_specialist` (#2), `qa_engineer` (#5), `repairer_ux` (#7), `release_engineer` (#6).
+- Décision : **NO-GO** inchangé. Auth réelle, tests RLS sous JWT, parcours mobile, synchronisation delta Lovable et préproduction indépendante restent à prouver. Aucun déploiement, SQL, paiement, compte réel ni donnée client modifiés ; tâche quotidienne inchangée.
