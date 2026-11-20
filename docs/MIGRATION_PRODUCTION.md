@@ -87,3 +87,25 @@ Références techniques :
 - Les deux fonctions de peuplement `seed_default_rules(uuid)` et `seed_default_services(uuid)` sont désormais **interdites aux rôles anonymes et authentifiés** ; `service_role` reste autorisé. Cette restriction est cohérente avec le code serveur et les migrations SQL.
 - Derniers tests de cloisonnement : visiteur `anon` sans données ; membre d'une boutique limité à sa boutique ; rôle propriétaire vérifié. Aucun test réel de connexion utilisateur avec mot de passe n'a encore été exécuté depuis un navigateur.
 - **Avant exécution du workflow**, geler brièvement les écritures de Lovable et refaire la comparaison complète, rattraper les nouvelles données et seulement ensuite ouvrir le domaine Cloudflare. Il est dangereux d'écrire simultanément dans les deux bases, car il n'y a pas de synchronisation en continu.
+
+## Audit après restauration constatée — 20/11/2026
+
+Les contrôles ont été réalisés en lecture seule sur la **source Lovable** et la cible `xuvaihwygkcwriqfnkbg`, sauf le test transactionnel RLS (simulation de JWT avec `ROLLBACK`), qui n'a conservé aucune écriture.
+
+- **Données** : 24/24 tables avec le même nombre d'enregistrements **et la même empreinte du contenu de chaque ligne** (agrégation ordonnée des hachages des lignes JSONB). Cela comprend 14 boutiques, 11 profils, 8 clients, 9 estimations, 14 réparations et 10 factures.
+- **Auth** : 17/17 utilisateurs et 17/17 identités ; UUID des utilisateurs, e-mails et hachages de mots de passe identiques. Trois champs de jetons d'authentification temporaires diffèrent ; aucun contenu sensible journalisé.
+- **Intégrité de schéma** : 24 tables, 24 avec RLS ; 61 politiques, 17 fonctions, 18 triggers, 30 clés étrangères ; empreintes des politiques, fonctions, triggers et index **identiques** à la source.
+- **Liens d'identité** : 0 profil orphelin, 0 rôle boutique orphelin, 0 rôle global orphelin.
+- **Isolation** : un test transactionnel exécuté sous `authenticated` avec identité simulée d'une boutique a donné 3 clients visibles dans sa boutique, 0 dans une autre, et aucune visibilité sur la boutique étrangère. Ce n'est pas un test de connexion HTTP avec de vrais identifiants.
+- **Storage** : compartiment privé `repair-photos` présent dans la destination, 0 fichier, comme dans la source ; le compartiment temporaire d'export présent dans Lovable n'a pas été copié, ce qui est normal.
+- **Security Advisor de la cible** : 4 alertes à analyser, dont fonctions `SECURITY DEFINER` accessibles et protection contre les mots de passe compromis désactivée. Ne pas modifier les autorisations des fonctions sans vérifier leurs appels depuis l'application.
+- **Cloudflare** : le Worker `quick-iphone-quote` existe, mais n'a actuellement que le binding `ASSETS`, sans URL/clé Supabase de production. Le Worker `trade-in-pro-staging` pointe toujours vers l'ancienne base staging maintenant en pause. **Aucune bascule publique et aucun changement des bindings Cloudflare.**
+
+### Critères bloquants avant bascule
+
+1. Effectuer une **véritable connexion** (e-mail + mot de passe existant), déconnexion, reconnexion et récupération de mot de passe sur la nouvelle cible ; vérifier e-mails et URL de redirection.
+2. Tester l'inscription, les accès boutiques, l'édition client, les estimations, les réparations, la génération de factures et les liens de suivi.
+3. Résoudre ou accepter après justification les avertissements Security Advisor pertinents ; revoir les privilèges `SECURITY DEFINER` exposés.
+4. Préparer les variables Worker de production (clé publiable côté client, secrets strictement serveur), vérifier les domaines et URLs de callback.
+5. Prévoir la synchronisation finale si des écritures surviennent sur Lovable après l'audit, puis préparer un plan de retour arrière testé.
+6. Faire approuver et exécuter le déploiement public seulement après le feu vert des tests.
