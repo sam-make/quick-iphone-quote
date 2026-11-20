@@ -37,13 +37,17 @@ Il n'y a actuellement **aucune identité Google** dans l'inventaire interrogé. 
 
 ## 3. Destination
 
-Créer un **nouveau projet Supabase vide, contrôlé par le propriétaire**, au choix de l'organisation Supabase et après vérification des coûts/limites. La nouvelle base sera la base de **production** de l'application Cloudflare, pas `trade-in-pro-staging`.
+**Créé et vérifié le 20/11/2026** : projet Supabase **`trade-in-pro-production`**, référence **`xuvaihwygkcwriqfnkbg`**, région **`eu-west-3`** (Paris), organisation du propriétaire. Création confirmée à **0 par mois dans le devis Supabase** ; les quotas gratuits et éventuels dépassements restent à surveiller.
+
+**Contrôles après création** : `ACTIVE_HEALTHY`, 0 compte Auth, 0 table métier dans `public`, 0 fichier Storage, aucun avertissement de sécurité initial. **Aucune restauration/importation exécutée à ce stade.**
+
+Pour libérer la place sur le plan Free (maximum deux projets actifs), le projet de test `gsaazisxtvjhekkwhulz` a été **mis en pause sans suppression** et vérifié `INACTIVE`. Le projet personnel `tkgupuunzudnynehvjhf` reste `ACTIVE_HEALTHY`.
 
 Ne pas écraser ces projets existants :
 - `tkgupuunzudnynehvjhf` : projet `app gestion de client`, non vide (1 compte Auth, schéma public existant) ;
 - `gsaazisxtvjhekkwhulz` : copie de test, dont les UID Auth ne correspondent pas aux profils copiés.
 
-Ne pas se précipiter sur la création si le tarif ou le compte destinataire ne sont pas approuvés.
+La destination est sélectionnée. Vérifier le devis, les quotas et les sauvegardes avant de faire passer ce projet à un usage réel.
 
 ## 4. Ordre de migration, une fois la cible sélectionnée
 
