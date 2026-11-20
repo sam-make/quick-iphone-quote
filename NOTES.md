@@ -142,3 +142,10 @@ Aucune variable `SUPABASE_SERVICE_ROLE_KEY` relevée dans les trois fichiers d'e
 - Audit live **lecture seule** : 24/24 tables métier et 538/538 lignes, empreintes identiques ; `auth.identities` identique (17 comptes). `auth.users` même nombre 17 avec jetons temporaires différents ; ne pas réimporter.
 - Supabase sécurité : 1 INFO (`rls_enabled_no_policy`), 3 WARN (deux catégories `SECURITY DEFINER` exposées et protection contre les mots de passe compromis désactivée). Risques consignés dans issue #3 ; dérive données issue #4.
 - Cloudflare non déployé, PR #1 non fusionnée. P0 encore ouverts : vraie reconnexion des utilisateurs, test métier navigateur, examen des privilèges, delta Lovable final et GO/NO-GO.
+
+## Sprint programmé 16 h 30 — audit sécurité RPC, 20/11/2026
+- Audit direct de `pg_proc` et `has_function_privilege` sur Supabase cible : 12 fonctions `SECURITY DEFINER` dans `public` ; 10 exécutables par `anon` et `authenticated`, 2 seed restreintes.
+- Code SQL de `owner_analytics`, `super_admin_mutate`, `next_shop_reference`, `record_shop_presence`, `has_role`, `current_shop_id` et `business_access_allowed` lu en lecture seule. Risque P1 d'énumération potentielle via `has_role(_user_id, _role)` à tester, sans conclusion d'exploitabilité.
+- Supabase Security Advisor inchangé : 1 INFO et 3 WARN. Inventaire, remédiations prudentes et GO/NO-GO consignés dans `docs/AGENTS_PRODUCTION.md` et issue #4.
+- Les deux GitHub Actions du commit `972d11e3` ont réussi. Nouvelle CI attendue après ce commit de documentation.
+- Aucun changement SQL ni production, aucun compte client touché. Auth réelle, RLS multi-boutiques sous JWT et parcours navigateur restent NON VÉRIFIÉS. Sous-agents Codex non exécutables directement par cette session ; audits réalisés avec les connecteurs.
