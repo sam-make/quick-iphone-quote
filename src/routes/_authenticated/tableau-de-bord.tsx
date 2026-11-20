@@ -1,4 +1,12 @@
-import { useEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode, type PointerEvent as ReactPointerEvent } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type KeyboardEvent,
+  type ReactNode,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -32,9 +40,15 @@ export const Route = createFileRoute("/_authenticated/tableau-de-bord")({
   head: () => ({
     meta: [
       { title: "Tableau de bord — Trade-In Pro" },
-      { name: "description", content: "Réparations et estimations de votre boutique en un coup d'œil." },
+      {
+        name: "description",
+        content: "Réparations et estimations de votre boutique en un coup d'œil.",
+      },
       { property: "og:title", content: "Tableau de bord — Trade-In Pro" },
-      { property: "og:description", content: "Suivi des réparations en cours et des dernières estimations." },
+      {
+        property: "og:description",
+        content: "Suivi des réparations en cours et des dernières estimations.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -261,7 +275,13 @@ function StatCard({
   );
   const cls = "surface-card block p-5";
   return to ? (
-    <Link to={to} className={cn(cls, "card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring")}>
+    <Link
+      to={to}
+      className={cn(
+        cls,
+        "card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+      )}
+    >
       {body}
     </Link>
   ) : (
@@ -306,7 +326,9 @@ function ErrorState({ onRetry }: { onRetry: () => void }) {
   return (
     <div className="surface-card flex flex-col items-center gap-3 px-6 py-10 text-center">
       <AlertTriangle className="size-6 text-destructive" />
-      <p className="text-sm text-muted-foreground">Impossible de charger les données. Vérifiez votre connexion.</p>
+      <p className="text-sm text-muted-foreground">
+        Impossible de charger les données. Vérifiez votre connexion.
+      </p>
       <Button variant="outline" size="sm" onClick={onRetry}>
         <RefreshCw className="size-4" /> Réessayer
       </Button>
@@ -368,11 +390,16 @@ function RepairsView({ shopId }: { shopId?: string }) {
     queryFn: async () => {
       const [all, open, clients, recent] = await Promise.all([
         supabase.from("repairs").select("id", { count: "exact", head: true }),
-        supabase.from("repairs").select("total_price").not("status", "in", `(${CLOSED.join(",")})`),
+        supabase
+          .from("repairs")
+          .select("total_price")
+          .not("status", "in", `(${CLOSED.join(",")})`),
         supabase.from("customers").select("id", { count: "exact", head: true }),
         supabase
           .from("repairs")
-          .select("id, reference, brand, model, status, total_price, created_at, customers(first_name, last_name)")
+          .select(
+            "id, reference, brand, model, status, total_price, created_at, customers(first_name, last_name)",
+          )
           .order("created_at", { ascending: false })
           .limit(6),
       ]);
@@ -415,7 +442,13 @@ function RepairsView({ shopId }: { shopId?: string }) {
           stats={[
             { label: "Réparations", value: data.total, icon: Wrench, to: "/reparations" },
             { label: "En cours", value: data.open, icon: Loader2, to: "/reparations" },
-            { label: "Montant en cours", value: data.openAmount, format: formatEuro, icon: Euro, hint: "Dossiers non terminés" },
+            {
+              label: "Montant en cours",
+              value: data.openAmount,
+              format: formatEuro,
+              icon: Euro,
+              hint: "Dossiers non terminés",
+            },
             { label: "Clients", value: data.clients, icon: Users, to: "/clients" },
           ]}
         />
@@ -429,7 +462,9 @@ function RepairsView({ shopId }: { shopId?: string }) {
           loading={loading}
           empty={
             data && data.recent.length === 0 ? (
-              <p className="px-5 py-10 text-center text-sm text-muted-foreground">Aucune réparation pour le moment.</p>
+              <p className="px-5 py-10 text-center text-sm text-muted-foreground">
+                Aucune réparation pour le moment.
+              </p>
             ) : null
           }
         >
@@ -496,10 +531,15 @@ function EstimationsView({ shopId }: { shopId?: string }) {
     queryFn: async () => {
       const [all, month, recent] = await Promise.all([
         supabase.from("estimations").select("final_price, is_blocked"),
-        supabase.from("estimations").select("id", { count: "exact", head: true }).gte("created_at", startOfMonth()),
         supabase
           .from("estimations")
-          .select("id, created_at, employee_name, model_name, color, storage_gb, base_price, total_deduction, final_price, is_blocked")
+          .select("id", { count: "exact", head: true })
+          .gte("created_at", startOfMonth()),
+        supabase
+          .from("estimations")
+          .select(
+            "id, created_at, employee_name, model_name, color, storage_gb, base_price, total_deduction, final_price, is_blocked",
+          )
           .order("created_at", { ascending: false })
           .limit(6),
       ]);
@@ -542,7 +582,13 @@ function EstimationsView({ shopId }: { shopId?: string }) {
           stats={[
             { label: "Estimations", value: data.total, icon: Sparkles, to: "/historique" },
             { label: "Ce mois", value: data.month, icon: CalendarDays, to: "/historique" },
-            { label: "Valeur totale", value: data.value, format: formatEuro, icon: Euro, hint: "Hors reprises bloquées" },
+            {
+              label: "Valeur totale",
+              value: data.value,
+              format: formatEuro,
+              icon: Euro,
+              hint: "Hors reprises bloquées",
+            },
             { label: "Reprises bloquées", value: data.blocked, icon: Ban },
           ]}
         />
@@ -556,7 +602,9 @@ function EstimationsView({ shopId }: { shopId?: string }) {
           loading={loading}
           empty={
             data && data.recent.length === 0 ? (
-              <p className="px-5 py-10 text-center text-sm text-muted-foreground">Aucune estimation pour le moment.</p>
+              <p className="px-5 py-10 text-center text-sm text-muted-foreground">
+                Aucune estimation pour le moment.
+              </p>
             ) : null
           }
         >

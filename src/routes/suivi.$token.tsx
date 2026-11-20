@@ -15,7 +15,10 @@ export const Route = createFileRoute("/suivi/$token")({
       { name: "description", content: "Suivez l'avancement de votre réparation en temps réel." },
       { name: "robots", content: "noindex, nofollow" },
       { property: "og:title", content: "Suivi de votre réparation — Trade-In Pro" },
-      { property: "og:description", content: "Consultez l’avancement de votre réparation et les coordonnées de votre boutique." },
+      {
+        property: "og:description",
+        content: "Consultez l’avancement de votre réparation et les coordonnées de votre boutique.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -146,7 +149,11 @@ function TrackingContent({ data }: { data: PublicTrackingDto }) {
                   <p
                     className={cn(
                       "text-sm",
-                      current ? "font-semibold text-ink" : reached ? "text-ink" : "text-muted-foreground",
+                      current
+                        ? "font-semibold text-ink"
+                        : reached
+                          ? "text-ink"
+                          : "text-muted-foreground",
                     )}
                   >
                     {PUBLIC_STEP_LABELS[entry.step]}
@@ -157,7 +164,9 @@ function TrackingContent({ data }: { data: PublicTrackingDto }) {
                     )}
                   </p>
                   {entry.reachedAt && (
-                    <p className="text-xs text-muted-foreground">{formatDateTime(entry.reachedAt)}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatDateTime(entry.reachedAt)}
+                    </p>
                   )}
                 </div>
               </li>

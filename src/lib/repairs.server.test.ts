@@ -75,7 +75,11 @@ describe("invoice eligibility", () => {
       profiles: { data: { shop_id: "shop-A" }, error: null },
       repairs: { data: { id: "repair-A", status: "en_reparation" }, error: null },
     });
-    const admin = { from: () => { throw new Error("unexpected privileged write"); } };
+    const admin = {
+      from: () => {
+        throw new Error("unexpected privileged write");
+      },
+    };
     await expect(
       generateInvoiceFor(user as never, admin as never, "user-A", "repair-A"),
     ).rejects.toThrow("Terminé");
@@ -85,7 +89,11 @@ describe("invoice eligibility", () => {
       profiles: { data: { shop_id: "shop-A", full_name: "A" }, error: null },
       repairs: { data: { id: "repair-A", status: "annule" }, error: null },
     });
-    const admin = { from: () => { throw new Error("unexpected privileged write"); } };
+    const admin = {
+      from: () => {
+        throw new Error("unexpected privileged write");
+      },
+    };
     await expect(
       changeStatusFor(user as never, admin as never, "user-A", "repair-A", "recu"),
     ).rejects.toThrow("clôturé");

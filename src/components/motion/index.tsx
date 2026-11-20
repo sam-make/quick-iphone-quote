@@ -1,10 +1,4 @@
-import {
-  useEffect,
-  useRef,
-  useState,
-  type CSSProperties,
-  type ReactNode,
-} from "react";
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { useRouterState } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 
@@ -16,8 +10,7 @@ import { cn } from "@/lib/utils";
 
 function prefersReducedMotion() {
   return (
-    typeof window !== "undefined" &&
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches
   );
 }
 

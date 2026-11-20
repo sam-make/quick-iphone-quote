@@ -107,10 +107,7 @@ export function RepairLabelPrint({
               fontFamily: "Arial, sans-serif",
             }}
           >
-            <p
-              className="font-bold leading-tight"
-              style={{ fontSize: small ? "9pt" : "12pt" }}
-            >
+            <p className="font-bold leading-tight" style={{ fontSize: small ? "9pt" : "12pt" }}>
               {reference}
             </p>
             <div style={{ height: small ? "8mm" : "14mm" }}>

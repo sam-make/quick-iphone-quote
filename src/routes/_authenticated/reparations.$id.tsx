@@ -170,23 +170,25 @@ function RepairDetailPage() {
 
         <div className="flex flex-wrap gap-2 pt-2">
           {REPAIR_STATUSES.map((value) => {
-            const rule = canChangeStatus(repair.status as RepairStatus, value, { invoiced: !!data.invoice });
+            const rule = canChangeStatus(repair.status as RepairStatus, value, {
+              invoiced: !!data.invoice,
+            });
             return (
-            <button
-              key={value}
-              type="button"
-              title={rule.ok ? undefined : rule.reason}
-              disabled={statusMutation.isPending || !rule.ok}
-              onClick={() => statusMutation.mutate(value)}
-              className={cn(
-                "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
-                value === repair.status
-                  ? "border-primary bg-primary/10 text-primary"
-                  : "border-border text-muted-foreground hover:bg-surface-2 disabled:cursor-not-allowed disabled:opacity-40",
-              )}
-            >
-              {STATUS_LABELS[value]}
-            </button>
+              <button
+                key={value}
+                type="button"
+                title={rule.ok ? undefined : rule.reason}
+                disabled={statusMutation.isPending || !rule.ok}
+                onClick={() => statusMutation.mutate(value)}
+                className={cn(
+                  "rounded-full border px-3 py-1.5 text-xs font-medium transition-colors",
+                  value === repair.status
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border text-muted-foreground hover:bg-surface-2 disabled:cursor-not-allowed disabled:opacity-40",
+                )}
+              >
+                {STATUS_LABELS[value]}
+              </button>
             );
           })}
         </div>
@@ -196,7 +198,9 @@ function RepairDetailPage() {
             <RepairLabelPrint
               key={repair.id}
               reference={repair.reference}
-              deviceLabel={[repair.brand, repair.model, repair.storage, repair.color].filter(Boolean).join(" · ")}
+              deviceLabel={[repair.brand, repair.model, repair.storage, repair.color]
+                .filter(Boolean)
+                .join(" · ")}
               customerFirstName={repair.customers?.first_name ?? ""}
               depositDate={formatDateTime(repair.created_at)}
               issue={repair.issue ?? ""}
@@ -208,7 +212,9 @@ function RepairDetailPage() {
               key={repair.id}
               repairId={repair.id}
               reference={repair.reference}
-              deviceLabel={[repair.brand, repair.model, repair.storage, repair.color].filter(Boolean).join(" · ")}
+              deviceLabel={[repair.brand, repair.model, repair.storage, repair.color]
+                .filter(Boolean)
+                .join(" · ")}
               issue={repair.issue ?? ""}
               totalPrice={Number(repair.total_price)}
               depositDate={formatDateTime(repair.created_at)}
@@ -229,7 +235,10 @@ function RepairDetailPage() {
           ) : (
             <Button
               variant="outline"
-              disabled={invoiceMutation.isPending || !INVOICEABLE_STATUSES.includes(repair.status as RepairStatus)}
+              disabled={
+                invoiceMutation.isPending ||
+                !INVOICEABLE_STATUSES.includes(repair.status as RepairStatus)
+              }
               title={
                 INVOICEABLE_STATUSES.includes(repair.status as RepairStatus)
                   ? undefined

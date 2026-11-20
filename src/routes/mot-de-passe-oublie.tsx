@@ -14,7 +14,10 @@ export const Route = createFileRoute("/mot-de-passe-oublie")({
     meta: [
       { name: "robots", content: "noindex, follow" },
       { title: "Mot de passe oublié — Trade-In Pro" },
-      { name: "description", content: "Recevez un lien sécurisé pour réinitialiser votre mot de passe Trade-In Pro." },
+      {
+        name: "description",
+        content: "Recevez un lien sécurisé pour réinitialiser votre mot de passe Trade-In Pro.",
+      },
       { property: "og:title", content: "Mot de passe oublié — Trade-In Pro" },
       { property: "og:description", content: "Réinitialisez l'accès à votre espace boutique." },
       { property: "og:type", content: "website" },

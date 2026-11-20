@@ -14,9 +14,15 @@ export const Route = createFileRoute("/connexion")({
   head: () => ({
     meta: [
       { title: "Connexion — Trade-In Pro" },
-      { name: "description", content: "Connectez-vous à l'espace sécurisé de votre boutique Trade-In Pro." },
+      {
+        name: "description",
+        content: "Connectez-vous à l'espace sécurisé de votre boutique Trade-In Pro.",
+      },
       { property: "og:title", content: "Connexion — Trade-In Pro" },
-      { property: "og:description", content: "Accédez à l'espace de votre boutique de reprise iPhone." },
+      {
+        property: "og:description",
+        content: "Accédez à l'espace de votre boutique de reprise iPhone.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -80,9 +86,7 @@ function LoginPage() {
       options: { emailRedirectTo: `${window.location.origin}/tableau-de-bord` },
     });
     setResending(false);
-    toast[error ? "error" : "success"](
-      error ? error.message : "E-mail de confirmation renvoyé.",
-    );
+    toast[error ? "error" : "success"](error ? error.message : "E-mail de confirmation renvoyé.");
   }
 
   return (
@@ -131,7 +135,13 @@ function LoginPage() {
           {submitting ? "Connexion…" : "Se connecter"}
         </Button>
         {unconfirmed ? (
-          <Button type="button" variant="outline" className="w-full" onClick={handleResend} disabled={resending}>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            onClick={handleResend}
+            disabled={resending}
+          >
             {resending ? "Envoi…" : "Renvoyer l'e-mail de confirmation"}
           </Button>
         ) : null}

@@ -4,10 +4,12 @@ export const defectDescriptionSchema = z.object({
   description: z.string().trim().min(3).max(1000),
 });
 
-const suggestionsSchema = z.object({
-  ruleIds: z.array(z.string().uuid()).max(200),
-  uncertainties: z.array(z.string().trim().min(1).max(250)).max(10),
-}).strict();
+const suggestionsSchema = z
+  .object({
+    ruleIds: z.array(z.string().uuid()).max(200),
+    uncertainties: z.array(z.string().trim().min(1).max(250)).max(10),
+  })
+  .strict();
 
 /** Reject invented IDs; the model cannot supply prices or mutate the diagnosis. */
 export function validateDefectSuggestions(

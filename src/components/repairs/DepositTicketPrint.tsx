@@ -90,7 +90,8 @@ export function DepositTicketPrint({
         <DialogHeader>
           <DialogTitle>Ticket de dépôt client (80 mm)</DialogTitle>
           <DialogDescription>
-            Remettez ce ticket au client : il lui permet de suivre sa réparation en scannant le QR code.
+            Remettez ce ticket au client : il lui permet de suivre sa réparation en scannant le QR
+            code.
           </DialogDescription>
         </DialogHeader>
 

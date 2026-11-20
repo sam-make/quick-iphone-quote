@@ -9,7 +9,8 @@ export const getOwnerAnalytics = createServerFn({ method: "POST" })
     const { requireOwner } = await import("./super-admin.server");
     await requireOwner(context.supabase);
     const result = await context.supabase.rpc("owner_analytics", {
-      _days: data.days, ... (data.shopId ? { _shop: data.shopId } : {}),
+      _days: data.days,
+      ...(data.shopId ? { _shop: data.shopId } : {}),
     });
     if (result.error) throw new Error("Impossible de charger les statistiques.");
     return analyticsResult.parse(result.data);

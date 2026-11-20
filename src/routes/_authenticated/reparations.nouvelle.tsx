@@ -36,9 +36,16 @@ export const Route = createFileRoute("/_authenticated/reparations/nouvelle")({
   head: () => ({
     meta: [
       { title: "Nouvelle réparation — Trade-In Pro" },
-      { name: "description", content: "Créez un dossier de réparation en quelques clics : client, appareil, prestations, photos." },
+      {
+        name: "description",
+        content:
+          "Créez un dossier de réparation en quelques clics : client, appareil, prestations, photos.",
+      },
       { property: "og:title", content: "Nouvelle réparation — Trade-In Pro" },
-      { property: "og:description", content: "Assistant guidé pour ouvrir un dossier atelier en moins d'une minute." },
+      {
+        property: "og:description",
+        content: "Assistant guidé pour ouvrir un dossier atelier en moins d'une minute.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -65,7 +72,13 @@ function NewRepairPage() {
   const [mode, setMode] = useState<"existing" | "new">(customerId ? "existing" : "existing");
   const [selectedId, setSelectedId] = useState<string | null>(customerId ?? null);
   const [search, setSearch] = useState("");
-  const [newCustomer, setNewCustomer] = useState({ firstName: "", lastName: "", phone: "", email: "", address: "" });
+  const [newCustomer, setNewCustomer] = useState({
+    firstName: "",
+    lastName: "",
+    phone: "",
+    email: "",
+    address: "",
+  });
 
   const [device, setDevice] = useState({
     brand: "Apple",
@@ -113,7 +126,9 @@ function NewRepairPage() {
     if (!term) return customers.slice(0, 8);
     return customers
       .filter((customer) =>
-        `${customer.first_name} ${customer.last_name} ${customer.phone}`.toLowerCase().includes(term),
+        `${customer.first_name} ${customer.last_name} ${customer.phone}`
+          .toLowerCase()
+          .includes(term),
       )
       .slice(0, 8);
   }, [customers, search]);
@@ -164,7 +179,8 @@ function NewRepairPage() {
       const shopId = workspace?.shop.id;
       if (shopId) {
         for (const group of photos) {
-          if (group.files.length > 0) await uploadRepairPhotos(shopId, result.id, group.files, group.phase);
+          if (group.files.length > 0)
+            await uploadRepairPhotos(shopId, result.id, group.files, group.phase);
         }
       }
       return result;
@@ -177,7 +193,8 @@ function NewRepairPage() {
   });
 
   const canContinue = () => {
-    if (step === 0) return mode === "existing" ? Boolean(selectedId) : newCustomer.phone.trim().length >= 4;
+    if (step === 0)
+      return mode === "existing" ? Boolean(selectedId) : newCustomer.phone.trim().length >= 4;
     if (step === 1) return device.model.trim().length > 0;
     if (step === 2) return lines.length > 0;
     return true;
@@ -185,7 +202,12 @@ function NewRepairPage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <Button variant="ghost" size="sm" className="-ml-2" onClick={() => navigate({ to: "/reparations" })}>
+      <Button
+        variant="ghost"
+        size="sm"
+        className="-ml-2"
+        onClick={() => navigate({ to: "/reparations" })}
+      >
         <ArrowLeft className="size-4" />
         Réparations
       </Button>
@@ -215,11 +237,19 @@ function NewRepairPage() {
         {step === 0 && (
           <div className="space-y-5">
             <div className="flex gap-2">
-              <Button variant={mode === "existing" ? "default" : "outline"} size="sm" onClick={() => setMode("existing")}>
+              <Button
+                variant={mode === "existing" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setMode("existing")}
+              >
                 <Search className="size-4" />
                 Client existant
               </Button>
-              <Button variant={mode === "new" ? "default" : "outline"} size="sm" onClick={() => setMode("new")}>
+              <Button
+                variant={mode === "new" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setMode("new")}
+              >
                 <UserPlus className="size-4" />
                 Nouveau client
               </Button>
@@ -245,12 +275,16 @@ function NewRepairPage() {
                       >
                         <span className="font-medium text-ink">{customerName(customer)}</span>
                         <span className="text-xs text-muted-foreground">{customer.phone}</span>
-                        {selectedId === customer.id && <Check className="ml-auto size-4 text-primary" />}
+                        {selectedId === customer.id && (
+                          <Check className="ml-auto size-4 text-primary" />
+                        )}
                       </button>
                     </li>
                   ))}
                   {filteredCustomers.length === 0 && (
-                    <li className="px-4 py-4 text-sm text-muted-foreground">Aucun client trouvé.</li>
+                    <li className="px-4 py-4 text-sm text-muted-foreground">
+                      Aucun client trouvé.
+                    </li>
                   )}
                 </ul>
               </div>
@@ -261,7 +295,9 @@ function NewRepairPage() {
                   <Input
                     id="n-first"
                     value={newCustomer.firstName}
-                    onChange={(event) => setNewCustomer((prev) => ({ ...prev, firstName: event.target.value }))}
+                    onChange={(event) =>
+                      setNewCustomer((prev) => ({ ...prev, firstName: event.target.value }))
+                    }
                   />
                 </div>
                 <div className="space-y-2">
@@ -269,7 +305,9 @@ function NewRepairPage() {
                   <Input
                     id="n-last"
                     value={newCustomer.lastName}
-                    onChange={(event) => setNewCustomer((prev) => ({ ...prev, lastName: event.target.value }))}
+                    onChange={(event) =>
+                      setNewCustomer((prev) => ({ ...prev, lastName: event.target.value }))
+                    }
                   />
                 </div>
                 <div className="space-y-2">
@@ -277,7 +315,9 @@ function NewRepairPage() {
                   <Input
                     id="n-phone"
                     value={newCustomer.phone}
-                    onChange={(event) => setNewCustomer((prev) => ({ ...prev, phone: event.target.value }))}
+                    onChange={(event) =>
+                      setNewCustomer((prev) => ({ ...prev, phone: event.target.value }))
+                    }
                   />
                 </div>
                 <div className="space-y-2">
@@ -286,7 +326,9 @@ function NewRepairPage() {
                     id="n-email"
                     type="email"
                     value={newCustomer.email}
-                    onChange={(event) => setNewCustomer((prev) => ({ ...prev, email: event.target.value }))}
+                    onChange={(event) =>
+                      setNewCustomer((prev) => ({ ...prev, email: event.target.value }))
+                    }
                   />
                 </div>
                 <div className="space-y-2 sm:col-span-2">
@@ -294,7 +336,9 @@ function NewRepairPage() {
                   <Input
                     id="n-address"
                     value={newCustomer.address}
-                    onChange={(event) => setNewCustomer((prev) => ({ ...prev, address: event.target.value }))}
+                    onChange={(event) =>
+                      setNewCustomer((prev) => ({ ...prev, address: event.target.value }))
+                    }
                   />
                 </div>
                 <p className="text-xs text-muted-foreground sm:col-span-2">
@@ -344,7 +388,9 @@ function NewRepairPage() {
                 id="d-storage"
                 value={device.storage}
                 placeholder="256 Go"
-                onChange={(event) => setDevice((prev) => ({ ...prev, storage: event.target.value }))}
+                onChange={(event) =>
+                  setDevice((prev) => ({ ...prev, storage: event.target.value }))
+                }
               />
             </div>
             <div className="space-y-2">
@@ -360,7 +406,9 @@ function NewRepairPage() {
               <Input
                 id="d-code"
                 value={device.unlockCode}
-                onChange={(event) => setDevice((prev) => ({ ...prev, unlockCode: event.target.value }))}
+                onChange={(event) =>
+                  setDevice((prev) => ({ ...prev, unlockCode: event.target.value }))
+                }
               />
             </div>
             <div className="space-y-2 sm:col-span-2">
@@ -369,7 +417,9 @@ function NewRepairPage() {
                 id="d-condition"
                 value={device.condition}
                 placeholder="Châssis marqué, écran fissuré…"
-                onChange={(event) => setDevice((prev) => ({ ...prev, condition: event.target.value }))}
+                onChange={(event) =>
+                  setDevice((prev) => ({ ...prev, condition: event.target.value }))
+                }
               />
             </div>
             <div className="space-y-2 sm:col-span-2">
@@ -398,11 +448,15 @@ function NewRepairPage() {
                   multiple
                   onChange={(event) => {
                     const files = Array.from(event.target.files ?? []);
-                    setPhotos((prev) => prev.map((item, i) => (i === index ? { ...item, files } : item)));
+                    setPhotos((prev) =>
+                      prev.map((item, i) => (i === index ? { ...item, files } : item)),
+                    );
                   }}
                 />
                 {group.files.length > 0 && (
-                  <p className="text-xs text-muted-foreground">{group.files.length} photo(s) sélectionnée(s)</p>
+                  <p className="text-xs text-muted-foreground">
+                    {group.files.length} photo(s) sélectionnée(s)
+                  </p>
                 )}
               </div>
             ))}
@@ -428,7 +482,9 @@ function NewRepairPage() {
               <p className="font-medium text-ink">
                 {device.brand} {device.model}
               </p>
-              <p className="text-muted-foreground">{[device.color, device.storage].filter(Boolean).join(" · ")}</p>
+              <p className="text-muted-foreground">
+                {[device.color, device.storage].filter(Boolean).join(" · ")}
+              </p>
               {device.issue && <p className="mt-2 text-muted-foreground">{device.issue}</p>}
             </div>
             <ul className="divide-y divide-border rounded-xl border border-border">
@@ -437,12 +493,16 @@ function NewRepairPage() {
                   <span className="text-ink">
                     {line.name} × {line.quantity}
                   </span>
-                  <span className="font-medium text-ink">{formatEuro(line.unitPrice * line.quantity)}</span>
+                  <span className="font-medium text-ink">
+                    {formatEuro(line.unitPrice * line.quantity)}
+                  </span>
                 </li>
               ))}
             </ul>
             <div className="flex items-center justify-between rounded-xl bg-primary/5 px-4 py-3">
-              <span className="text-muted-foreground">Durée estimée : {formatDuration(totals.minutes)}</span>
+              <span className="text-muted-foreground">
+                Durée estimée : {formatDuration(totals.minutes)}
+              </span>
               <span className="text-lg font-semibold text-ink">{formatEuro(totals.price)}</span>
             </div>
           </div>

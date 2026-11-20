@@ -88,7 +88,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:title", content: "Trade-In Pro — Logiciel d'estimation de reprise iPhone" },
       {
         property: "og:description",
-        content: "Estimez la reprise d'un iPhone en moins de 2 minutes. Règles de déduction 100 % personnalisables, historique complet, espace sécurisé par boutique.",
+        content:
+          "Estimez la reprise d'un iPhone en moins de 2 minutes. Règles de déduction 100 % personnalisables, historique complet, espace sécurisé par boutique.",
       },
       { property: "og:type", content: "website" },
       {
@@ -97,7 +98,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Trade-In Pro — Logiciel d'estimation de reprise iPhone" },
-      { name: "twitter:description", content: "Estimez la reprise d'un iPhone en moins de 2 minutes. Règles de déduction 100 % personnalisables, historique complet, espace sécurisé par boutique." },
+      {
+        name: "twitter:description",
+        content:
+          "Estimez la reprise d'un iPhone en moins de 2 minutes. Règles de déduction 100 % personnalisables, historique complet, espace sécurisé par boutique.",
+      },
     ],
     links: [
       { rel: "preconnect", href: "https://fonts.googleapis.com" },

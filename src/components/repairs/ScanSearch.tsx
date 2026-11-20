@@ -23,7 +23,9 @@ export function ScanSearch() {
     const reference = normalizeReference(value);
     if (!reference) return;
     if (!isValidReference(reference)) {
-      toast.error(`« ${reference} » n'est pas une référence de dossier valide (ex. REP-2026-0001).`);
+      toast.error(
+        `« ${reference} » n'est pas une référence de dossier valide (ex. REP-2026-0001).`,
+      );
       return;
     }
     setBusy(true);

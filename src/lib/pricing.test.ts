@@ -14,10 +14,20 @@ const rule = (over: Partial<DeductionRule>): DeductionRule => ({
 
 describe("resolveBasePrice", () => {
   it("prend le prix boutique exact (couleur) en priorité", () => {
-    expect(resolveBasePrice(500, 128, "Noir", [{ color: "*", base_price: 600 }, { color: "Noir", base_price: 650 }])).toBe(650);
+    expect(
+      resolveBasePrice(500, 128, "Noir", [
+        { color: "*", base_price: 600 },
+        { color: "Noir", base_price: 650 },
+      ]),
+    ).toBe(650);
   });
   it("sinon le prix boutique toutes couleurs", () => {
-    expect(resolveBasePrice(500, 128, "Bleu", [{ color: "*", base_price: "600" }, { color: "Noir", base_price: 650 }])).toBe(600);
+    expect(
+      resolveBasePrice(500, 128, "Bleu", [
+        { color: "*", base_price: "600" },
+        { color: "Noir", base_price: 650 },
+      ]),
+    ).toBe(600);
   });
   it("sinon le prix catalogue + palier de capacité", () => {
     expect(resolveBasePrice(500, 128, "Bleu", [])).toBe(500);
@@ -32,22 +42,34 @@ describe("resolveBasePrice", () => {
 
 describe("storageStep", () => {
   it("paliers aux seuils exacts", () => {
-    expect([64, 128, 255, 256, 511, 512, 1023, 1024, 2048].map(storageStep)).toEqual([0, 0, 0, 40, 40, 90, 90, 170, 170]);
+    expect([64, 128, 255, 256, 511, 512, 1023, 1024, 2048].map(storageStep)).toEqual([
+      0, 0, 0, 40, 40, 90, 90, 170, 170,
+    ]);
   });
 });
 
 describe("computePrice", () => {
   it("exemple du cahier des charges : 650 - 20 - 30 - 100 = 500 €", () => {
-    const r = computePrice(650, [rule({ deduction: 20 }), rule({ deduction: 30 }), rule({ deduction: 100 })]);
+    const r = computePrice(650, [
+      rule({ deduction: 20 }),
+      rule({ deduction: 30 }),
+      rule({ deduction: 100 }),
+    ]);
     expect(r.totalDeduction).toBe(150);
     expect(r.finalPrice).toBe(500);
     expect(r.isBlocked).toBe(false);
   });
   it("ignore les règles inactives", () => {
-    expect(computePrice(650, [rule({ deduction: 20 }), rule({ deduction: 300, active: false })]).finalPrice).toBe(630);
+    expect(
+      computePrice(650, [rule({ deduction: 20 }), rule({ deduction: 300, active: false })])
+        .finalPrice,
+    ).toBe(630);
   });
   it("un défaut bloquant met le prix à 0 €", () => {
-    const r = computePrice(650, [rule({ deduction: 20 }), rule({ deduction: 0, is_blocking: true, category: "blocage" })]);
+    const r = computePrice(650, [
+      rule({ deduction: 20 }),
+      rule({ deduction: 0, is_blocking: true, category: "blocage" }),
+    ]);
     expect(r.isBlocked).toBe(true);
     expect(r.finalPrice).toBe(0);
     expect(r.blocking).toHaveLength(1);

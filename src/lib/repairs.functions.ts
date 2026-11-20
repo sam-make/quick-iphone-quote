@@ -68,7 +68,14 @@ export const changeRepairStatus = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { changeStatusFor } = await import("./repairs.server");
-    return changeStatusFor(context.supabase, supabaseAdmin, context.userId, data.repairId, data.status, data.comment);
+    return changeStatusFor(
+      context.supabase,
+      supabaseAdmin,
+      context.userId,
+      data.repairId,
+      data.status,
+      data.comment,
+    );
   });
 
 export const generateInvoice = createServerFn({ method: "POST" })
@@ -109,5 +116,10 @@ export const regenerateTrackingToken = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { regenerateTrackingTokenFor } = await import("./repairs.server");
-    return regenerateTrackingTokenFor(context.supabase, supabaseAdmin, context.userId, data.repairId);
+    return regenerateTrackingTokenFor(
+      context.supabase,
+      supabaseAdmin,
+      context.userId,
+      data.repairId,
+    );
   });

@@ -7,7 +7,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export interface CustomerDraft {
   id?: string | null;
@@ -19,7 +25,14 @@ export interface CustomerDraft {
   notes: string;
 }
 
-const EMPTY: CustomerDraft = { firstName: "", lastName: "", phone: "", email: "", address: "", notes: "" };
+const EMPTY: CustomerDraft = {
+  firstName: "",
+  lastName: "",
+  phone: "",
+  email: "",
+  address: "",
+  notes: "",
+};
 
 /** Shared create/edit customer form; the server refuses phone duplicates. */
 export function CustomerFormDialog({
@@ -31,7 +44,12 @@ export function CustomerFormDialog({
   open: boolean;
   onOpenChange: (value: boolean) => void;
   initial?: Partial<CustomerDraft>;
-  onSaved?: (customer: { id: string; first_name: string; last_name: string; phone: string }) => void;
+  onSaved?: (customer: {
+    id: string;
+    first_name: string;
+    last_name: string;
+    phone: string;
+  }) => void;
 }) {
   const [draft, setDraft] = useState<CustomerDraft>({ ...EMPTY, ...initial });
   const save = useServerFn(saveCustomer);
@@ -55,9 +73,12 @@ export function CustomerFormDialog({
         },
       }),
     onSuccess: (result) => {
-      if (result.duplicate) toast.info("Ce numéro existe déjà : la fiche existante a été réutilisée.");
+      if (result.duplicate)
+        toast.info("Ce numéro existe déjà : la fiche existante a été réutilisée.");
       else toast.success(draft.id ? "Fiche mise à jour." : "Client créé.");
-      onSaved?.(result.customer as { id: string; first_name: string; last_name: string; phone: string });
+      onSaved?.(
+        result.customer as { id: string; first_name: string; last_name: string; phone: string },
+      );
       onOpenChange(false);
     },
     onError: () => toast.error("Enregistrement impossible."),
@@ -75,7 +96,12 @@ export function CustomerFormDialog({
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="c-first">Prénom</Label>
-            <Input id="c-first" value={draft.firstName} onChange={set("firstName")} maxLength={80} />
+            <Input
+              id="c-first"
+              value={draft.firstName}
+              onChange={set("firstName")}
+              maxLength={80}
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="c-last">Nom</Label>
@@ -83,11 +109,23 @@ export function CustomerFormDialog({
           </div>
           <div className="space-y-2">
             <Label htmlFor="c-phone">Téléphone</Label>
-            <Input id="c-phone" value={draft.phone} onChange={set("phone")} maxLength={30} placeholder="06 12 34 56 78" />
+            <Input
+              id="c-phone"
+              value={draft.phone}
+              onChange={set("phone")}
+              maxLength={30}
+              placeholder="06 12 34 56 78"
+            />
           </div>
           <div className="space-y-2">
             <Label htmlFor="c-email">E-mail (facultatif)</Label>
-            <Input id="c-email" type="email" value={draft.email} onChange={set("email")} maxLength={255} />
+            <Input
+              id="c-email"
+              type="email"
+              value={draft.email}
+              onChange={set("email")}
+              maxLength={255}
+            />
           </div>
           <div className="space-y-2 sm:col-span-2">
             <Label htmlFor="c-address">Adresse (facultative)</Label>
@@ -95,14 +133,23 @@ export function CustomerFormDialog({
           </div>
           <div className="space-y-2 sm:col-span-2">
             <Label htmlFor="c-notes">Notes internes</Label>
-            <Textarea id="c-notes" value={draft.notes} onChange={set("notes")} maxLength={2000} rows={3} />
+            <Textarea
+              id="c-notes"
+              value={draft.notes}
+              onChange={set("notes")}
+              maxLength={2000}
+              rows={3}
+            />
           </div>
         </div>
         <DialogFooter>
           <Button variant="ghost" onClick={() => onOpenChange(false)}>
             Annuler
           </Button>
-          <Button onClick={() => mutation.mutate()} disabled={draft.phone.trim().length < 4 || mutation.isPending}>
+          <Button
+            onClick={() => mutation.mutate()}
+            disabled={draft.phone.trim().length < 4 || mutation.isPending}
+          >
             Enregistrer
           </Button>
         </DialogFooter>

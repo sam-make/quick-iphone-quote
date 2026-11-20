@@ -8,12 +8,14 @@ export const Route = createFileRoute("/mentions-legales")({
       { title: "Mentions légales — Trade-In Pro" },
       {
         name: "description",
-        content: "Mentions légales du service Trade-In Pro : éditeur, hébergement et propriété intellectuelle.",
+        content:
+          "Mentions légales du service Trade-In Pro : éditeur, hébergement et propriété intellectuelle.",
       },
       { property: "og:title", content: "Mentions légales — Trade-In Pro" },
       {
         property: "og:description",
-        content: "Informations légales relatives à l’éditeur et à l’hébergement du service Trade-In Pro.",
+        content:
+          "Informations légales relatives à l’éditeur et à l’hébergement du service Trade-In Pro.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -26,11 +28,11 @@ function MentionsLegalesPage() {
   return (
     <LegalLayout title="Mentions légales" updated="25 octobre 2026">
       <LegalSection title="Éditeur du service">
+        <p>Le service Trade-In Pro est édité par :</p>
         <p>
-          Le service Trade-In Pro est édité par :
-        </p>
-        <p>
-          <Missing>raison sociale et forme juridique (ex. SAS, EURL, entrepreneur individuel)</Missing>
+          <Missing>
+            raison sociale et forme juridique (ex. SAS, EURL, entrepreneur individuel)
+          </Missing>
         </p>
         <p>
           <Missing>capital social, si applicable</Missing> — <Missing>numéro SIRET</Missing> —{" "}
