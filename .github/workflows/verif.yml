@@ -14,14 +14,19 @@ jobs:
       - name: Installer Bun
         uses: oven-sh/setup-bun@v2
       - name: Installer les paquets sans scripts tiers
+        id: install
         run: bun install --ignore-scripts
       - name: Vérifier les types TypeScript
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: bunx tsc --noEmit
       - name: Vérifier le lint
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: bun run lint
       - name: Exécuter les tests
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: bun run test
       - name: Compiler l'application
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: bun run build
   secrets:
     name: Vérifier les secrets des fichiers de la PR
