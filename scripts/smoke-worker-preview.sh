@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Ces valeurs sont fictives. Aucun compte ni base de données ne sont contactés.
-if [[ -e .dev.vars ]]; then
-  echo "Le fichier .dev.vars existe déjà : arrêt pour éviter tout écrasement."
+# La configuration fictive doit être chargée pendant vite build,
+# car le plugin Cloudflare la copie dans le résultat utilisé par vite preview.
+if [[ ! -f .dev.vars ]]; then
+  echo "Le fichier de configuration fictive n'a pas été préparé avant le build."
   exit 1
 fi
 
@@ -18,11 +19,6 @@ cleanup() {
   rm -f .dev.vars "$log" "$home" "$login"
 }
 trap cleanup EXIT
-
-cat > .dev.vars <<'EOF'
-SUPABASE_URL="https://staging.example.invalid"
-SUPABASE_PUBLISHABLE_KEY="sb_publishable_preview_dummy"
-EOF
 
 bun run preview --host 127.0.0.1 --port 4173 >"$log" 2>&1 &
 pid=$!

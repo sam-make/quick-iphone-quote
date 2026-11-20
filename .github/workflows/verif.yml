@@ -25,6 +25,13 @@ jobs:
       - name: Exécuter les tests
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: bun run test
+      - name: Préparer une configuration locale fictive pour le rendu serveur
+        if: ${{ !cancelled() && steps.install.outcome == 'success' }}
+        run: |
+          cat > .dev.vars <<'EOF'
+          SUPABASE_URL="https://staging.example.invalid"
+          SUPABASE_PUBLISHABLE_KEY="sb_publishable_preview_dummy"
+          EOF
       - name: Compiler l'application
         if: ${{ !cancelled() && steps.install.outcome == 'success' }}
         run: bun run build
